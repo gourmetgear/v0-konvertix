@@ -20,6 +20,7 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import type { User } from '@supabase/supabase-js'
 import { useRouter } from "next/navigation"
 import { getCurrentUserId } from "@/lib/auth"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
@@ -28,14 +29,19 @@ export default function CreateCampaignPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
 
-  const [campaignData, setCampaignData] = useState({
+  const [campaignData, setCampaignData] = useState<{
+    name: string
+    objective: string
+    status: 'ACTIVE' | 'PAUSED'
+    special_ad_categories: string[]
+  }>({
     name: "",
-    objective: "", // Facebook campaign objective
-    status: "PAUSED", // Facebook default (ACTIVE, PAUSED)
-    special_ad_categories: [], // Facebook specific
+    objective: "",
+    status: "PAUSED",
+    special_ad_categories: [],
   })
 
   const [showAdSetForm, setShowAdSetForm] = useState(false)
@@ -516,7 +522,7 @@ export default function CreateCampaignPage() {
                       <Label htmlFor="status">Campaign Status</Label>
                       <Select
                         value={campaignData.status}
-                        onValueChange={(value) => setCampaignData({ ...campaignData, status: value })}
+                        onValueChange={(value: 'ACTIVE' | 'PAUSED') => setCampaignData({ ...campaignData, status: value })}
                       >
                         <SelectTrigger className="bg-[#3f3f3f] border-[#4f4f4f] text-white">
                           <SelectValue />
@@ -796,7 +802,7 @@ export default function CreateCampaignPage() {
                   <CardContent className="pt-6">
                     <div className="flex items-center space-x-2 text-green-400">
                       <Target className="h-5 w-5" />
-                      <span>Campaign & Ad Set created successfully!</span>
+                      <span>Campaign &amp; Ad Set created successfully!</span>
                     </div>
                     <p className="text-[#afafaf] mt-2">Now upload an image for your ad creative:</p>
                   </CardContent>
