@@ -7,7 +7,6 @@ export async function POST(request: NextRequest) {
     const {
       name,
       campaign_id,
-      facebook_campaign_id,
       daily_budget,
       billing_event = 'IMPRESSIONS',
       optimization_goal = 'OFFSITE_CONVERSIONS',
@@ -26,12 +25,12 @@ export async function POST(request: NextRequest) {
       userId
     } = body
 
-    console.log('Ad set creation request:', { name, campaign_id, facebook_campaign_id: (body as any).facebook_campaign_id, userId })
+    console.log('Ad set creation request:', { name, campaign_id, userId })
 
     // Validate required fields
-    if (!name || !daily_budget || !userId || (!facebook_campaign_id && !campaign_id)) {
+    if (!name || !daily_budget || !userId || !campaign_id) {
       return NextResponse.json(
-        { error: 'Name, daily_budget, userId and either facebook_campaign_id or campaign_id are required' },
+        { error: 'Name, daily_budget, userId and campaign_id (campaign_name) are required' },
         { status: 400 }
       )
     }
@@ -51,29 +50,41 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    let facebookCampaignId = facebook_campaign_id as string | undefined
+    console.log('Looking up campaign in metrics_daily by name:', campaign_id)
 
-    if (!facebookCampaignId) {
-      console.log('Looking up campaign in metrics_daily by name:', campaign_id)
-      const { data: campaign, error: campaignError } = await supabaseAdmin
-        .from('metrics_daily')
-        .select('campaign_id, campaign_name')
-        .eq('campaign_name', campaign_id)
-        .eq('account_id', userId)
-        .not('campaign_id', 'is', null)
-        .single()
+    // Get user's CAPI config first to obtain ad_account_id for correct metrics_daily scoping
+    const { data: capiConfig, error: configError } = await supabaseAdmin
+      .from('capiconfig')
+      .select('pixel_id, token, ad_account_id')
+      .eq('user_id', userId)
+      .eq('provider', 'facebook')
+      .single()
 
-      if (campaignError || !campaign || !campaign.campaign_id) {
-        console.log('Campaign lookup failed:', { campaignError, campaign, campaign_id, userId })
-        return NextResponse.json(
-          { error: `Campaign "${campaign_id}" not found or missing Facebook campaign ID` },
-          { status: 400 }
-        )
-      }
-
-      console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
-      facebookCampaignId = campaign.campaign_id
+    if (configError || !capiConfig) {
+      return NextResponse.json(
+        { error: 'Facebook CAPI configuration not found. Please configure your Facebook settings first.' },
+        { status: 400 }
+      )
     }
+
+    const { data: campaign, error: campaignError } = await supabaseAdmin
+      .from('metrics_daily')
+      .select('campaign_id, campaign_name')
+      .eq('campaign_name', campaign_id)
+      .eq('account_id', capiConfig.ad_account_id)
+      .not('campaign_id', 'is', null)
+      .single()
+
+    if (campaignError || !campaign || !campaign.campaign_id) {
+      console.log('Campaign lookup failed:', { campaignError, campaign, campaign_id, userId, ad_account_id: capiConfig.ad_account_id })
+      return NextResponse.json(
+        { error: `Campaign "${campaign_id}" not found or missing Facebook campaign ID` },
+        { status: 400 }
+      )
+    }
+
+    console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
+    const facebookCampaignId = campaign.campaign_id
 
     // Prepare data for n8n webhook
     const webhookData = {
