@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     console.log('API received data:', { name, objective, status, special_ad_categories, userId })
-    console.log('Sending to webhook:', webhookData)
+    console.log('Sending to webhook:', { ...webhookData, token: '[REDACTED]' })
 
     // Call n8n webhook
     const webhookUrl = 'https://n8n.konvertix.de/webhook/create-campaign'
@@ -109,10 +109,16 @@ export async function POST(request: NextRequest) {
     }
     */
 
+    const facebookCampaignId = String(
+      (webhookResult && (webhookResult.id || webhookResult.campaign_id)) ||
+      (webhookResult?.data && (webhookResult.data.id || webhookResult.data.campaign_id)) ||
+      ''
+    )
     return NextResponse.json({
       success: true,
       message: 'Campaign created successfully on Facebook',
       campaignName: name,
+      facebook_campaign_id: facebookCampaignId,
       facebook_data: webhookResult
     })
 

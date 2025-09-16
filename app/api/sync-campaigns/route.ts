@@ -150,8 +150,9 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Sync campaigns API error:', error)
+    const message = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { error: 'Internal server error', details: error.message },
+      { error: 'Internal server error', details: message },
       { status: 500 }
     )
   }
