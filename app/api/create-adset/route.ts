@@ -35,6 +35,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Server misconfigured: missing SUPABASE_SERVICE_ROLE_KEY' },
+        { status: 500 }
+      )
+    }
+
     // Get user's capiconfig for pixel_id and access_token
     const { data: capiConfig, error: configError } = await supabaseAdmin
       .from('capiconfig')
@@ -50,35 +57,53 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log('Looking up campaign in metrics_daily by name:', campaign_id)
+    console.log('Looking up campaign in metrics_daily by name:', campaign_id, 'ad_account_id:', capiConfig.ad_account_id, 'userId:', userId)
 
-    // Get user's CAPI config first to obtain ad_account_id for correct metrics_daily scoping
-    const { data: capiConfig, error: configError } = await supabaseAdmin
-      .from('capiconfig')
-      .select('pixel_id, token, ad_account_id')
-      .eq('user_id', userId)
-      .eq('provider', 'facebook')
-      .single()
-
-    if (configError || !capiConfig) {
-      return NextResponse.json(
-        { error: 'Facebook CAPI configuration not found. Please configure your Facebook settings first.' },
-        { status: 400 }
-      )
-    }
-
-    const { data: campaign, error: campaignError } = await supabaseAdmin
+    let { data: campaign } = await supabaseAdmin
       .from('metrics_daily')
       .select('campaign_id, campaign_name')
       .eq('campaign_name', campaign_id)
       .eq('account_id', capiConfig.ad_account_id)
       .not('campaign_id', 'is', null)
-      .single()
+      .maybeSingle()
 
-    if (campaignError || !campaign || !campaign.campaign_id) {
-      console.log('Campaign lookup failed:', { campaignError, campaign, campaign_id, userId, ad_account_id: capiConfig.ad_account_id })
+    if (!campaign) {
+      const fallbackA = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name')
+        .ilike('campaign_name', `%${campaign_id}%`)
+        .eq('account_id', capiConfig.ad_account_id)
+        .not('campaign_id', 'is', null)
+        .maybeSingle()
+      campaign = fallbackA.data || null
+    }
+
+    if (!campaign) {
+      const fallbackB = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name')
+        .eq('campaign_name', campaign_id)
+        .eq('account_id', userId)
+        .not('campaign_id', 'is', null)
+        .maybeSingle()
+      campaign = fallbackB.data || null
+    }
+
+    if (!campaign) {
+      const fallbackC = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name')
+        .ilike('campaign_name', `%${campaign_id}%`)
+        .eq('account_id', userId)
+        .not('campaign_id', 'is', null)
+        .maybeSingle()
+      campaign = fallbackC.data || null
+    }
+
+    if (!campaign?.campaign_id) {
+      console.log('Campaign lookup failed:', { campaign, searched_name: campaign_id, userId, ad_account_id: capiConfig.ad_account_id })
       return NextResponse.json(
-        { error: `Campaign "${campaign_id}" not found or missing Facebook campaign ID` },
+        { error: `Campaign "${campaign_id}" not found in metrics_daily for the configured ad account.` },
         { status: 400 }
       )
     }
