@@ -28,10 +28,17 @@ export async function POST(request: NextRequest) {
     console.log('Ad set creation request:', { name, campaign_id, userId })
 
     // Validate required fields
-    if (!name || !campaign_id || !daily_budget || !userId) {
+    if (!name || !daily_budget || !userId || !campaign_id) {
       return NextResponse.json(
-        { error: 'Name, campaign_id, daily_budget, and userId are required' },
+        { error: 'Name, daily_budget, userId and campaign_id (campaign_name) are required' },
         { status: 400 }
+      )
+    }
+
+    if (!supabaseAdmin) {
+      return NextResponse.json(
+        { error: 'Server misconfigured: missing SUPABASE_SERVICE_ROLE_KEY' },
+        { status: 500 }
       )
     }
 
@@ -50,31 +57,114 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get Facebook campaign ID from metrics_daily table - lookup by campaign name
-    console.log('Looking up campaign in metrics_daily by name:', campaign_id)
-    const { data: campaign, error: campaignError } = await supabaseAdmin
-      .from('metrics_daily')
-      .select('campaign_id, campaign_name')
-      .eq('campaign_name', campaign_id) // campaign_id field actually contains campaign name
-      .eq('account_id', userId)
-      .not('campaign_id', 'is', null)
-      .single()
+    const authToken = capiConfig.token
+    let facebookCampaignId: string | null = null
 
-    if (campaignError || !campaign || !campaign.campaign_id) {
-      console.log('Campaign lookup failed:', { campaignError, campaign, campaign_id, userId })
-      return NextResponse.json(
-        { error: `Campaign "${campaign_id}" not found or missing Facebook campaign ID` },
-        { status: 400 }
-      )
+    try {
+      const webhookData = {
+        ad_account_id: capiConfig.ad_account_id,
+        user_id: userId,
+        account_id: userId,
+        token: authToken,
+        pixel_id: null,
+        provider: 'facebook'
+      }
+
+      const campaignsResp = await fetch('https://n8n.konvertix.de/webhook/get-campaigns', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(webhookData)
+      })
+
+      if (campaignsResp.ok) {
+        const campaignsJson = await campaignsResp.json()
+        const items = Array.isArray(campaignsJson) ? campaignsJson : (campaignsJson?.data || campaignsJson?.campaigns || [])
+        if (Array.isArray(items) && items.length) {
+          const byExact = items.find((c: any) => (c.name || c.campaign_name) === campaign_id)
+          const byIlike = byExact || items.find((c: any) => (c.name || c.campaign_name || '').toLowerCase().includes(String(campaign_id).toLowerCase()))
+          const chosen = byExact || byIlike
+          if (chosen) {
+            facebookCampaignId = String(chosen.id || chosen.campaign_id)
+          }
+        }
+      } else {
+        const t = await campaignsResp.text()
+        console.log('get-campaigns webhook non-200:', t)
+      }
+    } catch (e) {
+      console.log('get-campaigns webhook failed, will fallback to metrics_daily')
     }
 
-    console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
+    if (!facebookCampaignId) {
+      console.log('Looking up campaign in metrics_daily by name:', campaign_id, 'ad_account_id:', capiConfig.ad_account_id, 'userId:', userId)
+
+      // Primary: scope by userId (current data uses user UUID in account_id)
+      let { data: campaign } = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name, date')
+        .eq('campaign_name', campaign_id)
+        .eq('account_id', userId)
+        .not('campaign_id', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
+        .maybeSingle()
+
+      if (!campaign) {
+        const fallbackA = await supabaseAdmin
+          .from('metrics_daily')
+          .select('campaign_id, campaign_name, date')
+          .ilike('campaign_name', `%${campaign_id}%`)
+          .eq('account_id', userId)
+          .not('campaign_id', 'is', null)
+          .order('date', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        campaign = fallbackA.data || null
+      }
+
+      if (!campaign) {
+        const fallbackB = await supabaseAdmin
+          .from('metrics_daily')
+          .select('campaign_id, campaign_name, date')
+          .eq('campaign_name', campaign_id)
+          .eq('account_id', capiConfig.ad_account_id)
+          .not('campaign_id', 'is', null)
+          .order('date', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        campaign = fallbackB.data || null
+      }
+
+      if (!campaign) {
+        const fallbackC = await supabaseAdmin
+          .from('metrics_daily')
+          .select('campaign_id, campaign_name, date')
+          .ilike('campaign_name', `%${campaign_id}%`)
+          .eq('account_id', capiConfig.ad_account_id)
+          .not('campaign_id', 'is', null)
+          .order('date', { ascending: false })
+          .limit(1)
+          .maybeSingle()
+        campaign = fallbackC.data || null
+      }
+
+      if (!campaign?.campaign_id) {
+        console.log('Campaign lookup failed:', { campaign, searched_name: campaign_id, userId, ad_account_id: capiConfig.ad_account_id })
+        return NextResponse.json(
+          { error: `Campaign "${campaign_id}" not found in metrics_daily for the configured ad account.` },
+          { status: 400 }
+        )
+      }
+
+      console.log('Found campaign via metrics_daily:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
+      facebookCampaignId = campaign.campaign_id
+    }
 
     // Prepare data for n8n webhook
     const webhookData = {
       name,
-      campaign_id: campaign.campaign_id, // Use Facebook campaign ID from metrics_daily
-      daily_budget: daily_budget * 100, // Convert to cents for Facebook API
+      campaign_id: facebookCampaignId as string,
+      daily_budget: Number(daily_budget) * 100,
       billing_event,
       optimization_goal,
       bid_strategy,
@@ -100,13 +190,12 @@ export async function POST(request: NextRequest) {
       access_token: capiConfig.token
     }
 
-    console.log('API received adset data:', { name, campaign_id, daily_budget, userId })
+    console.log('API received adset data:', { name, campaign_name: campaign_id, daily_budget, userId })
     console.log('Campaign lookup result:', {
       searchedName: campaign_id,
-      foundCampaign: campaign.campaign_name,
-      facebookCampaignId: campaign.campaign_id
+      facebookCampaignId
     })
-    console.log('Sending to webhook:', webhookData)
+    console.log('Sending to webhook:', { ...webhookData, access_token: 'REDACTED' })
 
     // Call n8n webhook
     const webhookUrl = 'https://n8n.konvertix.de/webhook/create-adset'

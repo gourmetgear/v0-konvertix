@@ -20,22 +20,29 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 import { useState, useEffect } from "react"
+import type { User } from '@supabase/supabase-js'
 import { useRouter } from "next/navigation"
 import { getCurrentUserId } from "@/lib/auth"
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { supabase } from "@/lib/supabase/client"
 
 export default function CreateCampaignPage() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
 
-  const [campaignData, setCampaignData] = useState({
+  const [campaignData, setCampaignData] = useState<{
+    name: string
+    objective: string
+    status: 'ACTIVE' | 'PAUSED'
+    special_ad_categories: string[]
+  }>({
     name: "",
-    objective: "", // Facebook campaign objective
-    status: "PAUSED", // Facebook default (ACTIVE, PAUSED)
-    special_ad_categories: [], // Facebook specific
+    objective: "",
+    status: "PAUSED",
+    special_ad_categories: [],
   })
 
   const [showAdSetForm, setShowAdSetForm] = useState(false)
@@ -65,8 +72,55 @@ export default function CreateCampaignPage() {
   const [imageUploadData, setImageUploadData] = useState({
     selectedFile: null as File | null,
     uploading: false,
-    preview: null as string | null
+    preview: null as string | null,
   })
+  const [assetImages, setAssetImages] = useState<{ name: string; path: string; signedUrl?: string; size?: number }[]>([])
+  const [assetLoading, setAssetLoading] = useState(false)
+  const [assetError, setAssetError] = useState<string>("")
+  const [selectedAssetPath, setSelectedAssetPath] = useState<string | null>(null)
+  const ASSETS_BUCKET = (process.env.NEXT_PUBLIC_ASSETS_BUCKET || 'assets').trim()
+
+  const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+    let binary = ''
+    const bytes = new Uint8Array(buffer)
+    const len = bytes.byteLength
+    for (let i = 0; i < len; i++) {
+      binary += String.fromCharCode(bytes[i])
+    }
+    return btoa(binary)
+  }
+
+  const listUserAssets = async (uid: string) => {
+    setAssetLoading(true)
+    setAssetError("")
+    try {
+      const prefix = `private/${uid}/`
+      const { data, error } = await supabase.storage.from(ASSETS_BUCKET).list(prefix, {
+        limit: 200,
+        sortBy: { column: 'updated_at', order: 'desc' },
+      })
+      if (error) throw error
+      const rows = (data || []).filter((r: any) => r?.name)
+      const paths = rows.map((r: any) => `${prefix}${r.name}`)
+      let signedUrlMap: Record<string, string> = {}
+      if (paths.length) {
+        const { data: links, error: linkErr } = await supabase.storage.from(ASSETS_BUCKET).createSignedUrls(paths, 3600)
+        if (linkErr) throw linkErr
+        signedUrlMap = Object.fromEntries((links || []).map((l: any) => [l.path, l.signedUrl]))
+      }
+      setAssetImages(rows.map((r: any) => ({
+        name: r.name,
+        path: `${prefix}${r.name}`,
+        size: r.metadata?.size,
+        signedUrl: signedUrlMap[`${prefix}${r.name}`],
+      })))
+    } catch (e: any) {
+      setAssetError(e?.message || "Failed to load assets")
+      setAssetImages([])
+    } finally {
+      setAssetLoading(false)
+    }
+  }
 
   // Check authentication on component mount
   useEffect(() => {
@@ -124,6 +178,12 @@ export default function CreateCampaignPage() {
       subscription.unsubscribe()
     }
   }, [router])
+  useEffect(() => {
+    if (showImageUpload && user?.id) {
+      listUserAssets(user.id)
+    }
+  }, [showImageUpload, user?.id])
+
 
   const navItems = [
     { name: "Dashboard", icon: BarChart3, href: "/dashboard" },
@@ -187,7 +247,7 @@ export default function CreateCampaignPage() {
       console.log('campaignData.name:', campaignData.name)
 
       const campaignNameToUse = result.campaignName || campaignData.name
-      const facebookCampaignId = result.facebook_data?.campaign_id || result.facebook_data?.id
+      const facebookCampaignId = result.facebook_data?.campaign_id || result.facebook_data?.id || result.facebook_campaign_id
 
       console.log('Campaign name to use for ad set lookup:', campaignNameToUse)
       console.log('Facebook campaign ID:', facebookCampaignId)
@@ -237,7 +297,7 @@ export default function CreateCampaignPage() {
       const payload = {
         userId: user.id,
         name: adSetData.name,
-        campaign_id: createdCampaignName, // Campaign name for lookup in metrics_daily
+        campaign_id: createdCampaignName,
         daily_budget: parseFloat(adSetData.daily_budget),
         billing_event: adSetData.billing_event,
         optimization_goal: adSetData.optimization_goal,
@@ -327,7 +387,7 @@ export default function CreateCampaignPage() {
   const handleImageUpload = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!imageUploadData.selectedFile) {
+    if (!selectedAssetPath && !imageUploadData.selectedFile) {
       setError('Please select an image to upload')
       return
     }
@@ -337,15 +397,36 @@ export default function CreateCampaignPage() {
     setError('')
 
     try {
-      // Get user's capiconfig
       if (!user?.id) {
         throw new Error('You must be logged in to upload images')
       }
 
-      // Convert image to base64
-      const base64Image = await convertToBase64(imageUploadData.selectedFile)
+      let base64Image: string
+      let filename = 'image'
+      let mimetype = 'image/jpeg'
 
-      // Get capiconfig from API or mock it for now
+      if (selectedAssetPath) {
+        const sel = assetImages.find(i => i.path === selectedAssetPath)
+        if (!sel?.signedUrl) {
+          throw new Error('Selected asset is not accessible')
+        }
+        const resp = await fetch(sel.signedUrl)
+        if (!resp.ok) {
+          const t = await resp.text()
+          throw new Error(`Failed to download selected asset: ${t}`)
+        }
+        const buf = await resp.arrayBuffer()
+        base64Image = arrayBufferToBase64(buf)
+        filename = sel.name || 'asset-image'
+      } else {
+        if (!imageUploadData.selectedFile) {
+          throw new Error('Please select an image to upload')
+        }
+        base64Image = await convertToBase64(imageUploadData.selectedFile)
+        filename = imageUploadData.selectedFile.name
+        mimetype = imageUploadData.selectedFile.type
+      }
+
       const capiConfigResponse = await fetch(`/api/debug-capiconfig?userId=${user.id}`)
       const capiConfigResult = await capiConfigResponse.json()
 
@@ -355,24 +436,22 @@ export default function CreateCampaignPage() {
 
       const capiConfig = capiConfigResult.data
 
-      // Prepare webhook payload
       const webhookPayload = {
         image: base64Image,
         ad_account_id: capiConfig.ad_account_id,
         token: capiConfig.token,
-        filename: imageUploadData.selectedFile.name,
-        mimetype: imageUploadData.selectedFile.type,
+        user_id: user.id,
+        provider: 'facebook',
+        filename,
+        mimetype,
         adset_id: createdAdSetId,
         campaign_id: createdCampaignId
       }
 
       console.log('Uploading image to webhook...', {
-        filename: imageUploadData.selectedFile.name,
-        size: imageUploadData.selectedFile.size,
-        type: imageUploadData.selectedFile.type
+        filename,
       })
 
-      // Call n8n webhook
       const webhookResponse = await fetch('https://n8n.konvertix.de/webhook/upload-image/', {
         method: 'POST',
         headers: {
@@ -389,7 +468,6 @@ export default function CreateCampaignPage() {
       const webhookResult = await webhookResponse.json()
       console.log('Image uploaded successfully:', webhookResult)
 
-      // Success - redirect to campaigns page
       router.push('/campaigns?success=campaign-adset-image-created')
 
     } catch (error) {
@@ -516,7 +594,7 @@ export default function CreateCampaignPage() {
                       <Label htmlFor="status">Campaign Status</Label>
                       <Select
                         value={campaignData.status}
-                        onValueChange={(value) => setCampaignData({ ...campaignData, status: value })}
+                        onValueChange={(value: 'ACTIVE' | 'PAUSED') => setCampaignData({ ...campaignData, status: value })}
                       >
                         <SelectTrigger className="bg-[#3f3f3f] border-[#4f4f4f] text-white">
                           <SelectValue />
@@ -794,9 +872,41 @@ export default function CreateCampaignPage() {
                 {/* Success Message */}
                 <Card className="bg-green-900/20 border-green-500/50">
                   <CardContent className="pt-6">
+                      {/* Select From Assets */}
+                      <div className="space-y-3">
+                        <Label>Or select from My Assets</Label>
+                        {assetLoading ? (
+                          <div className="text-[#afafaf]">Loading your images...</div>
+                        ) : assetError ? (
+                          <div className="text-red-400">{assetError}</div>
+                        ) : assetImages.length === 0 ? (
+                          <div className="text-[#afafaf]">No images found in assets/private/{user.id}.</div>
+                        ) : (
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                            {assetImages.map((item) => (
+                              <button
+                                key={item.path}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedAssetPath(item.path)
+                                  setImageUploadData(prev => ({ ...prev, selectedFile: null, preview: item.signedUrl || null }))
+                                }}
+                                className={`relative border rounded-md overflow-hidden ${selectedAssetPath === item.path ? 'border-[#a545b6]' : 'border-[#3f3f3f]'} hover:border-[#a545b6]`}
+                              >
+                                {item.signedUrl ? (
+                                  <img src={item.signedUrl} alt={item.name} className="w-full h-32 object-cover" />
+                                ) : (
+                                  <div className="w-full h-32 bg-[#1f1f1f]" />
+                                )}
+                                <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-xs p-1 truncate">{item.name}</div>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     <div className="flex items-center space-x-2 text-green-400">
                       <Target className="h-5 w-5" />
-                      <span>Campaign & Ad Set created successfully!</span>
+                      <span>Campaign &amp; Ad Set created successfully!</span>
                     </div>
                     <p className="text-[#afafaf] mt-2">Now upload an image for your ad creative:</p>
                   </CardContent>
@@ -894,9 +1004,9 @@ export default function CreateCampaignPage() {
                     <Button
                       type="submit"
                       className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90"
-                      disabled={loading || imageUploadData.uploading || !imageUploadData.selectedFile}
+                      disabled={loading || imageUploadData.uploading || (!imageUploadData.selectedFile && !selectedAssetPath)}
                     >
-                      {loading || imageUploadData.uploading ? "Uploading..." : "Upload Image & Complete"}
+                      {loading || imageUploadData.uploading ? "Uploading..." : "Upload Image &amp; Complete"}
                     </Button>
                   </div>
                 </form>

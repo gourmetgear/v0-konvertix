@@ -20,7 +20,7 @@ type FileRow = {
   metadata?: { size?: number; mimetype?: string }
 }
 
-const BUCKET = (process.env.NEXT_PUBLIC_SUPABASE_DOCUMENTS_BUCKET || "documents").trim()
+const BUCKET = (process.env.NEXT_PUBLIC_ASSETS_BUCKET || "assets").trim()
 const PREFIX_MODE = (process.env.NEXT_PUBLIC_STORAGE_PREFIX || "user").trim() // 'user' | 'account'
 const DEFAULT_ACCOUNT_ID = (process.env.NEXT_PUBLIC_ACCOUNT_ID || "").trim()
 const EDGE_UPLOAD_FN = (process.env.NEXT_PUBLIC_SUPABASE_UPLOAD_FN || "upload-private").trim()
@@ -48,7 +48,8 @@ async function createSignedUrls(paths: string[], expiresInSeconds = 3600) {
   if (error) throw error
   const map: Record<string, string> = {}
   for (const item of data) {
-    map[item.path] = item.signedUrl
+    if (!item || !("path" in item) || !(item as any).signedUrl) continue
+    map[(item as any).path as string] = (item as any).signedUrl as string
   }
   return map
 }
@@ -174,8 +175,8 @@ export default function DocumentsPage() {
           await refresh(prefix)
           await fetchQuota()
         } else {
-          // Default: user-id prefix
-          const prefix = `${uid}/`
+          // Default: user-id prefix under assets/private/{uid}/
+          const prefix = `private/${uid}/`
           setUserPrefix(prefix)
           await refresh(prefix)
           await fetchQuota()
@@ -535,7 +536,7 @@ export default function DocumentsPage() {
             </div>
             {error && <div className="text-red-400 text-sm">{error}</div>}
             {!loading && files.length === 0 && !error && (
-              <div className="text-[#afafaf]">No files found in bucket "{BUCKET}".</div>
+              <div className="text-[#afafaf]">No files found in bucket "{BUCKET}" at "{userPrefix}".</div>
             )}
 
             {/* Card grid for all files with edit/delete */}
