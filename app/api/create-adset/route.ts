@@ -61,19 +61,23 @@ export async function POST(request: NextRequest) {
 
     let { data: campaign } = await supabaseAdmin
       .from('metrics_daily')
-      .select('campaign_id, campaign_name')
+      .select('campaign_id, campaign_name, date')
       .eq('campaign_name', campaign_id)
       .eq('account_id', capiConfig.ad_account_id)
       .not('campaign_id', 'is', null)
+      .order('date', { ascending: false })
+      .limit(1)
       .maybeSingle()
 
     if (!campaign) {
       const fallbackA = await supabaseAdmin
         .from('metrics_daily')
-        .select('campaign_id, campaign_name')
+        .select('campaign_id, campaign_name, date')
         .ilike('campaign_name', `%${campaign_id}%`)
         .eq('account_id', capiConfig.ad_account_id)
         .not('campaign_id', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
         .maybeSingle()
       campaign = fallbackA.data || null
     }
@@ -81,10 +85,12 @@ export async function POST(request: NextRequest) {
     if (!campaign) {
       const fallbackB = await supabaseAdmin
         .from('metrics_daily')
-        .select('campaign_id, campaign_name')
+        .select('campaign_id, campaign_name, date')
         .eq('campaign_name', campaign_id)
         .eq('account_id', userId)
         .not('campaign_id', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
         .maybeSingle()
       campaign = fallbackB.data || null
     }
@@ -92,10 +98,12 @@ export async function POST(request: NextRequest) {
     if (!campaign) {
       const fallbackC = await supabaseAdmin
         .from('metrics_daily')
-        .select('campaign_id, campaign_name')
+        .select('campaign_id, campaign_name, date')
         .ilike('campaign_name', `%${campaign_id}%`)
         .eq('account_id', userId)
         .not('campaign_id', 'is', null)
+        .order('date', { ascending: false })
+        .limit(1)
         .maybeSingle()
       campaign = fallbackC.data || null
     }
