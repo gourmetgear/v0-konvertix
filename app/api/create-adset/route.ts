@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       campaign_id,
+      facebook_campaign_id,
       daily_budget,
       billing_event = 'IMPRESSIONS',
       optimization_goal = 'OFFSITE_CONVERSIONS',
@@ -25,12 +26,12 @@ export async function POST(request: NextRequest) {
       userId
     } = body
 
-    console.log('Ad set creation request:', { name, campaign_id, userId })
+    console.log('Ad set creation request:', { name, campaign_id, facebook_campaign_id: (body as any).facebook_campaign_id, userId })
 
     // Validate required fields
-    if (!name || !campaign_id || !daily_budget || !userId) {
+    if (!name || !daily_budget || !userId || (!facebook_campaign_id && !campaign_id)) {
       return NextResponse.json(
-        { error: 'Name, campaign_id, daily_budget, and userId are required' },
+        { error: 'Name, daily_budget, userId and either facebook_campaign_id or campaign_id are required' },
         { status: 400 }
       )
     }
@@ -50,31 +51,35 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Get Facebook campaign ID from metrics_daily table - lookup by campaign name
-    console.log('Looking up campaign in metrics_daily by name:', campaign_id)
-    const { data: campaign, error: campaignError } = await supabaseAdmin
-      .from('metrics_daily')
-      .select('campaign_id, campaign_name')
-      .eq('campaign_name', campaign_id) // campaign_id field actually contains campaign name
-      .eq('account_id', userId)
-      .not('campaign_id', 'is', null)
-      .single()
+    let facebookCampaignId = facebook_campaign_id as string | undefined
 
-    if (campaignError || !campaign || !campaign.campaign_id) {
-      console.log('Campaign lookup failed:', { campaignError, campaign, campaign_id, userId })
-      return NextResponse.json(
-        { error: `Campaign "${campaign_id}" not found or missing Facebook campaign ID` },
-        { status: 400 }
-      )
+    if (!facebookCampaignId) {
+      console.log('Looking up campaign in metrics_daily by name:', campaign_id)
+      const { data: campaign, error: campaignError } = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name')
+        .eq('campaign_name', campaign_id)
+        .eq('account_id', userId)
+        .not('campaign_id', 'is', null)
+        .single()
+
+      if (campaignError || !campaign || !campaign.campaign_id) {
+        console.log('Campaign lookup failed:', { campaignError, campaign, campaign_id, userId })
+        return NextResponse.json(
+          { error: `Campaign "${campaign_id}" not found or missing Facebook campaign ID` },
+          { status: 400 }
+        )
+      }
+
+      console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
+      facebookCampaignId = campaign.campaign_id
     }
-
-    console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
 
     // Prepare data for n8n webhook
     const webhookData = {
       name,
-      campaign_id: campaign.campaign_id, // Use Facebook campaign ID from metrics_daily
-      daily_budget: daily_budget * 100, // Convert to cents for Facebook API
+      campaign_id: facebookCampaignId as string,
+      daily_budget: Number(daily_budget) * 100,
       billing_event,
       optimization_goal,
       bid_strategy,

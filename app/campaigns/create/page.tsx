@@ -222,8 +222,8 @@ export default function CreateCampaignPage() {
         throw new Error('You must be logged in to create ad sets')
       }
 
-      if (!createdCampaignName) {
-        throw new Error('Campaign name is required to create ad set')
+      if (!createdCampaignName && !createdCampaignId) {
+        throw new Error('Campaign identifier is required to create ad set')
       }
 
       console.log('=== AD SET CREATION DEBUG ===')
@@ -237,7 +237,8 @@ export default function CreateCampaignPage() {
       const payload = {
         userId: user.id,
         name: adSetData.name,
-        campaign_id: createdCampaignName, // Campaign name for lookup in metrics_daily
+        facebook_campaign_id: createdCampaignId ?? undefined,
+        campaign_id: createdCampaignId ?? createdCampaignName,
         daily_budget: parseFloat(adSetData.daily_budget),
         billing_event: adSetData.billing_event,
         optimization_goal: adSetData.optimization_goal,
