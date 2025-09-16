@@ -247,7 +247,7 @@ export default function CreateCampaignPage() {
       console.log('campaignData.name:', campaignData.name)
 
       const campaignNameToUse = result.campaignName || campaignData.name
-      const facebookCampaignId = result.facebook_data?.campaign_id || result.facebook_data?.id
+      const facebookCampaignId = result.facebook_data?.campaign_id || result.facebook_data?.id || result.facebook_campaign_id
 
       console.log('Campaign name to use for ad set lookup:', campaignNameToUse)
       console.log('Facebook campaign ID:', facebookCampaignId)
@@ -440,6 +440,8 @@ export default function CreateCampaignPage() {
         image: base64Image,
         ad_account_id: capiConfig.ad_account_id,
         token: capiConfig.token,
+        user_id: user.id,
+        provider: 'facebook',
         filename,
         mimetype,
         adset_id: createdAdSetId,
