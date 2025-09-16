@@ -10,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { Progress } from "@/components/ui/progress"
 import { ArrowLeft, ArrowRight, CheckCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { supabase } from "@/lib/supabase/client"
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -64,10 +65,78 @@ export default function OnboardingPage() {
     }
   }
 
-  const completeOnboarding = () => {
-    // Store onboarding data (could be sent to Supabase later)
-    localStorage.setItem("konvertix-onboarding", JSON.stringify(formData))
-    router.push("/dashboard")
+  const completeOnboarding = async () => {
+    // Persist onboarding settings to public.profiles for the signed-in user
+    try {
+      const { data: sessionRes } = await supabase.auth.getUser()
+      const uid = sessionRes.user?.id
+      if (!uid) {
+        // Fallback: keep local state and send user to auth
+        localStorage.setItem("konvertix-onboarding", JSON.stringify(formData))
+        router.push("/auth/login")
+        return
+      }
+
+      // Save business data to business_profiles table
+      const payload: any = {
+        user_id: uid,
+        business_name: formData.businessName || null,
+        website_url: formData.website || null,
+        industry: formData.industry || null,
+        business_size: formData.businessSize || null,
+        marketing_goal: formData.primaryGoal || null,
+        monthly_budget: formData.monthlyBudget || null,
+        target_audience: formData.targetAudience || null,
+        marketing_challenges: formData.currentChallenges || null,
+        marketing_channels: (formData.currentChannels || []) as any,
+        interested_channels: (formData.interestedChannels || []) as any,
+        reporting_frequency: formData.reportingFrequency || null,
+      }
+
+      console.log("Saving onboarding data to business_profiles table")
+      
+      // Save to business_profiles table (create this table with the SQL script)
+      const { error } = await supabase.from("business_profiles").upsert(payload, { onConflict: "user_id" })
+      if (error) {
+        console.error("Failed to save onboarding to profiles:", error.message)
+        // Still mark as completed locally - onboarding flow should complete even if DB save fails
+        localStorage.setItem("konvertix-onboarding", JSON.stringify({ ...formData, completed: true }))
+      } else {
+        // Mark onboarding as completed
+        localStorage.setItem("konvertix-onboarding", JSON.stringify({ ...formData, completed: true }))
+      }
+
+      // Create account_members entry safely after profile is saved
+      try {
+        const accountMemberResponse = await fetch('/api/create-account-member', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: uid })
+        })
+        
+        if (accountMemberResponse.ok) {
+          const result = await accountMemberResponse.json()
+          console.log("Account member created successfully for user:", uid, result)
+        } else {
+          const errorResult = await accountMemberResponse.json()
+          console.error("Failed to create account member:", {
+            status: accountMemberResponse.status,
+            error: errorResult,
+            userId: uid
+          })
+        }
+      } catch (accountMemberError) {
+        console.error("Account member creation error:", accountMemberError)
+      }
+
+      console.log("Onboarding completed for user:", uid)
+    } catch (e) {
+      console.error("Onboarding error:", e)
+      // Always mark as completed locally - user shouldn't be stuck in onboarding loop
+      localStorage.setItem("konvertix-onboarding", JSON.stringify({ ...formData, completed: true }))
+    } finally {
+      router.push("/dashboard")
+    }
   }
 
   const channels = [

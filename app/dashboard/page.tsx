@@ -1,10 +1,13 @@
 "use client"
+import Sidebar from "@/components/nav/Sidebar"
+import ComprehensiveMetricsDashboard from "@/components/ComprehensiveMetricsDashboard"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
+import { supabase } from "@/lib/supabase/client"
 import {
   Search,
   Bell,
@@ -67,89 +70,53 @@ const campaigns = [
 
 export default function DashboardPage() {
   const [showOnboarding, setShowOnboarding] = useState(false)
+  const [userId, setUserId] = useState<string>('')
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const onboardingData = localStorage.getItem("konvertix-onboarding")
-    if (!onboardingData) {
-      window.location.href = "/onboarding"
+    const loadUserData = async () => {
+      // Check onboarding first
+      const onboardingData = localStorage.getItem("konvertix-onboarding")
+      if (!onboardingData) {
+        window.location.href = "/onboarding"
+        return
+      }
+      
+      try {
+        const parsedData = JSON.parse(onboardingData)
+        if (!parsedData.completed) {
+          window.location.href = "/onboarding"
+          return
+        }
+      } catch (e) {
+        window.location.href = "/onboarding"
+        return
+      }
+
+      // Get current user
+      try {
+        const { data: userRes } = await supabase.auth.getUser()
+        if (userRes.user) {
+          setUserId(userRes.user.id)
+        }
+      } catch (error) {
+        console.error('Failed to get user:', error)
+      }
+      
+      setLoading(false)
     }
+
+    loadUserData()
   }, [])
 
-  const navItems = [
-    { name: "Dashboard", icon: BarChart3, href: "/dashboard", active: true },
-    { name: "Reports", icon: TrendingUp, href: "/reports" },
-    { name: "Documents", icon: Users, href: "/documents" },
-    { name: "Campaigns", icon: Target, href: "/campaigns" },
-    { name: "SEO", icon: Search, href: "/seo" },
-    { name: "Tools", icon: Users, href: "/tools" },
-    { name: "Support", icon: Users, href: "/support" },
-    { name: "Services", icon: Users, href: "/services" },
-    { name: "Settings", icon: Users, href: "/settings" },
-  ]
 
   return (
     <div className="min-h-screen bg-[#0b021c] text-white flex">
       {/* Sidebar */}
-      <div className="w-64 bg-[#201b2d] border-r border-[#2b2b2b] p-6">
-        {/* Logo */}
-        <div className="flex items-center space-x-2 mb-8">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
-          </div>
-          <span className="text-xl font-bold">Konvertix</span>
-        </div>
-
-        {/* Navigation */}
-        <nav className="space-y-2">
-          {navItems.map((item) => (
-            <Link key={item.name} href={item.href}>
-              <button
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
-                  item.active
-                    ? "bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] text-white"
-                    : "text-[#afafaf] hover:text-white hover:bg-[#2b2b2b]"
-                }`}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.name}</span>
-              </button>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="mt-auto pt-6"></div>
-      </div>
+      
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-[#201b2d] border-b border-[#2b2b2b] p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#afafaf]" />
-                <Input
-                  placeholder="Search"
-                  className="pl-10 bg-[#2b2b2b] border-[#3f3f3f] text-white placeholder-[#afafaf] w-80"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-[#afafaf] hover:text-white">
-                Select Business Manager
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-[#afafaf] hover:text-white">
-                <Bell className="h-5 w-5" />
-              </Button>
-              <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">U</span>
-              </div>
-            </div>
-          </div>
-        </header>
-
         {/* Dashboard Content */}
         <main className="flex-1 p-6 space-y-6">
           {/* Welcome Section */}
@@ -400,6 +367,13 @@ export default function DashboardPage() {
               </div>
             </CardContent>
           </Card>
+
+          {/* Comprehensive Metrics Dashboard */}
+          {userId && (
+            <div className="space-y-6">
+              <ComprehensiveMetricsDashboard userId={userId} />
+            </div>
+          )}
         </main>
       </div>
     </div>

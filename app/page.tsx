@@ -9,40 +9,53 @@ import Link from "next/link"
 
 export default function HomePage() {
   const [isCalendlyOpen, setIsCalendlyOpen] = useState(false)
+  const [pricingTab, setPricingTab] = useState<"paid" | "seo" | "full">("paid")
+  const pricingPlans: Record<typeof pricingTab, Array<{ title: string; price: string; items: string[]; highlight?: boolean; badge?: string }>> = {
+    paid: [
+      { title: "Basic plan", price: "$10/mth", items: ["Access to all basic features","Basic reporting and analytics","Up to 10 individual users","20GB individual data each user","Basic chat and email support"] },
+      { title: "Business plan", price: "$20/mth", highlight: true, badge: "Best Value", items: ["200+ integrations","Advanced reporting and analytics","Up to 20 individual users","40GB individual data each user","Priority chat and email support","Cancel anytime","14- day free trial","24/7 Support"] },
+      { title: "Enterprise plan", price: "$40/mth", items: ["Advanced custom fields","Audit log and data history","Unlimited individual users","Unlimited individual data","Personalised+priority service"] },
+    ],
+    seo: [
+      { title: "Starter SEO", price: "$15/mth", items: ["Keyword tracking (50)","Basic site audit","Monthly ranking report","Email support"] },
+      { title: "Pro SEO", price: "$30/mth", highlight: true, badge: "Best Value", items: ["Keyword tracking (250)","Advanced audit + fixes","Backlink monitoring","Content ideas","Weekly reports","Priority support"] },
+      { title: "Enterprise SEO", price: "$60/mth", items: ["Unlimited keywords","Technical concierge","Custom dashboards","SLA support"] },
+    ],
+    full: [
+      { title: "Growth Starter", price: "$25/mth", items: ["Paid Ads + SEO lite","Automation templates","Reporting dashboard","Email support"] },
+      { title: "Growth Suite", price: "$45/mth", highlight: true, badge: "Best Value", items: ["Paid Ads + SEO + Automation","Multichannel attribution","Advanced reporting","Priority support"] },
+      { title: "Growth Enterprise", price: "$90/mth", items: ["Custom playbooks","Full-funnel reporting","Unlimited users & workspaces","Dedicated success manager"] },
+    ],
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Header */}
-      <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="bg-[#1a1328] border-b border-[#2b2b2b]">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-sm">K</span>
+          <div className="flex items-center space-x-3">
+            <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-sm">K</span>
             </div>
-            <span className="text-xl font-bold">Konvertix</span>
+            <span className="text-xl font-bold text-white">Konvertix</span>
           </div>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors">
-              Home
-            </a>
-            <a href="#services" className="text-muted-foreground hover:text-foreground transition-colors">
-              Services
-            </a>
-            <a href="#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
-            </a>
-            <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-              Contact
-            </Link>
+            <a href="#" className="text-white font-medium">Home</a>
+            <a href="#services" className="text-[#afafaf] hover:text-white transition-colors">Services</a>
+            <a href="#results" className="text-[#afafaf] hover:text-white transition-colors">Case Studies / Results</a>
+            <a href="#pricing" className="text-[#afafaf] hover:text-white transition-colors">Pricing</a>
+            <a href="#about" className="text-[#afafaf] hover:text-white transition-colors">About</a>
           </nav>
 
-          <Button
-            asChild
-            className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-          >
-            <Link href="/dashboard">Get Started</Link>
-          </Button>
+          <div className="flex items-center gap-3">
+            <Button asChild variant="ghost" className="hidden sm:inline-flex text-[#afafaf] hover:text-white">
+              <Link href="/contact">Contact</Link>
+            </Button>
+            <Button asChild className="bg-gradient-to-r from-[#f59e0b] to-[#f97316] hover:from-[#f59e0b]/90 hover:to-[#f97316]/90">
+              <Link href="/contact">Book a call</Link>
+            </Button>
+          </div>
         </div>
       </header>
 
@@ -65,14 +78,16 @@ export default function HomePage() {
                 asChild
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
               >
-                <Link href="/dashboard">
+                <Link href="/auth/signup">
                   Start Free Trial
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" className="border-border hover:bg-muted bg-transparent">
-                <Play className="mr-2 h-4 w-4" />
-                View Pricing
+              <Button size="lg" variant="outline" asChild className="border-border hover:bg-muted bg-transparent">
+                <Link href="/auth/login">
+                  <Play className="mr-2 h-4 w-4" />
+                  Log in
+                </Link>
               </Button>
             </div>
           </div>
@@ -276,136 +291,54 @@ export default function HomePage() {
       </section>
 
       {/* Pricing Section */}
-      <section id="pricing" className="py-20 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Choose the Plan That Fits You Best</h2>
+      <section id="pricing" className="relative py-24">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.06),transparent_60%)]" />
+        <div className="relative container mx-auto px-4">
+          <div className="text-left md:text-left mb-12">
+            <span className="inline-block rounded-full border border-[#2b2b2b] bg-[#171226] px-3 py-1 text-xs text-white/90 mb-4">
+              Pricing
+            </span>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">Choose the Plan That Fits You Best</h2>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle>Starter</CardTitle>
-                <div className="text-3xl font-bold">
-                  $10<span className="text-lg font-normal text-muted-foreground">/mth</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Access to all basic features
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Basic reporting and analytics
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Up to 10 team members
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    20GB individual data
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Basic chat and email support
-                  </li>
-                </ul>
-                <Button className="w-full mt-6 bg-transparent" variant="outline">
-                  <Link href="/dashboard">Get Started</Link>
-                </Button>
-              </CardContent>
-            </Card>
+          {/* Toggle tabs (visual only) */}
+          <div className="mb-10 flex items-center gap-2">
+            <button onClick={() => setPricingTab("paid")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='paid' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>Paid Ads</button>
+            <button onClick={() => setPricingTab("seo")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='seo' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>SEO</button>
+            <button onClick={() => setPricingTab("full")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='full' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>Full services</button>
+          </div>
 
-            <Card className="relative border-primary shadow-lg scale-105">
-              <div className="absolute -top-3 left-1/2 transform -translate-x-1/2">
-                <Badge className="bg-gradient-to-r from-primary to-secondary text-primary-foreground">
-                  Most Popular
-                </Badge>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:items-stretch max-w-6xl">
+            {pricingPlans[pricingTab].map((p, i) => (
+              <div key={p.title} className={`relative rounded-2xl border p-6 flex flex-col ${p.highlight ? 'bg-[#cd4f9d] border-[#cd4f9d]' : 'bg-[#1b1527] border-[#2b2b2b]'}`}>
+                <div className={`mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full ${p.highlight ? 'bg-white/20 text-white' : 'bg-white/10 text-white'}`}>
+                  <svg viewBox="0 0 24 24" className="w-6 h-6"><path fill="currentColor" d="M12 2l3 7h7l-5.5 4.5L19 21l-7-4l-7 4l2.5-7.5L2 9h7z"/></svg>
+                </div>
+                <h3 className="text-center text-xl font-semibold text-white">{p.title}</h3>
+                {p.highlight && p.badge && (
+                  <span className="absolute right-4 top-4 rounded-md bg-white/20 px-2 py-1 text-xs text-white">{p.badge}</span>
+                )}
+                <div className="my-4 text-center">
+                  <div className="text-4xl font-extrabold text-white">{p.price}</div>
+                  <div className={`text-sm mt-1 ${p.highlight ? 'text-white/90' : 'text-white/70'}`}>Billed annually.</div>
+                </div>
+                <ul className={`space-y-3 text-sm ${p.highlight ? 'text-white' : 'text-white/90'}`}>
+                  {p.items.map((t) => (
+                    <li key={t} className="flex items-start gap-2">
+                      <span className={`mt-1 inline-flex h-5 w-5 items-center justify-center rounded-full ${p.highlight ? 'bg-white/25' : 'bg-white/10'}`}>
+                        <svg viewBox='0 0 24 24' className='w-3.5 h-3.5'><path fill='currentColor' d='m10 17l-4-4l1.4-1.4L10 14.2l6.6-6.6L18 9z'/></svg>
+                      </span>
+                      <span>{t}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="mt-6">
+                  <Link className="block" href="/dashboard">
+                    <button className={`w-full rounded-md py-2 ${p.highlight ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-gradient-to-r from-[#f59e0b] to-[#f97316] text-white'}`}>Get started</button>
+                  </Link>
+                </div>
               </div>
-              <CardHeader>
-                <CardTitle>Pro</CardTitle>
-                <div className="text-3xl font-bold">
-                  $20<span className="text-lg font-normal text-muted-foreground">/mth</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Access to all basic features
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Advanced reporting and analytics
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Up to 20 team members
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    100GB individual data
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Priority chat and email support
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Advanced integrations
-                  </li>
-                </ul>
-                <Button
-                  asChild
-                  className="w-full mt-6 bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-                >
-                  <Link href="/dashboard">Get Started</Link>
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="relative">
-              <CardHeader>
-                <CardTitle>Business</CardTitle>
-                <div className="text-3xl font-bold">
-                  $40<span className="text-lg font-normal text-muted-foreground">/mth</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <ul className="space-y-3">
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Access to all basic features
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Advanced reporting and analytics
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Up to 50 team members
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    200GB individual data
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Priority chat and email support
-                  </li>
-                  <li className="flex items-center">
-                    <Check className="h-4 w-4 text-chart-4 mr-2" />
-                    Advanced integrations
-                  </li>
-                </ul>
-                <Button className="w-full mt-6 bg-transparent" variant="outline">
-                  <Link href="/dashboard">Get Started</Link>
-                </Button>
-              </CardContent>
-            </Card>
+            ))}
           </div>
         </div>
       </section>

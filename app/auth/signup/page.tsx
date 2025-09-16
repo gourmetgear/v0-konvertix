@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { supabase } from "@/lib/supabase/client"
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -24,6 +25,7 @@ export default function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [agreeToTerms, setAgreeToTerms] = useState(false)
   const [error, setError] = useState("")
+  const [message, setMessage] = useState("")
   const [loading, setLoading] = useState(false)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,10 +72,29 @@ export default function SignupPage() {
     }
 
     try {
-      // Simulate signup process
-      await new Promise((resolve) => setTimeout(resolve, 1000))
+      const { data, error: signUpErr } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          },
+          emailRedirectTo:
+            typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : undefined,
+        },
+      })
 
-      // For now, redirect to onboarding
+      if (signUpErr) {
+        setError(signUpErr.message || "Failed to create account. Please try again.")
+        return
+      }
+
+      if (data.user && !data.session) {
+        setMessage("Confirmation email sent. Please check your inbox.")
+        return
+      }
+
       window.location.href = "/onboarding"
     } catch (err) {
       setError("Failed to create account. Please try again.")
@@ -107,9 +128,9 @@ export default function SignupPage() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
+              {(error || message) && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{error || message}</AlertDescription>
                 </Alert>
               )}
 

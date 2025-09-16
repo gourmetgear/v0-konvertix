@@ -43,17 +43,7 @@ export default function CompetitorAnalysisPage() {
     analysisGoals: "",
   })
 
-  const navItems = [
-    { name: "Dashboard", icon: BarChart3, href: "/dashboard" },
-    { name: "Reports", icon: TrendingUp, href: "/reports" },
-    { name: "Documents", icon: Users, href: "/documents" },
-    { name: "Campaigns", icon: Target, href: "/campaigns" },
-    { name: "SEO", icon: SearchIcon, href: "/seo" },
-    { name: "Tools", icon: Wrench, href: "/tools" },
-    { name: "Support", icon: HeadphonesIcon, href: "/support" },
-    { name: "Services", icon: Users, href: "/services" },
-    { name: "Settings", icon: Settings, href: "/settings" },
-  ]
+  
 
   const handleAnalyze = async () => {
     setIsAnalyzing(true)
@@ -111,33 +101,7 @@ export default function CompetitorAnalysisPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b021c] text-white flex">
-      {/* Sidebar */}
-      <div className="w-64 bg-[#201b2d] border-r border-[#2b2b2b] p-6">
-        <div className="flex items-center space-x-2 mb-8">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
-          </div>
-          <span className="text-xl font-bold">Konvertix</span>
-        </div>
-
-        <nav className="space-y-2">
-          {navItems.map((item) => (
-            <Link key={item.name} href={item.href}>
-              <button
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
-                  item.name === "Tools"
-                    ? "bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] text-white"
-                    : "text-[#afafaf] hover:text-white hover:bg-[#2b2b2b]"
-                }`}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.name}</span>
-              </button>
-            </Link>
-          ))}
-        </nav>
-      </div>
+    <div className="text-white">
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">

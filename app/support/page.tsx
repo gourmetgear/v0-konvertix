@@ -1,5 +1,5 @@
 "use client"
-
+import Sidebar from "@/components/nav/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -28,17 +28,7 @@ import { useState } from "react"
 export default function SupportPage() {
   const [openFAQ, setOpenFAQ] = useState<string | null>(null)
 
-  const navItems = [
-    { name: "Dashboard", icon: BarChart3, href: "/dashboard" },
-    { name: "Reports", icon: TrendingUp, href: "/reports" },
-    { name: "Documents", icon: Users, href: "/documents" },
-    { name: "Campaigns", icon: Target, href: "/campaigns" },
-    { name: "SEO", icon: Search, href: "/seo" },
-    { name: "Tools", icon: Users, href: "/tools" },
-    { name: "Support", icon: HeadphonesIcon, href: "/support", active: true },
-    { name: "Services", icon: Users, href: "/services" },
-    { name: "Settings", icon: Settings, href: "/settings" },
-  ]
+  const navItems: any[] = []
 
   const faqItems = [
     { id: "accounting", title: "Accounting & Billing" },
@@ -51,62 +41,10 @@ export default function SupportPage() {
   return (
     <div className="min-h-screen bg-[#0b021c] text-white flex">
       {/* Sidebar */}
-      <div className="w-64 bg-[#201b2d] border-r border-[#2b2b2b] p-6">
-        {/* Logo */}
-        <div className="flex items-center space-x-2 mb-8">
-          <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
-          </div>
-          <span className="text-xl font-bold">Konvertix</span>
-        </div>
-
-        {/* Navigation */}
-        <nav className="space-y-2">
-          {navItems.map((item) => (
-            <Link key={item.name} href={item.href}>
-              <button
-                className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
-                  item.active
-                    ? "bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] text-white"
-                    : "text-[#afafaf] hover:text-white hover:bg-[#2b2b2b]"
-                }`}
-              >
-                <item.icon className="h-5 w-5" />
-                <span>{item.name}</span>
-              </button>
-            </Link>
-          ))}
-        </nav>
-      </div>
+      
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="bg-[#201b2d] border-b border-[#2b2b2b] p-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#afafaf]" />
-                <Input
-                  placeholder="Search"
-                  className="pl-10 bg-[#2b2b2b] border-[#3f3f3f] text-white placeholder-[#afafaf] w-80"
-                />
-              </div>
-            </div>
-
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" className="text-[#afafaf] hover:text-white">
-                Select Business Manager
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-              <Button variant="ghost" size="icon" className="text-[#afafaf] hover:text-white">
-                <Bell className="h-5 w-5" />
-              </Button>
-              <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-full"></div>
-            </div>
-          </div>
-        </header>
-
         {/* Support Content */}
         <main className="flex-1 p-6 flex gap-6">
           {/* Left Side - Support Form and FAQ */}

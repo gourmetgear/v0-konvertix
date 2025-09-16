@@ -1,0 +1,600 @@
+{
+  "name": "Facebook Ads Metrics for Next.js",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours",
+              "hoursInterval": 24
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Daily Trigger",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": "public",
+        "table": "capiconfig",
+        "where": {
+          "values": [
+            {
+              "column": "provider",
+              "condition": "equal",
+              "value": "facebook"
+            },
+            {
+              "column": "is_active",
+              "condition": "equal",
+              "value": true
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-facebook-configs",
+      "name": "Get Facebook Configs",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [460, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-creds",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "batchSize": 1,
+        "options": {}
+      },
+      "id": "split-accounts",
+      "name": "Split Accounts",
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "account_id",
+              "name": "account_id",
+              "value": "={{ $json.account_id }}",
+              "type": "string"
+            },
+            {
+              "id": "access_token",
+              "name": "access_token",
+              "value": "={{ $json.access_token }}",
+              "type": "string"
+            },
+            {
+              "id": "user_id",
+              "name": "user_id",
+              "value": "={{ $json.user_id }}",
+              "type": "string"
+            },
+            {
+              "id": "pixel_id",
+              "name": "pixel_id",
+              "value": "={{ $json.pixel_id }}",
+              "type": "string"
+            },
+            {
+              "id": "yesterday",
+              "name": "yesterday",
+              "value": "={{ $now.minus({days: 1}).toFormat('yyyy-MM-dd') }}",
+              "type": "string"
+            },
+            {
+              "id": "today",
+              "name": "today",
+              "value": "={{ $now.toFormat('yyyy-MM-dd') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "prepare-variables",
+      "name": "Prepare Variables",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.3,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v18.0/act_{{ $json.account_id }}/insights",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $json.access_token }}"
+            },
+            {
+              "name": "time_range",
+              "value": "={\"since\":\"{{ $json.yesterday }}\",\"until\":\"{{ $json.yesterday }}\"}"
+            },
+            {
+              "name": "fields",
+              "value": "campaign_name,campaign_id,adset_name,adset_id,ad_name,ad_id,impressions,clicks,spend,actions,action_values,cpm,cpc,ctr,frequency,reach,unique_clicks,cost_per_action_type,conversion_values,conversions"
+            },
+            {
+              "name": "level",
+              "value": "ad"
+            },
+            {
+              "name": "limit",
+              "value": "1000"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-ads-insights",
+      "name": "Fetch Ads Insights",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 200]
+    },
+    {
+      "parameters": {
+        "url": "=https://graph.facebook.com/v18.0/{{ $json.pixel_id }}/stats",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "access_token",
+              "value": "={{ $json.access_token }}"
+            },
+            {
+              "name": "start_time",
+              "value": "={{ $json.yesterday }}"
+            },
+            {
+              "name": "end_time",
+              "value": "={{ $json.today }}"
+            },
+            {
+              "name": "granularity",
+              "value": "day"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "fetch-pixel-stats",
+      "name": "Fetch Pixel Stats",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Process Facebook Ads and Pixel data for metrics_daily table\nconst adsData = $input.first().json;\nconst pixelData = $input.last().json;\nconst config = $('Prepare Variables').item.json;\n\n// Initialize daily metrics\nlet dailyMetrics = {\n  date: config.yesterday,\n  user_id: config.user_id,\n  account_id: config.account_id,\n  pixel_id: config.pixel_id,\n  platform: 'facebook',\n  \n  // Ad Performance Metrics\n  impressions: 0,\n  clicks: 0,\n  spend: 0.00,\n  cpm: 0.00,\n  cpc: 0.00,\n  ctr: 0.0000,\n  frequency: 0.00,\n  reach: 0,\n  unique_clicks: 0,\n  \n  // Conversion Metrics\n  total_conversions: 0,\n  purchase_conversions: 0,\n  lead_conversions: 0,\n  registration_conversions: 0,\n  add_to_cart_conversions: 0,\n  initiate_checkout_conversions: 0,\n  \n  // Revenue Metrics\n  total_revenue: 0.00,\n  purchase_revenue: 0.00,\n  \n  // Cost Metrics\n  cost_per_conversion: 0.00,\n  cost_per_purchase: 0.00,\n  cost_per_lead: 0.00,\n  roas: 0.0000,\n  \n  // Pixel Metrics\n  server_events: 0,\n  browser_events: 0,\n  matched_events: 0,\n  match_rate: 0.0000,\n  \n  // Campaign Breakdown\n  active_campaigns: 0,\n  active_adsets: 0,\n  active_ads: 0,\n  \n  created_at: new Date().toISOString(),\n  raw_data: {\n    ads_insights: adsData,\n    pixel_stats: pixelData\n  }\n};\n\n// Process Ads Insights Data\nif (adsData && adsData.data && adsData.data.length > 0) {\n  const campaigns = new Set();\n  const adsets = new Set();\n  const ads = new Set();\n  \n  let totalImpressions = 0;\n  let totalClicks = 0;\n  let totalSpend = 0;\n  let totalReach = 0;\n  let totalUniqueClicks = 0;\n  let weightedCpm = 0;\n  let weightedCpc = 0;\n  let weightedCtr = 0;\n  let weightedFrequency = 0;\n  \n  adsData.data.forEach(ad => {\n    // Track unique entities\n    if (ad.campaign_id) campaigns.add(ad.campaign_id);\n    if (ad.adset_id) adsets.add(ad.adset_id);\n    if (ad.ad_id) ads.add(ad.ad_id);\n    \n    // Sum base metrics\n    const impressions = parseInt(ad.impressions || 0);\n    const clicks = parseInt(ad.clicks || 0);\n    const spend = parseFloat(ad.spend || 0);\n    const reach = parseInt(ad.reach || 0);\n    const uniqueClicks = parseInt(ad.unique_clicks || 0);\n    \n    totalImpressions += impressions;\n    totalClicks += clicks;\n    totalSpend += spend;\n    totalReach += reach;\n    totalUniqueClicks += uniqueClicks;\n    \n    // Weighted averages (weighted by impressions)\n    if (impressions > 0) {\n      weightedCpm += (parseFloat(ad.cpm || 0) * impressions);\n      weightedCpc += (parseFloat(ad.cpc || 0) * clicks);\n      weightedCtr += (parseFloat(ad.ctr || 0) * impressions);\n      weightedFrequency += (parseFloat(ad.frequency || 0) * impressions);\n    }\n    \n    // Process conversions\n    if (ad.actions) {\n      ad.actions.forEach(action => {\n        const actionType = action.action_type;\n        const value = parseInt(action.value || 0);\n        \n        switch(actionType) {\n          case 'purchase':\n          case 'offsite_conversion.fb_pixel_purchase':\n            dailyMetrics.purchase_conversions += value;\n            dailyMetrics.total_conversions += value;\n            break;\n          case 'lead':\n          case 'offsite_conversion.fb_pixel_lead':\n            dailyMetrics.lead_conversions += value;\n            dailyMetrics.total_conversions += value;\n            break;\n          case 'complete_registration':\n          case 'offsite_conversion.fb_pixel_complete_registration':\n            dailyMetrics.registration_conversions += value;\n            dailyMetrics.total_conversions += value;\n            break;\n          case 'add_to_cart':\n          case 'offsite_conversion.fb_pixel_add_to_cart':\n            dailyMetrics.add_to_cart_conversions += value;\n            break;\n          case 'initiate_checkout':\n          case 'offsite_conversion.fb_pixel_initiate_checkout':\n            dailyMetrics.initiate_checkout_conversions += value;\n            break;\n        }\n      });\n    }\n    \n    // Process action values (revenue)\n    if (ad.action_values) {\n      ad.action_values.forEach(actionValue => {\n        const actionType = actionValue.action_type;\n        const value = parseFloat(actionValue.value || 0);\n        \n        if (actionType === 'purchase' || actionType === 'offsite_conversion.fb_pixel_purchase') {\n          dailyMetrics.purchase_revenue += value;\n          dailyMetrics.total_revenue += value;\n        }\n      });\n    }\n    \n    // Process conversion values if available\n    if (ad.conversion_values) {\n      ad.conversion_values.forEach(convValue => {\n        dailyMetrics.total_revenue += parseFloat(convValue.value || 0);\n      });\n    }\n  });\n  \n  // Set aggregated metrics\n  dailyMetrics.impressions = totalImpressions;\n  dailyMetrics.clicks = totalClicks;\n  dailyMetrics.spend = totalSpend;\n  dailyMetrics.reach = totalReach;\n  dailyMetrics.unique_clicks = totalUniqueClicks;\n  \n  // Calculate weighted averages\n  if (totalImpressions > 0) {\n    dailyMetrics.cpm = weightedCpm / totalImpressions;\n    dailyMetrics.ctr = weightedCtr / totalImpressions;\n    dailyMetrics.frequency = weightedFrequency / totalImpressions;\n  }\n  \n  if (totalClicks > 0) {\n    dailyMetrics.cpc = weightedCpc / totalClicks;\n  }\n  \n  // Set entity counts\n  dailyMetrics.active_campaigns = campaigns.size;\n  dailyMetrics.active_adsets = adsets.size;\n  dailyMetrics.active_ads = ads.size;\n  \n  // Calculate cost metrics\n  if (dailyMetrics.total_conversions > 0) {\n    dailyMetrics.cost_per_conversion = totalSpend / dailyMetrics.total_conversions;\n  }\n  \n  if (dailyMetrics.purchase_conversions > 0) {\n    dailyMetrics.cost_per_purchase = totalSpend / dailyMetrics.purchase_conversions;\n  }\n  \n  if (dailyMetrics.lead_conversions > 0) {\n    dailyMetrics.cost_per_lead = totalSpend / dailyMetrics.lead_conversions;\n  }\n  \n  // Calculate ROAS\n  if (totalSpend > 0) {\n    dailyMetrics.roas = dailyMetrics.total_revenue / totalSpend;\n  }\n}\n\n// Process Pixel Stats Data\nif (pixelData && pixelData.data && pixelData.data.length > 0) {\n  const stats = pixelData.data[0];\n  \n  dailyMetrics.server_events = stats.server_events || 0;\n  dailyMetrics.browser_events = stats.browser_events || 0;\n  dailyMetrics.matched_events = stats.matched_server_events || 0;\n  \n  // Calculate match rate\n  if (dailyMetrics.server_events > 0) {\n    dailyMetrics.match_rate = dailyMetrics.matched_events / dailyMetrics.server_events;\n  }\n}\n\nreturn [dailyMetrics];"
+      },
+      "id": "process-daily-metrics",
+      "name": "Process Daily Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1340, 300]
+    },
+    {
+      "parameters": {
+        "operation": "upsert",
+        "schema": "public",
+        "table": "metrics_daily",
+        "columns": {
+          "values": [
+            {
+              "column": "date",
+              "value": "={{ $json.date }}"
+            },
+            {
+              "column": "user_id",
+              "value": "={{ $json.user_id }}"
+            },
+            {
+              "column": "account_id",
+              "value": "={{ $json.account_id }}"
+            },
+            {
+              "column": "pixel_id",
+              "value": "={{ $json.pixel_id }}"
+            },
+            {
+              "column": "platform",
+              "value": "={{ $json.platform }}"
+            },
+            {
+              "column": "impressions",
+              "value": "={{ $json.impressions }}"
+            },
+            {
+              "column": "clicks",
+              "value": "={{ $json.clicks }}"
+            },
+            {
+              "column": "spend",
+              "value": "={{ $json.spend }}"
+            },
+            {
+              "column": "cpm",
+              "value": "={{ $json.cpm }}"
+            },
+            {
+              "column": "cpc",
+              "value": "={{ $json.cpc }}"
+            },
+            {
+              "column": "ctr",
+              "value": "={{ $json.ctr }}"
+            },
+            {
+              "column": "frequency",
+              "value": "={{ $json.frequency }}"
+            },
+            {
+              "column": "reach",
+              "value": "={{ $json.reach }}"
+            },
+            {
+              "column": "unique_clicks",
+              "value": "={{ $json.unique_clicks }}"
+            },
+            {
+              "column": "total_conversions",
+              "value": "={{ $json.total_conversions }}"
+            },
+            {
+              "column": "purchase_conversions",
+              "value": "={{ $json.purchase_conversions }}"
+            },
+            {
+              "column": "lead_conversions",
+              "value": "={{ $json.lead_conversions }}"
+            },
+            {
+              "column": "registration_conversions",
+              "value": "={{ $json.registration_conversions }}"
+            },
+            {
+              "column": "add_to_cart_conversions",
+              "value": "={{ $json.add_to_cart_conversions }}"
+            },
+            {
+              "column": "initiate_checkout_conversions",
+              "value": "={{ $json.initiate_checkout_conversions }}"
+            },
+            {
+              "column": "total_revenue",
+              "value": "={{ $json.total_revenue }}"
+            },
+            {
+              "column": "purchase_revenue",
+              "value": "={{ $json.purchase_revenue }}"
+            },
+            {
+              "column": "cost_per_conversion",
+              "value": "={{ $json.cost_per_conversion }}"
+            },
+            {
+              "column": "cost_per_purchase",
+              "value": "={{ $json.cost_per_purchase }}"
+            },
+            {
+              "column": "cost_per_lead",
+              "value": "={{ $json.cost_per_lead }}"
+            },
+            {
+              "column": "roas",
+              "value": "={{ $json.roas }}"
+            },
+            {
+              "column": "server_events",
+              "value": "={{ $json.server_events }}"
+            },
+            {
+              "column": "browser_events",
+              "value": "={{ $json.browser_events }}"
+            },
+            {
+              "column": "matched_events",
+              "value": "={{ $json.matched_events }}"
+            },
+            {
+              "column": "match_rate",
+              "value": "={{ $json.match_rate }}"
+            },
+            {
+              "column": "active_campaigns",
+              "value": "={{ $json.active_campaigns }}"
+            },
+            {
+              "column": "active_adsets",
+              "value": "={{ $json.active_adsets }}"
+            },
+            {
+              "column": "active_ads",
+              "value": "={{ $json.active_ads }}"
+            },
+            {
+              "column": "raw_data",
+              "value": "={{ JSON.stringify($json.raw_data) }}"
+            },
+            {
+              "column": "created_at",
+              "value": "={{ $json.created_at }}"
+            }
+          ]
+        },
+        "onConflict": "date,user_id,account_id,platform",
+        "options": {}
+      },
+      "id": "save-metrics-daily",
+      "name": "Save to metrics_daily",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [1560, 300],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-creds",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "success-check",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notExists"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "check-save-success",
+      "name": "Check Save Success",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [1780, 300]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "capiconfig",
+        "where": {
+          "values": [
+            {
+              "column": "user_id",
+              "value": "={{ $('Process Daily Metrics').item.json.user_id }}"
+            },
+            {
+              "column": "account_id",
+              "value": "={{ $('Process Daily Metrics').item.json.account_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "values": [
+            {
+              "column": "last_sync_at",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "column": "sync_status",
+              "value": "success"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "update-sync-status",
+      "name": "Update Sync Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2000, 200],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-creds",
+          "name": "Supabase API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "schema": "public",
+        "table": "capiconfig",
+        "where": {
+          "values": [
+            {
+              "column": "user_id",
+              "value": "={{ $('Process Daily Metrics').item.json.user_id }}"
+            },
+            {
+              "column": "account_id",
+              "value": "={{ $('Process Daily Metrics').item.json.account_id }}"
+            }
+          ]
+        },
+        "columns": {
+          "values": [
+            {
+              "column": "last_sync_at",
+              "value": "={{ $now.toISO() }}"
+            },
+            {
+              "column": "sync_status",
+              "value": "error"
+            },
+            {
+              "column": "last_error",
+              "value": "={{ $json.error || 'Unknown error occurred' }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "update-error-status",
+      "name": "Update Error Status",
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [2000, 400],
+      "credentials": {
+        "supabaseApi": {
+          "id": "supabase-creds",
+          "name": "Supabase API"
+        }
+      }
+    }
+  ],
+  "connections": {
+    "Daily Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get Facebook Configs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Facebook Configs": {
+      "main": [
+        [
+          {
+            "node": "Split Accounts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Accounts": {
+      "main": [
+        [
+          {
+            "node": "Prepare Variables",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Variables": {
+      "main": [
+        [
+          {
+            "node": "Fetch Ads Insights",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Fetch Pixel Stats",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Ads Insights": {
+      "main": [
+        [
+          {
+            "node": "Process Daily Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fetch Pixel Stats": {
+      "main": [
+        [
+          {
+            "node": "Process Daily Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Process Daily Metrics": {
+      "main": [
+        [
+          {
+            "node": "Save to metrics_daily",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to metrics_daily": {
+      "main": [
+        [
+          {
+            "node": "Check Save Success",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Save Success": {
+      "main": [
+        [
+          {
+            "node": "Update Sync Status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Error Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "id": "facebook-ads-metrics-daily",
+  "tags": ["facebook", "ads", "metrics", "daily", "reporting"]
+}
