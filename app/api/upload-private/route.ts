@@ -34,6 +34,9 @@ export async function POST(req: NextRequest) {
   const filename = (payload.filename || "").trim()
   const contentType = (payload.contentType || "application/octet-stream").trim()
 
+  console.log('Upload API Debug - Received payload:', payload)
+  console.log('Upload API Debug - accountId:', accountId, 'filename:', filename)
+
   if (!accountId || !filename) {
     return new Response(
       JSON.stringify({ error: "Missing account_id or filename" }),
@@ -43,7 +46,9 @@ export async function POST(req: NextRequest) {
 
   // Basic filename normalization (avoid path traversal)
   const safeName = filename.replace(/\\/g, "/").split("/").pop() || "upload.bin"
-  const objectPath = `${accountId}/${safeName}`
+  const objectPath = `assets/private/${accountId}/${safeName}`
+
+  console.log('Upload API Debug - Generated objectPath:', objectPath)
 
   const { data, error } = await supabaseAdmin.storage
     .from(BUCKET)

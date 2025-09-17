@@ -49,6 +49,14 @@ export default function SettingsPage() {
   const [capi, setCapi] = useState<Record<string, { pixel_id?: string | null; access_token?: string | null; domain?: string | null; eventsCsv?: string; test_event_code?: string | null; last_verified_at?: string | null }>>({})
   const [capiMsg, setCapiMsg] = useState<string>("")
 
+  // WooCommerce configuration state
+  const [wooConfig, setWooConfig] = useState<{
+    consumer_key: string
+    consumer_secret: string
+    url: string
+  }>({ consumer_key: "", consumer_secret: "", url: "" })
+  const [wooMsg, setWooMsg] = useState<string>("")
+
   useEffect(() => {
     const load = async () => {
       setLoading(true)
@@ -183,6 +191,23 @@ export default function SettingsPage() {
           interested_channels: toArr((prof as any).interested_channels),
         })
       }
+
+      // Load WooCommerce configuration from capiconfig table
+      const { data: wooData, error: wooError } = await supabase
+        .from("capiconfig")
+        .select("consumer_key, consumer_secret, url")
+        .eq("user_id", userRes.user.id)
+        .eq("account_id", "woocommerce-store")
+        .maybeSingle()
+
+      if (!wooError && wooData) {
+        setWooConfig({
+          consumer_key: wooData.consumer_key || "",
+          consumer_secret: wooData.consumer_secret ? "••••••••" : "",
+          url: wooData.url || ""
+        })
+      }
+
       setLoading(false)
     }
     load()
@@ -429,6 +454,85 @@ export default function SettingsPage() {
     } catch (e) {
       console.error("Unexpected error during delete:", e)
       setCapiMsg("Delete error occurred")
+    }
+  }
+
+  const saveWooConfig = async () => {
+    setWooMsg("")
+    const { data: userRes } = await supabase.auth.getUser()
+    const uid = userRes.user?.id
+    if (!uid) {
+      setWooMsg("Not authenticated")
+      return
+    }
+
+    const payload: any = {
+      user_id: uid,
+      account_id: "woocommerce-store", // Use a unique account_id for WooCommerce
+      provider: "facebook", // Use facebook provider to satisfy constraint
+      consumer_key: wooConfig.consumer_key || null,
+      url: wooConfig.url || null,
+    }
+
+    // Only save consumer_secret if user typed a non-masked value
+    if (wooConfig.consumer_secret && wooConfig.consumer_secret !== "••••••••") {
+      payload.consumer_secret = wooConfig.consumer_secret
+    }
+
+    console.log("Saving WooCommerce payload:", payload)
+
+    try {
+      const { data, error } = await supabase
+        .from("capiconfig")
+        .upsert(payload, { onConflict: "user_id,account_id" })
+        .select()
+
+      if (error) {
+        console.error("WooCommerce save failed:", error)
+        setWooMsg(`Error: ${error.message}`)
+      } else {
+        console.log("WooCommerce config saved successfully:", data)
+        setWooMsg("Saved")
+
+        // Update local state to show masked secret
+        setWooConfig(prev => ({
+          ...prev,
+          consumer_secret: prev.consumer_secret && prev.consumer_secret !== "••••••••" ? "••••••••" : prev.consumer_secret
+        }))
+      }
+    } catch (e) {
+      console.error("Unexpected error:", e)
+      setWooMsg("Error occurred")
+    }
+  }
+
+  const deleteWooConfig = async () => {
+    setWooMsg("")
+    const { data: userRes } = await supabase.auth.getUser()
+    const uid = userRes.user?.id
+    if (!uid) {
+      setWooMsg("Not authenticated")
+      return
+    }
+
+    try {
+      const { error } = await supabase
+        .from("capiconfig")
+        .delete()
+        .eq("user_id", uid)
+        .eq("account_id", "woocommerce-store")
+
+      if (error) {
+        console.error("WooCommerce delete failed:", error)
+        setWooMsg(`Delete error: ${error.message}`)
+      } else {
+        console.log("WooCommerce config deleted successfully")
+        setWooMsg("Deleted")
+        setWooConfig({ consumer_key: "", consumer_secret: "", url: "" })
+      }
+    } catch (e) {
+      console.error("Unexpected error during delete:", e)
+      setWooMsg("Delete error occurred")
     }
   }
 
@@ -926,6 +1030,87 @@ export default function SettingsPage() {
                       })}
                     </div>
                   )}
+
+                  {/* WooCommerce Configuration */}
+                  <div className="space-y-3">
+                    <h3 className="text-lg font-semibold text-orange-400 flex items-center gap-2">
+                      <span className="w-3 h-3 rounded-full bg-orange-500"></span>
+                      WooCommerce Account
+                    </h3>
+                    {wooMsg && (
+                      <div className={`text-sm ${wooMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{wooMsg}</div>
+                    )}
+                    <div className="rounded-md border border-orange-500/50 bg-orange-900/10 p-3 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div className="text-sm font-medium">
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-1 rounded text-xs bg-orange-500/20 text-orange-400">
+                              WooCommerce
+                            </span>
+                            <span>API Configuration</span>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-sm mb-1">Consumer Key</label>
+                          <Input
+                            value={wooConfig.consumer_key}
+                            onChange={(e) => setWooConfig(prev => ({ ...prev, consumer_key: e.target.value }))}
+                            placeholder="ck_..."
+                            className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm mb-1">Consumer Secret</label>
+                          <Input
+                            type="password"
+                            value={wooConfig.consumer_secret}
+                            onChange={(e) => setWooConfig(prev => ({ ...prev, consumer_secret: e.target.value }))}
+                            placeholder="cs_..."
+                            className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm mb-1">Store URL</label>
+                          <Input
+                            value={wooConfig.url}
+                            onChange={(e) => setWooConfig(prev => ({ ...prev, url: e.target.value }))}
+                            placeholder="https://yourstore.com"
+                            className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <p className="text-xs text-[#afafaf]">
+                          <strong>Setup Instructions:</strong>
+                        </p>
+                        <ol className="text-xs text-[#afafaf] space-y-1 ml-4 list-decimal">
+                          <li>Go to your WooCommerce store admin → WooCommerce → Settings → Advanced → REST API</li>
+                          <li>Click "Add key" and set permissions to "Read/Write"</li>
+                          <li>Copy the Consumer key and Consumer secret here</li>
+                          <li>Enter your store URL (e.g., https://yourstore.com)</li>
+                        </ol>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Button onClick={saveWooConfig} className="bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-600/90 hover:to-orange-500/90">
+                          Save WooCommerce Config
+                        </Button>
+                        <Button
+                          onClick={() => {
+                            if (confirm("Delete WooCommerce configuration?")) {
+                              deleteWooConfig()
+                            }
+                          }}
+                          variant="outline"
+                          className="border-red-500 text-red-400 hover:bg-red-500/10"
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+
                   {accounts.length > 0 && (
                     <div className="space-y-3">
                       <div className="flex gap-2">

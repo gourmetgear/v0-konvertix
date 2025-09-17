@@ -162,12 +162,21 @@ export async function GET(request: NextRequest) {
           if (!campaignData.has(campaignKey)) {
             campaignData.set(campaignKey, {
               campaign: campaignKey,
+              campaign_id: metric.campaign_id || null,
               spend: 0,
               revenue: 0,
               conversions: 0,
               impressions: 0,
               clicks: 0,
-              roas: 0
+              roas: 0,
+              ctr: 0,
+              cpc: 0,
+              cpm: 0,
+              cpp: 0,
+              status: metric.status || 'UNKNOWN',
+              objective: metric.objective || 'OUTCOME_SALES',
+              daily_budget: metric.daily_budget || null,
+              recordCount: 0
             })
           }
 
@@ -177,6 +186,19 @@ export async function GET(request: NextRequest) {
           campaign.conversions += parseInt(metric.conversions || 0) // Use 'conversions' instead of 'total_conversions'
           campaign.impressions += parseInt(metric.impressions || 0)
           campaign.clicks += parseInt(metric.clicks || 0)
+
+          // Update status to the most recent non-null status (take latest status per campaign)
+          if (metric.status && metric.status !== 'UNKNOWN') {
+            campaign.status = metric.status
+          }
+
+          // Accumulate CTR, CPC, CPM, CPP, ROAS for averaging
+          campaign.ctr += parseFloat(metric.ctr || 0)
+          campaign.cpc += parseFloat(metric.cpc || 0)
+          campaign.cpm += parseFloat(metric.cpm || 0)
+          campaign.cpp += parseFloat(metric.cpp || 0)
+          campaign.roas += parseFloat(metric.roas || 0)
+          campaign.recordCount += 1
         } catch (error) {
           console.error('Error processing metric:', error, metric)
         }
@@ -206,13 +228,53 @@ export async function GET(request: NextRequest) {
     }
 
     // Calculate campaign-level metrics
-    const campaigns = Array.from(campaignData.values()).map(campaign => ({
-      ...campaign,
-      roas: campaign.spend > 0 ? campaign.revenue / campaign.spend : 0,
-      cpm: campaign.impressions > 0 ? (campaign.spend / campaign.impressions) * 1000 : 0,
-      cpc: campaign.clicks > 0 ? campaign.spend / campaign.clicks : 0,
-      ctr: campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0
-    }))
+    const campaigns = Array.from(campaignData.values()).map(campaign => {
+      // Calculate final ROAS - use averaged ROAS from database if available, otherwise calculate
+      const finalRoas = campaign.recordCount > 0 && campaign.roas > 0 ?
+        campaign.roas / campaign.recordCount :
+        (campaign.spend > 0 ? campaign.revenue / campaign.spend : 0)
+
+      // Use averaged metrics if available, otherwise calculate from aggregated data
+      const finalCtr = campaign.recordCount > 0 ?
+        campaign.ctr / campaign.recordCount :
+        (campaign.impressions > 0 ? (campaign.clicks / campaign.impressions) * 100 : 0)
+
+      const finalCpc = campaign.recordCount > 0 ?
+        campaign.cpc / campaign.recordCount :
+        (campaign.clicks > 0 ? campaign.spend / campaign.clicks : 0)
+
+      const finalCpm = campaign.recordCount > 0 ?
+        campaign.cpm / campaign.recordCount :
+        (campaign.impressions > 0 ? (campaign.spend / campaign.impressions) * 1000 : 0)
+
+      const finalCpp = campaign.recordCount > 0 ?
+        campaign.cpp / campaign.recordCount :
+        (campaign.conversions > 0 ? campaign.spend / campaign.conversions : 0)
+
+      // Debug logging for ROAS and Status
+      if (campaign.campaign.includes('Test') || campaign.recordCount > 0) {
+        console.log('Campaign Debug:', {
+          name: campaign.campaign,
+          status: campaign.status,
+          rawRoas: campaign.roas,
+          recordCount: campaign.recordCount,
+          avgRoas: campaign.recordCount > 0 ? campaign.roas / campaign.recordCount : 0,
+          calculatedRoas: campaign.spend > 0 ? campaign.revenue / campaign.spend : 0,
+          finalRoas: finalRoas,
+          spend: campaign.spend,
+          revenue: campaign.revenue
+        })
+      }
+
+      return {
+        ...campaign,
+        roas: finalRoas,
+        ctr: finalCtr,
+        cpc: finalCpc,
+        cpm: finalCpm,
+        cpp: finalCpp
+      }
+    })
 
     return NextResponse.json({
       success: true,

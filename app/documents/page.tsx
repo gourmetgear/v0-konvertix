@@ -62,6 +62,7 @@ export default function DocumentsPage() {
   const fileInputRef = useRef<HTMLInputElement | null>(null)
   const [signedUrlMap, setSignedUrlMap] = useState<Record<string, string>>({})
   const [accountId, setAccountId] = useState<string>("")
+  const [userId, setUserId] = useState<string>("")
   const [pending, setPending] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [query, setQuery] = useState("")
@@ -142,40 +143,35 @@ export default function DocumentsPage() {
           setUserPrefix("")
           return
         }
+        setUserId(uid)
         if (PREFIX_MODE === "account") {
-          let prefix = ""
-          if (DEFAULT_ACCOUNT_ID) {
-            prefix = `${DEFAULT_ACCOUNT_ID}/`
-            setAccountId(DEFAULT_ACCOUNT_ID)
-          } else {
-            try {
-              const { data: acct } = await supabase
-                .from("my_accounts")
-                .select("id")
-                .limit(1)
-                .maybeSingle()
-              if (acct?.id) {
-                prefix = `${acct.id}/`
-                setAccountId(acct.id as string)
-              }
-            } catch {
-              // ignore; will show guidance below
-            }
-          }
-          if (!prefix) {
-            setError(
-              "Account prefix enabled but no account id found. Set NEXT_PUBLIC_ACCOUNT_ID in .env.local or make public.my_accounts readable to authenticated users."
-            )
-            setFiles([])
-            setUserPrefix("")
-            return
-          }
+          // Use the User ID as the Account ID for assets/private/{accountId}/ structure
+          console.log('Account mode - Using User ID as Account ID:', uid)
+
+          const actualAccountId = uid // Use User ID directly as Account ID
+          const prefix = `assets/private/${actualAccountId}/`
+
+          console.log('Account mode - Set accountId to:', actualAccountId)
+          console.log('Account mode - Using prefix:', prefix)
+
+          setAccountId(actualAccountId)
           setUserPrefix(prefix)
           await refresh(prefix)
           await fetchQuota()
         } else {
-          // Default: user-id prefix
-          const prefix = `${uid}/`
+          // Use the User ID directly as the Account ID for assets/private/{accountId}/ structure
+          // Since your User ID is 5ac29770-66f4-4b01-a6d2-08122fe480cd and that's what you want as the account ID
+          console.log('Using User ID as Account ID:', uid)
+
+          const actualAccountId = uid // Use User ID directly as Account ID
+
+          // Set the account ID state BEFORE using it
+          setAccountId(actualAccountId)
+          console.log('Set accountId state to:', actualAccountId)
+
+          // Use assets/private/{accountId}/ prefix for user documents
+          const prefix = `assets/private/${actualAccountId}/`
+          console.log('Using prefix:', prefix)
           setUserPrefix(prefix)
           await refresh(prefix)
           await fetchQuota()
@@ -189,13 +185,20 @@ export default function DocumentsPage() {
     load()
   }, [])
 
-  const uploadViaEdge = async (file: File) => {
+  const uploadViaEdge = async (file: File, overrideAccountId?: string) => {
     const { data: sessionRes } = await supabase.auth.getSession()
     const token = sessionRes.session?.access_token
     if (!token) throw new Error("Not authenticated")
     if (!SUPABASE_URL) throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL")
     if (!EDGE_UPLOAD_FN) throw new Error("Missing NEXT_PUBLIC_SUPABASE_UPLOAD_FN")
-    if (!accountId) throw new Error("Missing account id for upload")
+
+    // Use overrideAccountId if provided, otherwise use default accountId
+    const uploadAccountId = overrideAccountId || accountId
+    console.log('Upload Debug - uploadAccountId:', uploadAccountId, 'overrideAccountId:', overrideAccountId, 'accountId:', accountId)
+    if (!uploadAccountId) throw new Error("Missing account id for upload")
+
+    const payload = { account_id: uploadAccountId, filename: file.name, contentType: file.type }
+    console.log('Upload payload:', payload)
 
     const url = `/api/${EDGE_UPLOAD_FN}`
     const init = {
@@ -204,7 +207,7 @@ export default function DocumentsPage() {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       } as any,
-      body: JSON.stringify({ account_id: accountId, filename: file.name, contentType: file.type }),
+      body: JSON.stringify(payload),
     }
     const res = await fetch(url, init)
     if (!res.ok) {
@@ -248,15 +251,17 @@ export default function DocumentsPage() {
   }
 
   async function uploadSingle(file: File) {
+    console.log('uploadSingle called with accountId:', accountId, 'PREFIX_MODE:', PREFIX_MODE)
+
     if (PREFIX_MODE === "account") {
       await uploadViaEdge(file)
     } else {
-      const path = `${userPrefix}${file.name}`
-      const { error } = await supabase.storage.from(BUCKET).upload(path, file, {
-        upsert: true,
-        cacheControl: "3600",
-      })
-      if (error) throw error
+      // Ensure accountId is set before uploading
+      if (!accountId) {
+        throw new Error("Account ID not yet resolved. Please wait and try again.")
+      }
+      // Use uploadViaEdge for user prefix mode with assets/private structure
+      await uploadViaEdge(file, accountId)
     }
   }
 
@@ -505,7 +510,7 @@ export default function DocumentsPage() {
                 const { data: sessionRes } = await supabase.auth.getSession()
                 const token = sessionRes.session?.access_token
                 const payload: any = { prompt: genPrompt || "banana mascot", n: genCount }
-                if (PREFIX_MODE === "account") payload.account_id = accountId
+                if (PREFIX_MODE === "account" || accountId) payload.account_id = accountId
                 else payload.prefix = userPrefix
                 const res = await fetch("/api/generate-images", {
                   method: "POST",

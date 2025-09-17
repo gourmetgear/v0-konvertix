@@ -28,11 +28,18 @@ import {
   MoreHorizontal,
   RefreshCw,
   AlertCircle,
+  BarChart4,
+  Eye,
+  EyeOff,
+  Lightbulb,
+  TrendingDown,
+  Calendar,
 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import CampaignAnalysisModal from "@/components/CampaignAnalysisModal"
 
 interface Campaign {
   id: string
@@ -44,6 +51,12 @@ interface Campaign {
   date: string
   objective: string
   daily_budget: number | null
+  ctr: string | number
+  cpc: string | number
+  cpm: string | number
+  cpp: string | number
+  status?: string
+  campaign_id?: string
 }
 
 interface CampaignStats {
@@ -51,6 +64,18 @@ interface CampaignStats {
   activeCampaigns: number
   totalSpend: number
   avgRoas: number
+}
+
+interface CampaignAnalysis {
+  id: string
+  title: string
+  summary: string
+  detailed_analysis: any
+  insights: any[]
+  recommendations: any[]
+  metrics: any
+  confidence_score: number
+  created_at: string
 }
 
 export default function CampaignsPage() {
@@ -75,7 +100,31 @@ export default function CampaignsPage() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false)
   const [sortBy, setSortBy] = useState<string>('')
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc')
+  const [analyzingCampaigns, setAnalyzingCampaigns] = useState(false)
+  const [analyses, setAnalyses] = useState<CampaignAnalysis[]>([])
+  const [loadingAnalyses, setLoadingAnalyses] = useState(false)
+  const [showAnalyses, setShowAnalyses] = useState(false)
+  const [analysisModalOpen, setAnalysisModalOpen] = useState(false)
+  const [currentAnalysisResult, setCurrentAnalysisResult] = useState(null)
+  const [currentAnalysisCampaign, setCurrentAnalysisCampaign] = useState('')
+  const [analyzingSingleCampaign, setAnalyzingSingleCampaign] = useState<string | null>(null)
   const CAMPAIGNS_PER_PAGE = 10
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (isDropdownOpen) {
+        setIsDropdownOpen(false)
+      }
+    }
+
+    if (isDropdownOpen) {
+      document.addEventListener('click', handleClickOutside)
+      return () => {
+        document.removeEventListener('click', handleClickOutside)
+      }
+    }
+  }, [isDropdownOpen])
 
   useEffect(() => {
     const loadUserData = async () => {
@@ -96,6 +145,7 @@ export default function CampaignsPage() {
   useEffect(() => {
     if (userId) {
       fetchCampaigns()
+      fetchAnalyses()
     }
   }, [userId])
 
@@ -114,9 +164,29 @@ export default function CampaignsPage() {
     if (statusFilter !== 'All') {
       filtered = filtered.filter(campaign => {
         const campaignStatus = getCampaignStatus(campaign)
-        return campaignStatus === statusFilter
+        // Handle case-insensitive comparison and various status formats
+        const match = campaignStatus.toUpperCase() === statusFilter.toUpperCase()
+
+        // Debug logging for status filtering
+        if (!match) {
+          console.log('Filter Debug:', {
+            campaignName: campaign.campaign_name,
+            campaignStatus: campaignStatus,
+            statusFilter: statusFilter,
+            match: match
+          })
+        }
+
+        return match
       })
     }
+
+    console.log('Filter Results:', {
+      originalCount: campaigns.length,
+      filteredCount: filtered.length,
+      statusFilter: statusFilter,
+      searchTerm: searchTerm
+    })
 
     // Apply sorting
     if (sortBy) {
@@ -139,8 +209,17 @@ export default function CampaignsPage() {
           case 'conversions':
             result = a.conversions - b.conversions
             break
-          case 'revenue':
-            result = parseFloat(a.revenue as string) - parseFloat(b.revenue as string)
+          case 'ctr':
+            result = parseFloat(a.ctr as string) - parseFloat(b.ctr as string)
+            break
+          case 'cpc':
+            result = parseFloat(a.cpc as string) - parseFloat(b.cpc as string)
+            break
+          case 'cpm':
+            result = parseFloat(a.cpm as string) - parseFloat(b.cpm as string)
+            break
+          case 'cpp':
+            result = parseFloat(a.cpp as string) - parseFloat(b.cpp as string)
             break
           default:
             return 0
@@ -177,17 +256,38 @@ export default function CampaignsPage() {
       const campaignsData = result.data.campaigns || []
 
       // Convert campaigns data to the expected format
-      const campaignsList = campaignsData.map((campaign: any) => ({
-        id: campaign.campaign || `campaign-${Math.random()}`,
-        campaign_name: campaign.campaign,
-        spend: campaign.spend || 0,
-        revenue: campaign.revenue || 0,
-        conversions: campaign.conversions || 0,
-        roas: campaign.roas || 0,
-        date: new Date().toISOString().split('T')[0],
-        objective: 'OUTCOME_SALES',
-        daily_budget: null
-      }))
+      const campaignsList = campaignsData.map((campaign: any) => {
+        // Debug ROAS and Status values
+        if (campaign.campaign && (campaign.roas !== undefined || campaign.status)) {
+          console.log('Frontend Debug:', {
+            name: campaign.campaign,
+            status: campaign.status,
+            statusType: typeof campaign.status,
+            roas: campaign.roas,
+            roasType: typeof campaign.roas,
+            spend: campaign.spend,
+            revenue: campaign.revenue
+          })
+        }
+
+        return {
+          id: campaign.campaign || `campaign-${Math.random()}`,
+          campaign_name: campaign.campaign,
+          spend: campaign.spend || 0,
+          revenue: campaign.revenue || 0,
+          conversions: campaign.conversions || 0,
+          roas: campaign.roas || 0,
+          date: new Date().toISOString().split('T')[0],
+          objective: campaign.objective || 'OUTCOME_SALES',
+          daily_budget: campaign.daily_budget || null,
+          ctr: campaign.ctr || 0,
+          cpc: campaign.cpc || 0,
+          cpm: campaign.cpm || 0,
+          cpp: campaign.cpp || 0,
+          status: campaign.status || 'UNKNOWN',
+          campaign_id: campaign.campaign_id || null
+        }
+      })
 
       setCampaigns(campaignsList)
 
@@ -215,17 +315,51 @@ export default function CampaignsPage() {
     }
   }
 
+  const fetchAnalyses = async () => {
+    if (!userId) return
+
+    try {
+      setLoadingAnalyses(true)
+      // Skip fetching analyses since the table doesn't exist yet
+      // This can be re-enabled once the campaign_analysis table is created
+      console.log('Skipping analysis fetch - campaign_analysis table not available')
+      setAnalyses([])
+    } catch (error) {
+      console.error('Error fetching analyses:', error)
+    } finally {
+      setLoadingAnalyses(false)
+    }
+  }
+
   const getCampaignStatus = (campaign: Campaign) => {
+    // Use actual status from database if available, otherwise fall back to spend-based logic
+    if (campaign.status && campaign.status !== 'UNKNOWN') {
+      // Normalize status to title case for consistency
+      return campaign.status.charAt(0).toUpperCase() + campaign.status.slice(1).toLowerCase()
+    }
+
+    // Fallback logic for campaigns without status data
     const spent = parseFloat(campaign.spend as string) || 0
     return spent > 0 ? 'Active' : 'No Spend'
   }
 
   const getStatusBadge = (campaign: Campaign) => {
     const status = getCampaignStatus(campaign)
-    if (status === 'Active') {
-      return <Badge className="bg-green-600 hover:bg-green-700">Active</Badge>
-    } else {
-      return <Badge className="bg-gray-600 hover:bg-gray-700">No Spend</Badge>
+
+    switch (status.toLowerCase()) {
+      case 'active':
+        return <Badge className="bg-green-600 hover:bg-green-700">{status}</Badge>
+      case 'paused':
+        return <Badge className="bg-yellow-600 hover:bg-yellow-700">{status}</Badge>
+      case 'archived':
+        return <Badge className="bg-gray-600 hover:bg-gray-700">{status}</Badge>
+      case 'deleted':
+        return <Badge className="bg-red-600 hover:bg-red-700">{status}</Badge>
+      case 'no spend':
+        return <Badge className="bg-gray-600 hover:bg-gray-700">{status}</Badge>
+      default:
+        // Handle other statuses or show the actual status
+        return <Badge className="bg-blue-600 hover:bg-blue-700">{status}</Badge>
     }
   }
 
@@ -247,6 +381,16 @@ export default function CampaignsPage() {
     }).format(num)
   }
 
+  const formatPercentage = (value: number | string, decimals = 2) => {
+    const num = parseFloat(value as string) || 0
+    return `${formatNumber(num, decimals)}%`
+  }
+
+  const formatCurrencyMetric = (value: number | string, decimals = 2) => {
+    const num = parseFloat(value as string) || 0
+    return `$${formatNumber(num, decimals)}`
+  }
+
   const loadMoreCampaigns = () => {
     const nextPage = currentPage + 1
     const startIndex = 0 // Always start from beginning
@@ -260,11 +404,32 @@ export default function CampaignsPage() {
 
   const getStatusOptions = () => {
     const statuses = new Set(['All'])
-    campaigns.forEach(campaign => {
-      const status = getCampaignStatus(campaign)
-      statuses.add(status)
+
+    // Only process campaigns if they exist
+    if (campaigns && campaigns.length > 0) {
+      campaigns.forEach(campaign => {
+        try {
+          const status = getCampaignStatus(campaign)
+          // Normalize status display (capitalize first letter, rest lowercase for consistency)
+          const normalizedStatus = status.charAt(0).toUpperCase() + status.slice(1).toLowerCase()
+          statuses.add(normalizedStatus)
+        } catch (error) {
+          console.error('Error processing campaign status:', error, campaign)
+        }
+      })
+    }
+
+    const statusArray = Array.from(statuses).sort((a, b) => {
+      // Sort with 'All' first, then alphabetically
+      if (a === 'All') return -1
+      if (b === 'All') return 1
+      return a.localeCompare(b)
     })
-    return Array.from(statuses)
+
+    console.log('Status Options:', statusArray)
+    console.log('Current Status Filter:', statusFilter)
+    console.log('Total Campaigns:', campaigns?.length || 0)
+    return statusArray
   }
 
   const handleSort = (column: string) => {
@@ -283,6 +448,135 @@ export default function CampaignsPage() {
       <ChevronDown className="ml-1 h-4 w-4 inline" />
   }
 
+  const analyzeCampaigns = async () => {
+    if (!userId) {
+      setError('User not authenticated')
+      return
+    }
+
+    try {
+      setAnalyzingCampaigns(true)
+      setError(null)
+
+      // Use userId directly as account_id (same pattern as fetchCampaigns and reports API)
+      let accountId = userId
+
+      // Try to get account_id from account_members table as fallback
+      try {
+        const { data: accountMember, error: accountError } = await supabase
+          .from('account_members')
+          .select('account_id')
+          .eq('user_id', userId)
+          .single()
+
+        if (!accountError && accountMember) {
+          accountId = accountMember.account_id
+        }
+      } catch (fallbackError) {
+        // If account_members lookup fails, continue with userId as account_id
+        console.log('Using userId as account_id (account_members lookup failed):', fallbackError)
+      }
+
+      // Call the analyze campaigns webhook
+      const response = await fetch('https://n8n.konvertix.de/webhook/analyze-campaigns', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          account_id: accountId
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Analysis failed: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+
+      // Show success message and refresh analyses
+      alert('Campaign analysis started successfully! Check your reports for insights.')
+
+      // Refresh analyses after a short delay to allow processing
+      setTimeout(() => {
+        fetchAnalyses()
+      }, 2000)
+
+    } catch (error) {
+      console.error('Error analyzing campaigns:', error)
+      setError(error.message || 'Failed to analyze campaigns')
+    } finally {
+      setAnalyzingCampaigns(false)
+    }
+  }
+
+  const analyzeSingleCampaign = async (campaignName: string, campaignId?: string) => {
+    if (!userId) {
+      setError('User not authenticated')
+      return
+    }
+
+    try {
+      setError(null)
+      setAnalyzingSingleCampaign(campaignName)
+
+      // Use userId directly as account_id (same pattern as fetchCampaigns and reports API)
+      let accountId = userId
+
+      // Try to get account_id from account_members table as fallback
+      try {
+        const { data: accountMember, error: accountError } = await supabase
+          .from('account_members')
+          .select('account_id')
+          .eq('user_id', userId)
+          .single()
+
+        if (!accountError && accountMember) {
+          accountId = accountMember.account_id
+        }
+      } catch (fallbackError) {
+        // If account_members lookup fails, continue with userId as account_id
+        console.log('Using userId as account_id (account_members lookup failed):', fallbackError)
+      }
+
+      // Call the analyze single campaign webhook
+      const response = await fetch('https://n8n.konvertix.de/webhook/analyze-single-campaign', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          account_id: accountId,
+          campaign_name: campaignName,
+          campaign_id: campaignId
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error(`Analysis failed: ${response.statusText}`)
+      }
+
+      const result = await response.json()
+      console.log('Analysis result:', result)
+
+      // Display the analysis results in the modal
+      setCurrentAnalysisResult(result)
+      setCurrentAnalysisCampaign(campaignName)
+      setAnalysisModalOpen(true)
+
+      // Also refresh analyses for future reference
+      setTimeout(() => {
+        fetchAnalyses()
+      }, 2000)
+
+    } catch (error) {
+      console.error('Error analyzing single campaign:', error)
+      setError(error.message || `Failed to analyze campaign "${campaignName}"`)
+    } finally {
+      setAnalyzingSingleCampaign(null)
+    }
+  }
+
   const exportToCSV = () => {
     // Use filtered campaigns for export to include search/filter results
     const dataToExport = filteredCampaigns.length > 0 ? filteredCampaigns : campaigns
@@ -291,11 +585,15 @@ export default function CampaignsPage() {
     const headers = [
       'Campaign Name',
       'Status',
-      'Budget',
+      'Daily Budget',
       'Spent',
       'Revenue',
       'Conversions',
       'ROAS',
+      'CTR',
+      'CPC',
+      'CPM',
+      'CPP',
       'Date',
       'Objective'
     ]
@@ -309,6 +607,10 @@ export default function CampaignsPage() {
       formatCurrency(campaign.revenue).replace(/[$,]/g, ''),
       campaign.conversions.toString(),
       formatNumber(campaign.roas, 2),
+      formatNumber(campaign.ctr, 2),
+      formatNumber(campaign.cpc, 2),
+      formatNumber(campaign.cpm, 2),
+      formatNumber(campaign.cpp, 2),
       campaign.date,
       campaign.objective
     ])
@@ -343,9 +645,6 @@ export default function CampaignsPage() {
 
   return (
     <div className="min-h-screen bg-[#0b021c] text-white flex">
-      {/* Sidebar */}
-      
-
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Campaigns Content */}
@@ -367,6 +666,23 @@ export default function CampaignsPage() {
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Export
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => setShowAnalyses(!showAnalyses)}
+                  className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent"
+                >
+                  {showAnalyses ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
+                  {showAnalyses ? 'Hide Insights' : `View Insights ${analyses.length > 0 ? `(${analyses.length})` : ''}`}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={analyzeCampaigns}
+                  disabled={analyzingCampaigns || !userId || campaigns.length === 0}
+                  className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent disabled:opacity-50"
+                >
+                  <BarChart4 className={`mr-2 h-4 w-4 ${analyzingCampaigns ? 'animate-pulse' : ''}`} />
+                  {analyzingCampaigns ? 'Analyzing...' : 'Analyze'}
                 </Button>
                 <Button
                   variant="outline"
@@ -441,6 +757,104 @@ export default function CampaignsPage() {
               </Card>
             </div>
 
+            {/* Campaign Analysis Section */}
+            {showAnalyses && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-semibold flex items-center">
+                    <Lightbulb className="mr-2 h-5 w-5 text-yellow-400" />
+                    Campaign Insights
+                  </h2>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={fetchAnalyses}
+                    disabled={loadingAnalyses}
+                    className="text-[#afafaf] hover:text-white"
+                  >
+                    <RefreshCw className={`mr-2 h-4 w-4 ${loadingAnalyses ? 'animate-spin' : ''}`} />
+                    Refresh
+                  </Button>
+                </div>
+
+                {loadingAnalyses ? (
+                  <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
+                    <CardContent className="p-6 text-center">
+                      <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-[#a545b6]" />
+                      <p className="text-[#afafaf]">Loading analysis...</p>
+                    </CardContent>
+                  </Card>
+                ) : analyses.length === 0 ? (
+                  <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
+                    <CardContent className="p-6 text-center">
+                      <BarChart4 className="h-12 w-12 mx-auto mb-4 text-[#afafaf]" />
+                      <p className="text-white font-semibold mb-2">No analysis available</p>
+                      <p className="text-[#afafaf] mb-4">
+                        Click "Analyze" to generate AI-powered insights for your campaigns
+                      </p>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <div className="grid gap-4">
+                    {analyses.map((analysis) => (
+                      <Card key={analysis.id} className="bg-[#2b2b2b] border-[#3f3f3f]">
+                        <CardHeader className="pb-3">
+                          <div className="flex items-center justify-between">
+                            <CardTitle className="text-lg flex items-center">
+                              <TrendingUp className="mr-2 h-5 w-5 text-green-400" />
+                              {analysis.title}
+                            </CardTitle>
+                            <div className="flex items-center space-x-2">
+                              <Badge variant="outline" className="text-xs">
+                                {Math.round(analysis.confidence_score * 100)}% confidence
+                              </Badge>
+                              <div className="flex items-center text-xs text-[#afafaf]">
+                                <Calendar className="mr-1 h-3 w-3" />
+                                {new Date(analysis.created_at).toLocaleDateString()}
+                              </div>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          {analysis.summary && (
+                            <p className="text-[#afafaf] mb-4">{analysis.summary}</p>
+                          )}
+
+                          {analysis.insights && analysis.insights.length > 0 && (
+                            <div className="mb-4">
+                              <h4 className="text-sm font-semibold mb-2 text-white">Key Insights:</h4>
+                              <ul className="space-y-1">
+                                {analysis.insights.slice(0, 3).map((insight, index) => (
+                                  <li key={index} className="text-sm text-[#afafaf] flex items-start">
+                                    <span className="mr-2 mt-1">•</span>
+                                    <span>{typeof insight === 'string' ? insight : insight.text || insight.description}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+
+                          {analysis.recommendations && analysis.recommendations.length > 0 && (
+                            <div>
+                              <h4 className="text-sm font-semibold mb-2 text-white">Recommendations:</h4>
+                              <ul className="space-y-1">
+                                {analysis.recommendations.slice(0, 2).map((rec, index) => (
+                                  <li key={index} className="text-sm text-green-400 flex items-start">
+                                    <span className="mr-2 mt-1">→</span>
+                                    <span>{typeof rec === 'string' ? rec : rec.text || rec.description}</span>
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
             {/* Search and Filters */}
             <div className="flex items-center space-x-4">
               <div className="relative flex-1 max-w-md">
@@ -453,85 +867,122 @@ export default function CampaignsPage() {
                 />
               </div>
 
-              {/* Status Filter */}
-              <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
-                    Status: {statusFilter}
-                    <ChevronDown className="ml-2 h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="bg-[#2b2b2b] border-[#3f3f3f]">
-                  {getStatusOptions().map((status) => (
-                    <DropdownMenuItem
-                      key={status}
-                      className="text-white hover:bg-[#3f3f3f] cursor-pointer"
-                      onClick={(e) => {
-                        e.preventDefault()
-                        setStatusFilter(status)
-                        setIsDropdownOpen(false)
-                      }}
-                    >
-                      {status}
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuContent>
-              </DropdownMenu>
+              {/* Status Filter - Custom Dropdown */}
+              <div className="relative">
+                <Button
+                  variant="outline"
+                  className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent"
+                  onClick={(e) => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    console.log('Dropdown button clicked, current state:', isDropdownOpen)
+                    setIsDropdownOpen(!isDropdownOpen)
+                  }}
+                >
+                  Status: {statusFilter}
+                  <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                </Button>
+
+                {isDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 w-48 bg-[#2b2b2b] border border-[#3f3f3f] rounded-md shadow-lg z-50">
+                    {getStatusOptions().map((status) => (
+                      <button
+                        key={status}
+                        className="w-full text-left px-4 py-2 text-white hover:bg-[#3f3f3f] focus:bg-[#3f3f3f] focus:outline-none first:rounded-t-md last:rounded-b-md"
+                        onClick={(e) => {
+                          e.preventDefault()
+                          e.stopPropagation()
+                          console.log('Status selected:', status)
+                          setStatusFilter(status)
+                          setIsDropdownOpen(false)
+                        }}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
             </div>
 
             {/* Campaigns Table */}
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardContent className="p-0">
-                <Table>
+                <div className="overflow-x-auto">
+                  <Table className="min-w-full">
                   <TableHeader>
                     <TableRow className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
                       <TableHead
-                        className="text-[#afafaf] cursor-pointer hover:text-white select-none"
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[200px]"
                         onClick={() => handleSort('campaign_name')}
                       >
                         Campaign Name {getSortIcon('campaign_name')}
                       </TableHead>
-                      <TableHead className="text-[#afafaf]">Status</TableHead>
-                      <TableHead className="text-[#afafaf]">Budget</TableHead>
+                      <TableHead className="text-[#afafaf] min-w-[80px]">Status</TableHead>
+                      <TableHead className="text-[#afafaf] min-w-[80px]">Daily Budget</TableHead>
                       <TableHead
-                        className="text-[#afafaf] cursor-pointer hover:text-white select-none"
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('spend')}
                       >
                         Spent {getSortIcon('spend')}
                       </TableHead>
                       <TableHead
-                        className="text-[#afafaf] cursor-pointer hover:text-white select-none"
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('revenue')}
                       >
                         Revenue {getSortIcon('revenue')}
                       </TableHead>
                       <TableHead
-                        className="text-[#afafaf] cursor-pointer hover:text-white select-none"
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[100px]"
                         onClick={() => handleSort('conversions')}
                       >
                         Conversions {getSortIcon('conversions')}
                       </TableHead>
                       <TableHead
-                        className="text-[#afafaf] cursor-pointer hover:text-white select-none"
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('roas')}
                       >
                         ROAS {getSortIcon('roas')}
                       </TableHead>
-                      <TableHead className="text-[#afafaf]">Actions</TableHead>
+                      <TableHead
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
+                        onClick={() => handleSort('ctr')}
+                      >
+                        CTR {getSortIcon('ctr')}
+                      </TableHead>
+                      <TableHead
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
+                        onClick={() => handleSort('cpc')}
+                      >
+                        CPC {getSortIcon('cpc')}
+                      </TableHead>
+                      <TableHead
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
+                        onClick={() => handleSort('cpm')}
+                      >
+                        CPM {getSortIcon('cpm')}
+                      </TableHead>
+                      <TableHead
+                        className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
+                        onClick={() => handleSort('cpp')}
+                      >
+                        CPP {getSortIcon('cpp')}
+                      </TableHead>
+                      <TableHead className="text-[#afafaf] min-w-[100px]">Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {loading ? (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center py-8">
+                        <TableCell colSpan={12} className="text-center py-8">
                           <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-[#a545b6]" />
                           <p className="text-[#afafaf]">Loading campaigns...</p>
                         </TableCell>
                       </TableRow>
                     ) : displayedCampaigns.length === 0 ? (
                       <TableRow>
-                        <TableCell colSpan={8} className="text-center py-8">
+                        <TableCell colSpan={12} className="text-center py-8">
                           <BarChart3 className="h-12 w-12 mx-auto mb-4 text-[#afafaf]" />
                           <p className="text-white font-semibold mb-2">No campaigns found</p>
                           <p className="text-[#afafaf] mb-4">
@@ -549,6 +1000,10 @@ export default function CampaignsPage() {
                           <TableCell className="text-white">{formatCurrency(campaign.revenue)}</TableCell>
                           <TableCell className="text-white">{formatNumber(campaign.conversions)}</TableCell>
                           <TableCell className="text-white">{formatNumber(campaign.roas, 2)}x</TableCell>
+                          <TableCell className="text-white">{formatPercentage(campaign.ctr)}</TableCell>
+                          <TableCell className="text-white">{formatCurrencyMetric(campaign.cpc)}</TableCell>
+                          <TableCell className="text-white">{formatCurrencyMetric(campaign.cpm)}</TableCell>
+                          <TableCell className="text-white">{formatCurrencyMetric(campaign.cpp)}</TableCell>
                           <TableCell>
                             <div className="flex items-center space-x-2">
                               <Button variant="ghost" size="sm" className="text-[#afafaf] hover:text-white">
@@ -573,10 +1028,32 @@ export default function CampaignsPage() {
                                       e.preventDefault()
                                       if (navigating) return
                                       setNavigating(true)
-                                      router.push(`/campaigns/create-adset?campaign_id=${campaign.id}`)
+                                      router.push(`/campaigns/create-adset?campaign_id=${encodeURIComponent(campaign.id)}`)
                                     }}
                                   >
                                     Create Ad Set
+                                  </DropdownMenuItem>
+                                  <DropdownMenuItem
+                                    className="text-white hover:bg-[#3f3f3f] cursor-pointer disabled:opacity-50"
+                                    disabled={analyzingSingleCampaign === campaign.campaign_name}
+                                    onSelect={(e) => {
+                                      e.preventDefault()
+                                      if (analyzingSingleCampaign !== campaign.campaign_name) {
+                                        analyzeSingleCampaign(campaign.campaign_name, campaign.campaign_id)
+                                      }
+                                    }}
+                                  >
+                                    {analyzingSingleCampaign === campaign.campaign_name ? (
+                                      <>
+                                        <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
+                                        Analyzing...
+                                      </>
+                                    ) : (
+                                      <>
+                                        <BarChart4 className="mr-2 h-4 w-4" />
+                                        Analyze Campaign
+                                      </>
+                                    )}
                                   </DropdownMenuItem>
                                 </DropdownMenuContent>
                               </DropdownMenu>
@@ -587,6 +1064,7 @@ export default function CampaignsPage() {
                     )}
                   </TableBody>
                 </Table>
+                </div>
               </CardContent>
             </Card>
 
@@ -619,6 +1097,14 @@ export default function CampaignsPage() {
           </div>
         </main>
       </div>
+
+      {/* Campaign Analysis Modal */}
+      <CampaignAnalysisModal
+        isOpen={analysisModalOpen}
+        onClose={() => setAnalysisModalOpen(false)}
+        analysisResult={currentAnalysisResult}
+        campaignName={currentAnalysisCampaign}
+      />
     </div>
   )
 }

@@ -27,6 +27,7 @@ import {
   Download,
   RefreshCw,
   Wand2,
+  Package,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -184,6 +185,30 @@ export default function ToolsPage() {
                   </CardHeader>
                   <CardContent>
                     <p className="text-[#afafaf] mb-4">Analyze competitors and discover market opportunities</p>
+                    <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                      Launch Tool
+                      <ExternalLink className="h-4 w-4 ml-2" />
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Link>
+              <Link href="/products/upload">
+                <Card className="bg-[#2b2b2b] border-[#3f3f3f] hover:border-[#a545b6] transition-colors cursor-pointer">
+                  <CardHeader>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-10 h-10 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-lg flex items-center justify-center">
+                        <Package className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <CardTitle className="text-white text-lg">Product Uploader</CardTitle>
+                        <Badge variant="secondary" className="bg-[#3f3f3f] text-[#afafaf] text-xs">
+                          WooCommerce
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-[#afafaf] mb-4">Upload products directly to your WooCommerce store</p>
                     <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                       Launch Tool
                       <ExternalLink className="h-4 w-4 ml-2" />
