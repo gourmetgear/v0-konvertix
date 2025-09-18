@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Bell, ChevronDown } from "lucide-react"
 import { useLanguage } from '@/contexts/LanguageContext'
-import LanguageSwitcher from "@/components/LanguageSwitcher"
+import ProfileAvatar from "@/components/ui/ProfileAvatar"
 
 export default function AppHeader() {
   const { t } = useLanguage()
@@ -27,11 +27,10 @@ export default function AppHeader() {
             Select Business Manager
             <ChevronDown className="ml-2 h-4 w-4" />
           </Button>
-          <LanguageSwitcher />
           <Button variant="ghost" size="icon" className="text-[#afafaf] hover:text-white">
             <Bell className="h-5 w-5" />
           </Button>
-          <div className="w-8 h-8 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-full" />
+          <ProfileAvatar size="md" />
         </div>
       </div>
     </header>

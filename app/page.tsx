@@ -9,7 +9,7 @@ import Link from "next/link"
 import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function HomePage() {
-  const { t, language, setLanguage } = useLanguage()
+  const { t } = useLanguage()
   const [isCalendlyOpen, setIsCalendlyOpen] = useState(false)
   const [pricingTab, setPricingTab] = useState<"paid" | "seo" | "full">("paid")
 
@@ -147,29 +147,6 @@ export default function HomePage() {
           </nav>
 
           <div className="flex items-center gap-3">
-            {/* Language Switcher */}
-            <div className="flex items-center gap-1 mr-2">
-              <button
-                onClick={() => setLanguage('en')}
-                className={`px-2 py-1 text-sm rounded transition-colors ${
-                  language === 'en'
-                    ? 'bg-[#f59e0b] text-white'
-                    : 'text-[#afafaf] hover:text-white'
-                }`}
-              >
-                EN
-              </button>
-              <button
-                onClick={() => setLanguage('de')}
-                className={`px-2 py-1 text-sm rounded transition-colors ${
-                  language === 'de'
-                    ? 'bg-[#f59e0b] text-white'
-                    : 'text-[#afafaf] hover:text-white'
-                }`}
-              >
-                DE
-              </button>
-            </div>
             <Button asChild variant="ghost" className="hidden sm:inline-flex text-[#afafaf] hover:text-white">
               <Link href="/contact">{t("landingPage.header.contact")}</Link>
             </Button>
@@ -685,6 +662,11 @@ export default function HomePage() {
                   </Link>
                 </li>
                 <li>
+                  <Link href="/faq" className="hover:text-foreground transition-colors">
+                    {t("landingPage.footer.faq")}
+                  </Link>
+                </li>
+                <li>
                   <Link href="/contact" className="hover:text-foreground transition-colors">
                     {t("landingPage.footer.contact")}
                   </Link>
@@ -703,16 +685,34 @@ export default function HomePage() {
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">{t("landingPage.footer.salesConsulting")}</h4>
-              <p className="text-muted-foreground mb-4">
-                {t("landingPage.footer.salesDescription")}
-              </p>
-              <Button
-                asChild
-                className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-              >
-                <Link href="/dashboard">{t("landingPage.footer.bookCall")}</Link>
-              </Button>
+              <h4 className="font-semibold mb-4">{t("landingPage.footer.legal")}</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>
+                  <Link href="/legal/privacy-policy" className="hover:text-foreground transition-colors">
+                    {t("landingPage.footer.privacyPolicy")}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/terms-of-service" className="hover:text-foreground transition-colors">
+                    {t("landingPage.footer.termsOfService")}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/cookie-policy" className="hover:text-foreground transition-colors">
+                    {t("landingPage.footer.cookiePolicy")}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/gdpr" className="hover:text-foreground transition-colors">
+                    {t("landingPage.footer.gdpr")}
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/legal/data-processing" className="hover:text-foreground transition-colors">
+                    {t("landingPage.footer.dataProcessing")}
+                  </Link>
+                </li>
+              </ul>
             </div>
           </div>
 

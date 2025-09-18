@@ -81,15 +81,113 @@ export default function SEOPage() {
     }
   }
 
-  return (
-    <div className="min-h-screen bg-[#0b021c] text-white flex">
-      {/* Sidebar */}
-      
+  const blogPostIdeas = [
+    {
+      title: "10 Essential Facebook Ad Metrics Every Marketer Should Track",
+      category: "Facebook Ads",
+      searchVolume: 2400,
+      difficulty: 42,
+      estimatedTraffic: 720,
+      status: "planned",
+      priority: "high"
+    },
+    {
+      title: "Complete Guide to Google Ads Conversion Tracking in 2024",
+      category: "Google Ads",
+      searchVolume: 1800,
+      difficulty: 38,
+      estimatedTraffic: 540,
+      status: "in-progress",
+      priority: "high"
+    },
+    {
+      title: "How to Optimize Landing Pages for Maximum Conversion Rates",
+      category: "Conversion Optimization",
+      searchVolume: 3200,
+      difficulty: 55,
+      estimatedTraffic: 960,
+      status: "published",
+      priority: "medium"
+    },
+    {
+      title: "Email Marketing Automation: From Setup to Scale",
+      category: "Email Marketing",
+      searchVolume: 1600,
+      difficulty: 35,
+      estimatedTraffic: 480,
+      status: "planned",
+      priority: "medium"
+    },
+    {
+      title: "The Ultimate TikTok Ads Strategy for E-commerce Brands",
+      category: "Social Media",
+      searchVolume: 2800,
+      difficulty: 48,
+      estimatedTraffic: 840,
+      status: "draft",
+      priority: "high"
+    },
+    {
+      title: "Marketing Attribution Models: Which One Should You Use?",
+      category: "Analytics",
+      searchVolume: 1200,
+      difficulty: 62,
+      estimatedTraffic: 360,
+      status: "planned",
+      priority: "low"
+    },
+    {
+      title: "Programmatic Advertising: A Beginner's Complete Guide",
+      category: "Programmatic",
+      searchVolume: 1500,
+      difficulty: 45,
+      estimatedTraffic: 450,
+      status: "outline",
+      priority: "medium"
+    },
+    {
+      title: "Customer Lifetime Value: How to Calculate and Increase CLV",
+      category: "Analytics",
+      searchVolume: 2100,
+      difficulty: 52,
+      estimatedTraffic: 630,
+      status: "planned",
+      priority: "high"
+    }
+  ]
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        {/* SEO Content */}
-        <main className="flex-1 p-6">
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "published":
+        return <Badge className="bg-green-600 hover:bg-green-700">Published</Badge>
+      case "in-progress":
+        return <Badge className="bg-blue-600 hover:bg-blue-700">In Progress</Badge>
+      case "draft":
+        return <Badge className="bg-yellow-600 hover:bg-yellow-700">Draft</Badge>
+      case "outline":
+        return <Badge className="bg-purple-600 hover:bg-purple-700">Outline</Badge>
+      case "planned":
+        return <Badge className="bg-gray-600 hover:bg-gray-700">Planned</Badge>
+      default:
+        return <Badge className="bg-gray-600 hover:bg-gray-700">Unknown</Badge>
+    }
+  }
+
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return <Badge variant="destructive">High</Badge>
+      case "medium":
+        return <Badge className="bg-yellow-600 hover:bg-yellow-700">Medium</Badge>
+      case "low":
+        return <Badge variant="secondary">Low</Badge>
+      default:
+        return <Badge variant="secondary">Low</Badge>
+    }
+  }
+
+  return (
+    <main className="p-6">
           <div className="space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
@@ -148,6 +246,75 @@ export default function SEOPage() {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Blog Post Ideas */}
+            <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-white">Blog Post Ideas & Content Calendar</CardTitle>
+                  <div className="flex items-center space-x-3">
+                    <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
+                      <Filter className="h-4 w-4 mr-2" />
+                      Filter by Status
+                    </Button>
+                    <Button variant="outline" className="border-[#a545b6] text-[#a545b6] hover:bg-[#a545b6] hover:text-white bg-transparent">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Ideas
+                    </Button>
+                    <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Blog Post
+                    </Button>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
+                      <TableHead className="text-[#afafaf]">Blog Post Title</TableHead>
+                      <TableHead className="text-[#afafaf]">Category</TableHead>
+                      <TableHead className="text-[#afafaf]">Search Volume</TableHead>
+                      <TableHead className="text-[#afafaf]">Difficulty</TableHead>
+                      <TableHead className="text-[#afafaf]">Est. Traffic</TableHead>
+                      <TableHead className="text-[#afafaf]">Status</TableHead>
+                      <TableHead className="text-[#afafaf]">Priority</TableHead>
+                      <TableHead className="text-[#afafaf]">Actions</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {blogPostIdeas.map((idea, index) => (
+                      <TableRow key={index} className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
+                        <TableCell className="font-medium text-white max-w-md">
+                          <div className="truncate">{idea.title}</div>
+                        </TableCell>
+                        <TableCell className="text-white">{idea.category}</TableCell>
+                        <TableCell className="text-white">{idea.searchVolume.toLocaleString()}</TableCell>
+                        <TableCell className="text-white">{idea.difficulty}%</TableCell>
+                        <TableCell className="text-white">{idea.estimatedTraffic}</TableCell>
+                        <TableCell>{getStatusBadge(idea.status)}</TableCell>
+                        <TableCell>{getPriorityBadge(idea.priority)}</TableCell>
+                        <TableCell>
+                          <div className="flex items-center space-x-2">
+                            <Link href={`/seo/blog/${index + 1}`}>
+                              <Button variant="ghost" size="sm" className="text-[#afafaf] hover:text-white">
+                                <Eye className="h-4 w-4" />
+                              </Button>
+                            </Link>
+                            <Button variant="ghost" size="sm" className="text-[#afafaf] hover:text-white">
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button variant="ghost" size="sm" className="text-[#afafaf] hover:text-white">
+                              <ExternalLink className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
 
             {/* Charts Section */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -309,8 +476,6 @@ export default function SEOPage() {
               </CardContent>
             </Card>
           </div>
-        </main>
-      </div>
-    </div>
+    </main>
   )
 }

@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
+import { useLanguage } from "@/contexts/LanguageContext"
 import {
   Search,
   Bell,
@@ -17,6 +18,7 @@ import {
   Settings,
   HeadphonesIcon,
   Upload,
+  Globe,
 } from "lucide-react"
 import Link from "next/link"
 
@@ -29,6 +31,7 @@ export default function SettingsPage() {
 }
 
 function SettingsContent() {
+  const { t, language, setLanguage } = useLanguage()
   // account_members rows for this user
   const [accounts, setAccounts] = useState<Array<{ account_id: string; ad_account_id: string | null; business_id: string | null; ad_token: string | null }>>([])
   const [loading, setLoading] = useState(true)
@@ -52,8 +55,44 @@ function SettingsContent() {
     marketing_channels?: string[] | null
     interested_channels?: string[] | null
     reporting_frequency?: string | null
+    // Product Information
+    product_type?: string | null
+    product_category?: string | null
+    main_products?: string | null
+    product_description?: string | null
+    unique_selling_proposition?: string | null
+    price_range?: string | null
+    // Business Model
+    business_model?: string | null
+    revenue_streams?: string[] | null
+    target_market?: string | null
+    geographic_reach?: string | null
+    // Competition & Market
+    main_competitors?: string | null
+    competitive_advantage?: string | null
+    market_position?: string | null
+    // Customer Information
+    customer_demographics?: string | null
+    customer_pain_points?: string | null
+    customer_journey_stage?: string | null
+    average_customer_value?: string | null
+    customer_lifetime_value?: string | null
   }>({ business_name: null, website_url: null, industry: null, business_size: null })
   const [profileMsg, setProfileMsg] = useState<string>("")
+  const [marketingMsg, setMarketingMsg] = useState<string>("")
+  const [marketMsg, setMarketMsg] = useState<string>("")
+  const [customerMsg, setCustomerMsg] = useState<string>("")
+
+  // Personal profile state
+  const [personalProfile, setPersonalProfile] = useState<{
+    first_name: string
+    last_name: string
+    email: string
+    profile_picture_url: string
+  }>({ first_name: "", last_name: "", email: "", profile_picture_url: "" })
+  const [personalProfileMsg, setPersonalProfileMsg] = useState<string>("")
+  const [uploadingImage, setUploadingImage] = useState<boolean>(false)
+
   // capiconfig per account
   const [capi, setCapi] = useState<Record<string, { pixel_id?: string | null; access_token?: string | null; domain?: string | null; eventsCsv?: string; test_event_code?: string | null; last_verified_at?: string | null }>>({})
   const [capiMsg, setCapiMsg] = useState<string>("")
@@ -185,7 +224,7 @@ function SettingsContent() {
       // Load profile basics (business info saved from onboarding)
       const { data: prof, error: profErr } = await supabase
         .from("profiles")
-        .select("business_name, website_url, industry, business_size, full_name, marketing_goal, monthly_budget, target_audience, marketing_challenges, marketing_channels, interested_channels, reporting_frequency")
+        .select("business_name, website_url, industry, business_size, full_name, marketing_goal, monthly_budget, target_audience, marketing_challenges, marketing_channels, interested_channels, reporting_frequency, product_type, product_category, main_products, product_description, unique_selling_proposition, price_range, business_model, revenue_streams, target_market, geographic_reach, main_competitors, competitive_advantage, market_position, customer_demographics, customer_pain_points, customer_journey_stage, average_customer_value, customer_lifetime_value, profile_picture_url")
         .eq("id", userRes.user.id)
         .maybeSingle()
       if (!profErr && prof) {
@@ -198,6 +237,20 @@ function SettingsContent() {
           ...(prof as any),
           marketing_channels: toArr((prof as any).marketing_channels),
           interested_channels: toArr((prof as any).interested_channels),
+          revenue_streams: toArr((prof as any).revenue_streams),
+        })
+
+        // Load personal profile data - split full_name into first and last
+        const fullName = prof.full_name || ""
+        const nameParts = fullName.split(" ")
+        const firstName = nameParts[0] || ""
+        const lastName = nameParts.slice(1).join(" ") || ""
+
+        setPersonalProfile({
+          first_name: firstName,
+          last_name: lastName,
+          email: userRes.user.email || "",
+          profile_picture_url: prof.profile_picture_url || "",
         })
       }
 
@@ -282,10 +335,304 @@ function SettingsContent() {
         marketing_channels: (profile.marketing_channels || null) as any,
         interested_channels: (profile.interested_channels || null) as any,
         reporting_frequency: profile.reporting_frequency || null,
+        // Product Information
+        product_type: profile.product_type || null,
+        product_category: profile.product_category || null,
+        main_products: profile.main_products || null,
+        product_description: profile.product_description || null,
+        unique_selling_proposition: profile.unique_selling_proposition || null,
+        price_range: profile.price_range || null,
+        // Business Model
+        business_model: profile.business_model || null,
+        revenue_streams: (profile.revenue_streams || null) as any,
+        target_market: profile.target_market || null,
+        geographic_reach: profile.geographic_reach || null,
+        // Competition & Market
+        main_competitors: profile.main_competitors || null,
+        competitive_advantage: profile.competitive_advantage || null,
+        market_position: profile.market_position || null,
+        // Customer Information
+        customer_demographics: profile.customer_demographics || null,
+        customer_pain_points: profile.customer_pain_points || null,
+        customer_journey_stage: profile.customer_journey_stage || null,
+        average_customer_value: profile.average_customer_value || null,
+        customer_lifetime_value: profile.customer_lifetime_value || null,
       }
     const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
     if (error) setProfileMsg(error.message)
     else setProfileMsg("Saved")
+  }
+
+  const saveMarketProfile = async () => {
+    setMarketMsg("")
+    const { data: userRes } = await supabase.auth.getUser()
+    const uid = userRes.user?.id
+    if (!uid) {
+      setMarketMsg("Not signed in")
+      return
+    }
+      const payload: any = {
+        id: uid,
+        business_name: profile.business_name || null,
+        website_url: profile.website_url || null,
+        industry: profile.industry || null,
+        business_size: profile.business_size || null,
+        full_name: profile.full_name || null,
+        marketing_goal: profile.marketing_goal || null,
+        monthly_budget: profile.monthly_budget || null,
+        target_audience: profile.target_audience || null,
+        marketing_challenges: profile.marketing_challenges || null,
+        marketing_channels: (profile.marketing_channels || null) as any,
+        interested_channels: (profile.interested_channels || null) as any,
+        reporting_frequency: profile.reporting_frequency || null,
+        // Product Information
+        product_type: profile.product_type || null,
+        product_category: profile.product_category || null,
+        main_products: profile.main_products || null,
+        product_description: profile.product_description || null,
+        unique_selling_proposition: profile.unique_selling_proposition || null,
+        price_range: profile.price_range || null,
+        // Business Model
+        business_model: profile.business_model || null,
+        revenue_streams: (profile.revenue_streams || null) as any,
+        target_market: profile.target_market || null,
+        geographic_reach: profile.geographic_reach || null,
+        // Competition & Market
+        main_competitors: profile.main_competitors || null,
+        competitive_advantage: profile.competitive_advantage || null,
+        market_position: profile.market_position || null,
+        // Customer Information
+        customer_demographics: profile.customer_demographics || null,
+        customer_pain_points: profile.customer_pain_points || null,
+        customer_journey_stage: profile.customer_journey_stage || null,
+        average_customer_value: profile.average_customer_value || null,
+        customer_lifetime_value: profile.customer_lifetime_value || null,
+      }
+    const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
+    if (error) setMarketMsg(error.message)
+    else setMarketMsg("Saved")
+  }
+
+  const saveMarketingPreferences = async () => {
+    setMarketingMsg("")
+    const { data: userRes } = await supabase.auth.getUser()
+    const uid = userRes.user?.id
+    if (!uid) {
+      setMarketingMsg("Not signed in")
+      return
+    }
+      const payload: any = {
+        id: uid,
+        business_name: profile.business_name || null,
+        website_url: profile.website_url || null,
+        industry: profile.industry || null,
+        business_size: profile.business_size || null,
+        full_name: profile.full_name || null,
+        marketing_goal: profile.marketing_goal || null,
+        monthly_budget: profile.monthly_budget || null,
+        target_audience: profile.target_audience || null,
+        marketing_challenges: profile.marketing_challenges || null,
+        marketing_channels: (profile.marketing_channels || null) as any,
+        interested_channels: (profile.interested_channels || null) as any,
+        reporting_frequency: profile.reporting_frequency || null,
+        // Product Information
+        product_type: profile.product_type || null,
+        product_category: profile.product_category || null,
+        main_products: profile.main_products || null,
+        product_description: profile.product_description || null,
+        unique_selling_proposition: profile.unique_selling_proposition || null,
+        price_range: profile.price_range || null,
+        // Business Model
+        business_model: profile.business_model || null,
+        revenue_streams: (profile.revenue_streams || null) as any,
+        target_market: profile.target_market || null,
+        geographic_reach: profile.geographic_reach || null,
+        // Competition & Market
+        main_competitors: profile.main_competitors || null,
+        competitive_advantage: profile.competitive_advantage || null,
+        market_position: profile.market_position || null,
+        // Customer Information
+        customer_demographics: profile.customer_demographics || null,
+        customer_pain_points: profile.customer_pain_points || null,
+        customer_journey_stage: profile.customer_journey_stage || null,
+        average_customer_value: profile.average_customer_value || null,
+        customer_lifetime_value: profile.customer_lifetime_value || null,
+      }
+    const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
+    if (error) setMarketingMsg(error.message)
+    else setMarketingMsg("Saved")
+  }
+
+  const saveCustomerProfile = async () => {
+    setCustomerMsg("")
+    const { data: userRes } = await supabase.auth.getUser()
+    const uid = userRes.user?.id
+    if (!uid) {
+      setCustomerMsg("Not signed in")
+      return
+    }
+      const payload: any = {
+        id: uid,
+        business_name: profile.business_name || null,
+        website_url: profile.website_url || null,
+        industry: profile.industry || null,
+        business_size: profile.business_size || null,
+        full_name: profile.full_name || null,
+        marketing_goal: profile.marketing_goal || null,
+        monthly_budget: profile.monthly_budget || null,
+        target_audience: profile.target_audience || null,
+        marketing_challenges: profile.marketing_challenges || null,
+        marketing_channels: (profile.marketing_channels || null) as any,
+        interested_channels: (profile.interested_channels || null) as any,
+        reporting_frequency: profile.reporting_frequency || null,
+        // Product Information
+        product_type: profile.product_type || null,
+        product_category: profile.product_category || null,
+        main_products: profile.main_products || null,
+        product_description: profile.product_description || null,
+        unique_selling_proposition: profile.unique_selling_proposition || null,
+        price_range: profile.price_range || null,
+        // Business Model
+        business_model: profile.business_model || null,
+        revenue_streams: (profile.revenue_streams || null) as any,
+        target_market: profile.target_market || null,
+        geographic_reach: profile.geographic_reach || null,
+        // Competition & Market
+        main_competitors: profile.main_competitors || null,
+        competitive_advantage: profile.competitive_advantage || null,
+        market_position: profile.market_position || null,
+        // Customer Information
+        customer_demographics: profile.customer_demographics || null,
+        customer_pain_points: profile.customer_pain_points || null,
+        customer_journey_stage: profile.customer_journey_stage || null,
+        average_customer_value: profile.average_customer_value || null,
+        customer_lifetime_value: profile.customer_lifetime_value || null,
+      }
+    const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
+    if (error) setCustomerMsg(error.message)
+    else setCustomerMsg("Saved")
+  }
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setPersonalProfileMsg("Please select a valid image file")
+      return
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setPersonalProfileMsg("Image must be smaller than 5MB")
+      return
+    }
+
+    setUploadingImage(true)
+    setPersonalProfileMsg("")
+
+    try {
+      const { data: userRes } = await supabase.auth.getUser()
+      const uid = userRes.user?.id
+      if (!uid) {
+        setPersonalProfileMsg("Not signed in")
+        setUploadingImage(false)
+        return
+      }
+
+      // Try different bucket first - use 'avatars' which is commonly supported
+      const fileExt = file.name.split('.').pop()
+      const fileName = `avatar_${Date.now()}.${fileExt}`
+
+      // First try avatars bucket, then fall back to assets-public
+      let uploadData, uploadError;
+
+      // Try avatars bucket first
+      const avatarsUpload = await supabase.storage
+        .from('avatars')
+        .upload(fileName, file, {
+          upsert: true,
+        })
+
+      if (!avatarsUpload.error) {
+        uploadData = avatarsUpload.data
+        uploadError = null
+      } else {
+        // Fallback to assets-public
+        const assetsUpload = await supabase.storage
+          .from('assets-public')
+          .upload(fileName, file, {
+            upsert: true,
+          })
+        uploadData = assetsUpload.data
+        uploadError = assetsUpload.error
+      }
+
+      if (uploadError) {
+        console.error('Storage upload error:', uploadError)
+        setPersonalProfileMsg(`Upload failed: ${uploadError.message}`)
+        setUploadingImage(false)
+        return
+      }
+
+      // Get public URL from the correct bucket
+      const bucketName = !avatarsUpload.error ? 'avatars' : 'assets-public'
+      const { data: { publicUrl } } = supabase.storage
+        .from(bucketName)
+        .getPublicUrl(fileName)
+
+      // Update personal profile state with new URL
+      setPersonalProfile(prev => ({
+        ...prev,
+        profile_picture_url: publicUrl
+      }))
+
+      setPersonalProfileMsg("Profile picture uploaded successfully")
+    } catch (error) {
+      setPersonalProfileMsg("Upload failed. Please try again.")
+    } finally {
+      setUploadingImage(false)
+    }
+  }
+
+  const savePersonalProfile = async () => {
+    setPersonalProfileMsg("")
+    const { data: userRes } = await supabase.auth.getUser()
+    const uid = userRes.user?.id
+    if (!uid) {
+      setPersonalProfileMsg("Not signed in")
+      return
+    }
+
+    // Combine first and last name for full_name
+    const fullName = `${personalProfile.first_name} ${personalProfile.last_name}`.trim()
+
+    // Update user metadata for name and auth email update
+    const { error: updateError } = await supabase.auth.updateUser({
+      data: { full_name: fullName },
+      email: personalProfile.email
+    })
+
+    if (updateError) {
+      setPersonalProfileMsg(updateError.message)
+      return
+    }
+
+    // Also update the profiles table with individual fields
+    const { error: profileError } = await supabase.from("profiles").upsert({
+      id: uid,
+      full_name: fullName || null,
+      first_name: personalProfile.first_name || null,
+      last_name: personalProfile.last_name || null,
+      profile_picture_url: personalProfile.profile_picture_url || null,
+    }, { onConflict: "id" })
+
+    if (profileError) {
+      setPersonalProfileMsg(profileError.message)
+    } else {
+      setPersonalProfileMsg("Saved")
+    }
   }
 
   const setCapiField = (accountId: string, field: string, value: string) => {
@@ -567,31 +914,78 @@ function SettingsContent() {
 
                   {/* Profile Picture Upload */}
                   <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 bg-[#3f3f3f] rounded-full flex items-center justify-center">
-                      <Upload className="h-6 w-6 text-[#afafaf]" />
+                    <div className="w-16 h-16 bg-[#3f3f3f] rounded-full flex items-center justify-center overflow-hidden">
+                      {personalProfile.profile_picture_url ? (
+                        <img
+                          src={personalProfile.profile_picture_url}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <Upload className="h-6 w-6 text-[#afafaf]" />
+                      )}
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-medium">Upload Profile</p>
-                      <p className="text-xs text-[#afafaf]">Min 600x600.PNG, JPEG</p>
+                      <p className="text-sm font-medium">Upload Profile Picture</p>
+                      <p className="text-xs text-[#afafaf]">PNG, JPEG. Max 5MB</p>
                     </div>
-                    <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
-                      Upload
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        id="profile-picture-upload"
+                        disabled={uploadingImage}
+                      />
+                      <Button
+                        variant="outline"
+                        className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent"
+                        onClick={() => document.getElementById('profile-picture-upload')?.click()}
+                        disabled={uploadingImage}
+                      >
+                        {uploadingImage ? "Uploading..." : "Upload"}
+                      </Button>
+                      {personalProfile.profile_picture_url && (
+                        <Button
+                          variant="outline"
+                          className="border-red-500 text-red-400 hover:bg-red-500/10"
+                          onClick={() => setPersonalProfile(prev => ({ ...prev, profile_picture_url: "" }))}
+                        >
+                          Remove
+                        </Button>
+                      )}
+                    </div>
                   </div>
 
                   {/* Name and Email Fields */}
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Name</label>
-                      <Input
-                        placeholder="Name"
-                        className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                      />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">First Name</label>
+                        <Input
+                          value={personalProfile.first_name}
+                          onChange={(e) => setPersonalProfile((p) => ({ ...p, first_name: e.target.value }))}
+                          placeholder="John"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Last Name</label>
+                        <Input
+                          value={personalProfile.last_name}
+                          onChange={(e) => setPersonalProfile((p) => ({ ...p, last_name: e.target.value }))}
+                          placeholder="Doe"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
+                        />
+                      </div>
                     </div>
                     <div>
                       <label className="block text-sm font-medium mb-2">Email</label>
                       <Input
-                        placeholder="Mail id"
+                        value={personalProfile.email}
+                        onChange={(e) => setPersonalProfile((p) => ({ ...p, email: e.target.value }))}
+                        placeholder="your.email@example.com"
                         type="email"
                         className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
                       />
@@ -613,6 +1007,14 @@ function SettingsContent() {
                       </Button>
                     </div>
                   </div>
+
+                  {/* Save Personal Profile Button */}
+                  <div className="flex items-center gap-3">
+                    <Button onClick={savePersonalProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                      Save Personal Profile
+                    </Button>
+                    {personalProfileMsg && <span className={`text-sm ${personalProfileMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{personalProfileMsg}</span>}
+                  </div>
                 </CardContent>
               </Card>
 
@@ -620,57 +1022,186 @@ function SettingsContent() {
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardContent className="p-6 space-y-6">
                   <h2 className="text-xl font-semibold">Business Profile</h2>
+
+                  {/* Basic Business Information */}
                   <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Business Name</label>
-                      <Input
-                        value={profile.business_name ?? ""}
-                        onChange={(e) => setProfile((p) => ({ ...p, business_name: e.target.value }))}
-                        placeholder="Your company"
-                        className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Website URL</label>
-                      <Input
-                        value={profile.website_url ?? ""}
-                        onChange={(e) => setProfile((p) => ({ ...p, website_url: e.target.value }))}
-                        placeholder="https://yourwebsite.com"
-                        className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Industry</label>
-                      <select
-                        value={profile.industry ?? ""}
-                        onChange={(e) => setProfile((p) => ({ ...p, industry: e.target.value }))}
-                        className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
-                      >
-                        <option value="">Select industry</option>
-                        <option value="ecommerce">E-commerce</option>
-                        <option value="saas">SaaS</option>
-                        <option value="healthcare">Healthcare</option>
-                        <option value="finance">Finance</option>
-                        <option value="education">Education</option>
-                        <option value="real-estate">Real Estate</option>
-                        <option value="other">Other</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium mb-2">Business Size</label>
-                      <select
-                        value={profile.business_size ?? ""}
-                        onChange={(e) => setProfile((p) => ({ ...p, business_size: e.target.value }))}
-                        className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
-                      >
-                        <option value="">Select size</option>
-                        <option value="startup">Startup (1-10 employees)</option>
-                        <option value="small">Small (11-50 employees)</option>
-                        <option value="medium">Medium (51-200 employees)</option>
-                        <option value="large">Large (200+ employees)</option>
-                      </select>
+                    <h3 className="text-lg font-medium text-[#a545b6]">Basic Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Business Name</label>
+                        <Input
+                          value={profile.business_name ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, business_name: e.target.value }))}
+                          placeholder="Your company"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Website URL</label>
+                        <Input
+                          value={profile.website_url ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, website_url: e.target.value }))}
+                          placeholder="https://yourwebsite.com"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Industry</label>
+                        <select
+                          value={profile.industry ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, industry: e.target.value }))}
+                          className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                        >
+                          <option value="">Select industry</option>
+                          <option value="ecommerce">E-commerce</option>
+                          <option value="saas">SaaS</option>
+                          <option value="healthcare">Healthcare</option>
+                          <option value="finance">Finance</option>
+                          <option value="education">Education</option>
+                          <option value="real-estate">Real Estate</option>
+                          <option value="manufacturing">Manufacturing</option>
+                          <option value="retail">Retail</option>
+                          <option value="consulting">Consulting</option>
+                          <option value="food-beverage">Food & Beverage</option>
+                          <option value="travel-hospitality">Travel & Hospitality</option>
+                          <option value="other">Other</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Business Size</label>
+                        <select
+                          value={profile.business_size ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, business_size: e.target.value }))}
+                          className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                        >
+                          <option value="">Select size</option>
+                          <option value="startup">Startup (1-10 employees)</option>
+                          <option value="small">Small (11-50 employees)</option>
+                          <option value="medium">Medium (51-200 employees)</option>
+                          <option value="large">Large (200+ employees)</option>
+                        </select>
+                      </div>
                     </div>
                   </div>
+
+                  {/* Product Information */}
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-medium text-[#a545b6]">Product Information</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Product Type</label>
+                        <select
+                          value={profile.product_type ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, product_type: e.target.value }))}
+                          className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                        >
+                          <option value="">Select type</option>
+                          <option value="physical-product">Physical Product</option>
+                          <option value="digital-product">Digital Product</option>
+                          <option value="service">Service</option>
+                          <option value="software">Software/SaaS</option>
+                          <option value="subscription">Subscription</option>
+                          <option value="marketplace">Marketplace</option>
+                          <option value="hybrid">Hybrid (Product + Service)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Product Category</label>
+                        <Input
+                          value={profile.product_category ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, product_category: e.target.value }))}
+                          placeholder="e.g., Electronics, Fashion, B2B Software"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Price Range</label>
+                        <select
+                          value={profile.price_range ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, price_range: e.target.value }))}
+                          className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                        >
+                          <option value="">Select range</option>
+                          <option value="under-25">Under $25</option>
+                          <option value="25-100">$25 - $100</option>
+                          <option value="100-500">$100 - $500</option>
+                          <option value="500-1000">$500 - $1,000</option>
+                          <option value="1000-5000">$1,000 - $5,000</option>
+                          <option value="5000-10000">$5,000 - $10,000</option>
+                          <option value="over-10000">Over $10,000</option>
+                          <option value="varies">Varies by product</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Business Model</label>
+                        <select
+                          value={profile.business_model ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, business_model: e.target.value }))}
+                          className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                        >
+                          <option value="">Select model</option>
+                          <option value="b2c">B2C (Business to Consumer)</option>
+                          <option value="b2b">B2B (Business to Business)</option>
+                          <option value="b2b2c">B2B2C (Business to Business to Consumer)</option>
+                          <option value="marketplace">Marketplace</option>
+                          <option value="subscription">Subscription</option>
+                          <option value="freemium">Freemium</option>
+                          <option value="advertising">Advertising Revenue</option>
+                          <option value="commission">Commission-based</option>
+                        </select>
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 gap-4">
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Main Products/Services</label>
+                        <Textarea
+                          value={profile.main_products ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, main_products: e.target.value }))}
+                          placeholder="List your main products or services (e.g., iPhone cases, Marketing automation software, SEO services)"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                          rows={2}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Product Description</label>
+                        <Textarea
+                          value={profile.product_description ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, product_description: e.target.value }))}
+                          placeholder="Detailed description of what you sell and how it works"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                          rows={3}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Unique Selling Proposition (USP)</label>
+                        <Textarea
+                          value={profile.unique_selling_proposition ?? ""}
+                          onChange={(e) => setProfile((p) => ({ ...p, unique_selling_proposition: e.target.value }))}
+                          placeholder="What makes your product/service unique? Why should customers choose you?"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                          rows={2}
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium mb-2">Revenue Streams (comma separated)</label>
+                        <Input
+                          value={(Array.isArray(profile.revenue_streams)
+                            ? profile.revenue_streams
+                            : typeof profile.revenue_streams === "string"
+                            ? (profile.revenue_streams as unknown as string)
+                                .split(",")
+                                .map((s) => s.trim())
+                                .filter(Boolean)
+                            : []
+                          ).join(", ")}
+                          onChange={(e) => setProfile((p) => ({ ...p, revenue_streams: e.target.value.split(",").map((s) => s.trim()).filter(Boolean) }))}
+                          placeholder="Product sales, Subscription fees, Licensing, Consulting"
+                          className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-3">
                     <Button onClick={saveProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                       Save business profile
@@ -785,10 +1316,227 @@ function SettingsContent() {
                   </div>
                 </div>
                 <div className="flex items-center gap-3">
-                  <Button onClick={saveProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                  <Button onClick={saveMarketingPreferences} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                     Save preferences
                   </Button>
-                  {profileMsg && <span className={`text-sm ${profileMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{profileMsg}</span>}
+                  {marketingMsg && <span className={`text-sm ${marketingMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{marketingMsg}</span>}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Market & Competition Analysis */}
+            <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
+              <CardContent className="p-6 space-y-6">
+                <h2 className="text-xl font-semibold">Market & Competition</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Target Market</label>
+                    <Textarea
+                      value={profile.target_market ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, target_market: e.target.value }))}
+                      placeholder="Who is your ideal customer? (e.g., Small business owners, Tech professionals, Parents)"
+                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Geographic Reach</label>
+                    <select
+                      value={profile.geographic_reach ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, geographic_reach: e.target.value }))}
+                      className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                    >
+                      <option value="">Select reach</option>
+                      <option value="local">Local (City/Region)</option>
+                      <option value="national">National</option>
+                      <option value="international">International</option>
+                      <option value="global">Global</option>
+                      <option value="online-only">Online Only</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Market Position</label>
+                    <select
+                      value={profile.market_position ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, market_position: e.target.value }))}
+                      className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                    >
+                      <option value="">Select position</option>
+                      <option value="market-leader">Market Leader</option>
+                      <option value="challenger">Challenger</option>
+                      <option value="follower">Follower</option>
+                      <option value="niche-player">Niche Player</option>
+                      <option value="disruptor">Disruptor</option>
+                      <option value="new-entrant">New Entrant</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-1">
+                    <label className="block text-sm font-medium mb-2">Main Competitors</label>
+                    <Textarea
+                      value={profile.main_competitors ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, main_competitors: e.target.value }))}
+                      placeholder="List your top 3-5 competitors and what they do"
+                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                      rows={2}
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-2">Competitive Advantage</label>
+                    <Textarea
+                      value={profile.competitive_advantage ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, competitive_advantage: e.target.value }))}
+                      placeholder="What gives you an edge over competitors? (price, quality, service, innovation, etc.)"
+                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button onClick={saveMarketProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                    Save market analysis
+                  </Button>
+                  {marketMsg && <span className={`text-sm ${marketMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{marketMsg}</span>}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Customer Intelligence */}
+            <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
+              <CardContent className="p-6 space-y-6">
+                <h2 className="text-xl font-semibold">Customer Intelligence</h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Customer Demographics</label>
+                    <Textarea
+                      value={profile.customer_demographics ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, customer_demographics: e.target.value }))}
+                      placeholder="Age, gender, income, location, education, job titles"
+                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                      rows={2}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Customer Journey Stage</label>
+                    <select
+                      value={profile.customer_journey_stage ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, customer_journey_stage: e.target.value }))}
+                      className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                    >
+                      <option value="">Select stage focus</option>
+                      <option value="awareness">Awareness (People don't know the problem exists)</option>
+                      <option value="interest">Interest (People are researching solutions)</option>
+                      <option value="consideration">Consideration (People are comparing options)</option>
+                      <option value="purchase">Purchase (People are ready to buy)</option>
+                      <option value="retention">Retention (Existing customers)</option>
+                      <option value="advocacy">Advocacy (Customers refer others)</option>
+                      <option value="full-funnel">Full Funnel (All stages)</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Average Customer Value</label>
+                    <select
+                      value={profile.average_customer_value ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, average_customer_value: e.target.value }))}
+                      className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                    >
+                      <option value="">Select value range</option>
+                      <option value="under-50">Under $50</option>
+                      <option value="50-250">$50 - $250</option>
+                      <option value="250-1000">$250 - $1,000</option>
+                      <option value="1000-5000">$1,000 - $5,000</option>
+                      <option value="5000-25000">$5,000 - $25,000</option>
+                      <option value="over-25000">Over $25,000</option>
+                      <option value="varies">Varies significantly</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium mb-2">Customer Lifetime Value</label>
+                    <select
+                      value={profile.customer_lifetime_value ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, customer_lifetime_value: e.target.value }))}
+                      className="w-full bg-[#3f3f3f] border-[#4f4f4f] text-white rounded-md h-10 px-3"
+                    >
+                      <option value="">Select CLV range</option>
+                      <option value="under-100">Under $100</option>
+                      <option value="100-500">$100 - $500</option>
+                      <option value="500-2500">$500 - $2,500</option>
+                      <option value="2500-10000">$2,500 - $10,000</option>
+                      <option value="10000-50000">$10,000 - $50,000</option>
+                      <option value="over-50000">Over $50,000</option>
+                      <option value="unknown">Unknown/Calculating</option>
+                    </select>
+                  </div>
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium mb-2">Customer Pain Points</label>
+                    <Textarea
+                      value={profile.customer_pain_points ?? ""}
+                      onChange={(e) => setProfile((p) => ({ ...p, customer_pain_points: e.target.value }))}
+                      placeholder="What problems do your customers face that your product/service solves?"
+                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Button onClick={saveCustomerProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                    Save customer intelligence
+                  </Button>
+                  {customerMsg && <span className={`text-sm ${customerMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{customerMsg}</span>}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Language Preferences */}
+            <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
+              <CardContent className="p-6 space-y-6">
+                <div className="flex items-center gap-3">
+                  <Globe className="h-5 w-5 text-[#a545b6]" />
+                  <h2 className="text-xl font-semibold">{t("settings.language")}</h2>
+                </div>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium mb-3">{t("settings.languageSelection")}</label>
+                    <div className="flex gap-3">
+                      <button
+                        onClick={() => setLanguage('en')}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
+                          language === 'en'
+                            ? 'border-[#a545b6] bg-[#a545b6]/10 text-white'
+                            : 'border-[#3f3f3f] bg-[#3f3f3f] text-[#afafaf] hover:border-[#4f4f4f] hover:text-white'
+                        }`}
+                      >
+                        <div className="w-6 h-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAzMiAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMjQiIGZpbGw9IiMwMTJBNDciLz48cGF0aCBkPSJNMCAwaDMydjI0SDBWMHoiIGZpbGw9IiMwMTJBNDciLz48cGF0aCBkPSJNMCAwaDMyTDE2IDEyTDAgMHoiIGZpbGw9IiNGRkZGRkYiLz48cGF0aCBkPSJNMzIgMHYyNEwxNiAxMkwzMiAweiIgZmlsbD0iI0ZGRkZGRiIvPjxwYXRoIGQ9Ik0wIDI0aDMyTDE2IDEyTDAgMjR6IiBmaWxsPSIjRkZGRkZGIi8+PHBhdGggZD0iTTE2IDEyTDAgMGgzMkwxNiAxMnoiIGZpbGw9IiNDRTExMjQiLz48cGF0aCBkPSJNMTYgMTJMMCAyNGgzMkwxNiAxMnoiIGZpbGw9IiNDRTExMjQiLz48L3N2Zz4=')] bg-cover rounded-sm"></div>
+                        <div>
+                          <div className="font-medium text-sm">English</div>
+                          <div className="text-xs text-[#afafaf]">English (US)</div>
+                        </div>
+                        {language === 'en' && (
+                          <div className="ml-auto w-2 h-2 bg-[#a545b6] rounded-full"></div>
+                        )}
+                      </button>
+
+                      <button
+                        onClick={() => setLanguage('de')}
+                        className={`flex items-center gap-3 px-4 py-3 rounded-lg border transition-all ${
+                          language === 'de'
+                            ? 'border-[#a545b6] bg-[#a545b6]/10 text-white'
+                            : 'border-[#3f3f3f] bg-[#3f3f3f] text-[#afafaf] hover:border-[#4f4f4f] hover:text-white'
+                        }`}
+                      >
+                        <div className="w-6 h-4 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAzMiAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iOCIgZmlsbD0iIzAwMDAwMCIvPjxyZWN0IHk9IjgiIHdpZHRoPSIzMiIgaGVpZ2h0PSI4IiBmaWxsPSIjREQwMDAwIi8+PHJlY3QgeT0iMTYiIHdpZHRoPSIzMiIgaGVpZ2h0PSI4IiBmaWxsPSIjRkZDRTAwIi8+PC9zdmc+')] bg-cover rounded-sm"></div>
+                        <div>
+                          <div className="font-medium text-sm">Deutsch</div>
+                          <div className="text-xs text-[#afafaf]">German</div>
+                        </div>
+                        {language === 'de' && (
+                          <div className="ml-auto w-2 h-2 bg-[#a545b6] rounded-full"></div>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                  <div className="text-sm text-[#afafaf]">
+                    {t("settings.languageDescription")}
+                  </div>
                 </div>
               </CardContent>
             </Card>

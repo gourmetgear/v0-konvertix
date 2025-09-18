@@ -28,6 +28,7 @@ import {
   Trash2,
   MoreHorizontal,
   RefreshCw,
+  ExternalLink,
   AlertCircle,
   BarChart4,
   Eye,
@@ -41,6 +42,7 @@ import { useRouter } from "next/navigation"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import CampaignAnalysisModal from "@/components/CampaignAnalysisModal"
+import { generateFacebookCampaignUrl, openInNewTab, extractCampaignId } from "@/lib/facebook-utils"
 
 interface Campaign {
   id: string
@@ -586,6 +588,29 @@ function CampaignsContent() {
     }
   }
 
+  const handleViewInFacebook = (campaign: Campaign) => {
+    try {
+      // Extract campaign ID from the campaign data
+      const campaignId = campaign.campaign_id || extractCampaignId(campaign.campaign_name)
+
+      // Generate Facebook URL
+      const facebookUrl = generateFacebookCampaignUrl(campaignId)
+
+      // Open in new tab
+      openInNewTab(facebookUrl)
+
+      console.log('Opening Facebook Ads Manager:', {
+        campaignName: campaign.campaign_name,
+        campaignId: campaignId,
+        url: facebookUrl
+      })
+    } catch (error) {
+      console.error('Error opening Facebook Ads Manager:', error)
+      // Fallback: open general Facebook Ads Manager
+      openInNewTab('https://www.facebook.com/adsmanager/manage/campaigns')
+    }
+  }
+
   const exportToCSV = () => {
     // Use filtered campaigns for export to include search/filter results
     const dataToExport = filteredCampaigns.length > 0 ? filteredCampaigns : campaigns
@@ -1002,7 +1027,18 @@ function CampaignsContent() {
                     ) : (
                       displayedCampaigns.map((campaign) => (
                         <TableRow key={campaign.id} className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
-                          <TableCell className="font-medium text-white">{campaign.campaign_name}</TableCell>
+                          <TableCell className="font-medium text-white">
+                            <button
+                              onClick={() => {
+                                if (navigating) return
+                                setNavigating(true)
+                                router.push(`/campaigns/${encodeURIComponent(campaign.campaign_name)}`)
+                              }}
+                              className="text-left hover:text-[#a545b6] transition-colors cursor-pointer underline decoration-transparent hover:decoration-[#a545b6]"
+                            >
+                              {campaign.campaign_name}
+                            </button>
+                          </TableCell>
                           <TableCell>{getStatusBadge(campaign)}</TableCell>
                           <TableCell className="text-white">{campaign.daily_budget ? formatCurrency(campaign.daily_budget) : '-'}</TableCell>
                           <TableCell className="text-white">{formatCurrency(campaign.spend)}</TableCell>
@@ -1025,10 +1061,26 @@ function CampaignsContent() {
                                   </button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="bg-[#2b2b2b] border-[#3f3f3f]">
-                                  <DropdownMenuItem className="text-white hover:bg-[#3f3f3f]">
+                                  <DropdownMenuItem
+                                    className="text-white hover:bg-[#3f3f3f] cursor-pointer"
+                                    onSelect={(e) => {
+                                      e.preventDefault()
+                                      if (navigating) return
+                                      setNavigating(true)
+                                      // Use campaign name as the ID for the details page
+                                      router.push(`/campaigns/${encodeURIComponent(campaign.campaign_name)}`)
+                                    }}
+                                  >
                                     View Details
                                   </DropdownMenuItem>
-                                  <DropdownMenuItem className="text-white hover:bg-[#3f3f3f]">
+                                  <DropdownMenuItem
+                                    className="text-white hover:bg-[#3f3f3f] cursor-pointer"
+                                    onSelect={(e) => {
+                                      e.preventDefault()
+                                      handleViewInFacebook(campaign)
+                                    }}
+                                  >
+                                    <ExternalLink className="mr-2 h-4 w-4" />
                                     View in Facebook
                                   </DropdownMenuItem>
                                   <DropdownMenuItem

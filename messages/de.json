@@ -75,7 +75,9 @@
     "preferences": "Einstellungen",
     "language": "Sprache",
     "notifications": "Benachrichtigungen",
-    "security": "Sicherheit"
+    "security": "Sicherheit",
+    "languageSelection": "Wählen Sie Ihre bevorzugte Sprache",
+    "languageDescription": "Dies ändert die Sprache für die gesamte Anwendungsoberfläche."
   },
   "forms": {
     "required": "Dieses Feld ist erforderlich",
@@ -357,12 +359,19 @@
       "api": "API",
       "support": "Support",
       "helpCenter": "Hilfe-Center",
+      "faq": "FAQ",
       "contact": "Kontakt",
       "status": "Status",
       "community": "Community",
       "salesConsulting": "Verkaufsberatung erhalten",
       "salesDescription": "Brauchst du Hilfe mit deiner Marketing-Strategie? Unsere Experten sind hier, um zu helfen.",
       "bookCall": "Termin buchen",
+      "legal": "Rechtliches",
+      "privacyPolicy": "Datenschutzerklärung",
+      "termsOfService": "Nutzungsbedingungen",
+      "cookiePolicy": "Cookie-Richtlinie",
+      "gdpr": "DSGVO-Konformität",
+      "dataProcessing": "Datenverarbeitung",
       "copyright": "© 2024 Konvertix. Alle Rechte vorbehalten."
     }
   }

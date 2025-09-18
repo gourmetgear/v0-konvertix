@@ -14,7 +14,10 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
     pathname === "/pricing" ||
     pathname === "/contact" ||
     pathname === "/onboarding" ||
-    (pathname && pathname.startsWith("/auth"))
+    pathname === "/help-center" ||
+    pathname === "/faq" ||
+    (pathname && pathname.startsWith("/auth")) ||
+    (pathname && pathname.startsWith("/legal"))
 
   if (isLanding) {
     return <>{children}</>
