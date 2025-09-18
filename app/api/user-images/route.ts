@@ -55,18 +55,29 @@ export async function GET(request: NextRequest) {
 
     console.log('🖼️ Image files after filtering:', imageFiles.length, imageFiles.map(f => f.name))
 
-    // Generate public URLs for the images
-    const imageUrls = imageFiles.map(file => {
-      const { data } = supabaseAdmin.storage
-        .from('assets-private')
-        .getPublicUrl(`assets/private/${userId}/${file.name}`)
-      console.log('🔗 Generated URL for', file.name, ':', data.publicUrl)
-      return data.publicUrl
-    })
+    // Generate signed URLs for private images (valid for 1 hour)
+    const imageUrls = await Promise.all(
+      imageFiles.map(async (file) => {
+        const { data, error } = await supabaseAdmin.storage
+          .from('assets-private')
+          .createSignedUrl(`assets/private/${userId}/${file.name}`, 3600) // 1 hour expiry
 
-    console.log('✅ Final image URLs:', imageUrls)
+        if (error) {
+          console.error('Error creating signed URL for', file.name, ':', error)
+          return null
+        }
 
-    return NextResponse.json({ images: imageUrls })
+        console.log('🔗 Generated signed URL for', file.name, ':', data.signedUrl)
+        return data.signedUrl
+      })
+    )
+
+    // Filter out any null URLs (failed to create signed URL)
+    const validImageUrls = imageUrls.filter(url => url !== null)
+
+    console.log('✅ Final signed image URLs:', validImageUrls)
+
+    return NextResponse.json({ images: validImageUrls })
 
   } catch (error) {
     console.error('API Error:', error)

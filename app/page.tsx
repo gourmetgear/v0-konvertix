@@ -6,25 +6,123 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, BarChart3, Users, Zap, Target, TrendingUp, Star, Check, Play } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function HomePage() {
+  const { t, language, setLanguage } = useLanguage()
   const [isCalendlyOpen, setIsCalendlyOpen] = useState(false)
   const [pricingTab, setPricingTab] = useState<"paid" | "seo" | "full">("paid")
+
   const pricingPlans: Record<typeof pricingTab, Array<{ title: string; price: string; items: string[]; highlight?: boolean; badge?: string }>> = {
     paid: [
-      { title: "Basic plan", price: "$10/mth", items: ["Access to all basic features","Basic reporting and analytics","Up to 10 individual users","20GB individual data each user","Basic chat and email support"] },
-      { title: "Business plan", price: "$20/mth", highlight: true, badge: "Best Value", items: ["200+ integrations","Advanced reporting and analytics","Up to 20 individual users","40GB individual data each user","Priority chat and email support","Cancel anytime","14- day free trial","24/7 Support"] },
-      { title: "Enterprise plan", price: "$40/mth", items: ["Advanced custom fields","Audit log and data history","Unlimited individual users","Unlimited individual data","Personalised+priority service"] },
+      {
+        title: t("landingPage.pricing.paid.basic.title"),
+        price: t("landingPage.pricing.paid.basic.price"),
+        items: [
+          t("landingPage.pricing.paid.basic.features.0"),
+          t("landingPage.pricing.paid.basic.features.1"),
+          t("landingPage.pricing.paid.basic.features.2"),
+          t("landingPage.pricing.paid.basic.features.3"),
+          t("landingPage.pricing.paid.basic.features.4")
+        ]
+      },
+      {
+        title: t("landingPage.pricing.paid.business.title"),
+        price: t("landingPage.pricing.paid.business.price"),
+        highlight: true,
+        badge: t("landingPage.pricing.bestValue"),
+        items: [
+          t("landingPage.pricing.paid.business.features.0"),
+          t("landingPage.pricing.paid.business.features.1"),
+          t("landingPage.pricing.paid.business.features.2"),
+          t("landingPage.pricing.paid.business.features.3"),
+          t("landingPage.pricing.paid.business.features.4"),
+          t("landingPage.pricing.paid.business.features.5"),
+          t("landingPage.pricing.paid.business.features.6"),
+          t("landingPage.pricing.paid.business.features.7")
+        ]
+      },
+      {
+        title: t("landingPage.pricing.paid.enterprise.title"),
+        price: t("landingPage.pricing.paid.enterprise.price"),
+        items: [
+          t("landingPage.pricing.paid.enterprise.features.0"),
+          t("landingPage.pricing.paid.enterprise.features.1"),
+          t("landingPage.pricing.paid.enterprise.features.2"),
+          t("landingPage.pricing.paid.enterprise.features.3"),
+          t("landingPage.pricing.paid.enterprise.features.4")
+        ]
+      },
     ],
     seo: [
-      { title: "Starter SEO", price: "$15/mth", items: ["Keyword tracking (50)","Basic site audit","Monthly ranking report","Email support"] },
-      { title: "Pro SEO", price: "$30/mth", highlight: true, badge: "Best Value", items: ["Keyword tracking (250)","Advanced audit + fixes","Backlink monitoring","Content ideas","Weekly reports","Priority support"] },
-      { title: "Enterprise SEO", price: "$60/mth", items: ["Unlimited keywords","Technical concierge","Custom dashboards","SLA support"] },
+      {
+        title: t("landingPage.pricing.seoPlans.starter.title"),
+        price: t("landingPage.pricing.seoPlans.starter.price"),
+        items: [
+          t("landingPage.pricing.seoPlans.starter.features.0"),
+          t("landingPage.pricing.seoPlans.starter.features.1"),
+          t("landingPage.pricing.seoPlans.starter.features.2"),
+          t("landingPage.pricing.seoPlans.starter.features.3")
+        ]
+      },
+      {
+        title: t("landingPage.pricing.seoPlans.pro.title"),
+        price: t("landingPage.pricing.seoPlans.pro.price"),
+        highlight: true,
+        badge: t("landingPage.pricing.bestValue"),
+        items: [
+          t("landingPage.pricing.seoPlans.pro.features.0"),
+          t("landingPage.pricing.seoPlans.pro.features.1"),
+          t("landingPage.pricing.seoPlans.pro.features.2"),
+          t("landingPage.pricing.seoPlans.pro.features.3"),
+          t("landingPage.pricing.seoPlans.pro.features.4"),
+          t("landingPage.pricing.seoPlans.pro.features.5")
+        ]
+      },
+      {
+        title: t("landingPage.pricing.seoPlans.enterprise.title"),
+        price: t("landingPage.pricing.seoPlans.enterprise.price"),
+        items: [
+          t("landingPage.pricing.seoPlans.enterprise.features.0"),
+          t("landingPage.pricing.seoPlans.enterprise.features.1"),
+          t("landingPage.pricing.seoPlans.enterprise.features.2"),
+          t("landingPage.pricing.seoPlans.enterprise.features.3")
+        ]
+      },
     ],
     full: [
-      { title: "Growth Starter", price: "$25/mth", items: ["Paid Ads + SEO lite","Automation templates","Reporting dashboard","Email support"] },
-      { title: "Growth Suite", price: "$45/mth", highlight: true, badge: "Best Value", items: ["Paid Ads + SEO + Automation","Multichannel attribution","Advanced reporting","Priority support"] },
-      { title: "Growth Enterprise", price: "$90/mth", items: ["Custom playbooks","Full-funnel reporting","Unlimited users & workspaces","Dedicated success manager"] },
+      {
+        title: t("landingPage.pricing.full.starter.title"),
+        price: t("landingPage.pricing.full.starter.price"),
+        items: [
+          t("landingPage.pricing.full.starter.features.0"),
+          t("landingPage.pricing.full.starter.features.1"),
+          t("landingPage.pricing.full.starter.features.2"),
+          t("landingPage.pricing.full.starter.features.3")
+        ]
+      },
+      {
+        title: t("landingPage.pricing.full.suite.title"),
+        price: t("landingPage.pricing.full.suite.price"),
+        highlight: true,
+        badge: t("landingPage.pricing.bestValue"),
+        items: [
+          t("landingPage.pricing.full.suite.features.0"),
+          t("landingPage.pricing.full.suite.features.1"),
+          t("landingPage.pricing.full.suite.features.2"),
+          t("landingPage.pricing.full.suite.features.3")
+        ]
+      },
+      {
+        title: t("landingPage.pricing.full.enterprise.title"),
+        price: t("landingPage.pricing.full.enterprise.price"),
+        items: [
+          t("landingPage.pricing.full.enterprise.features.0"),
+          t("landingPage.pricing.full.enterprise.features.1"),
+          t("landingPage.pricing.full.enterprise.features.2"),
+          t("landingPage.pricing.full.enterprise.features.3")
+        ]
+      },
     ],
   }
 
@@ -41,19 +139,42 @@ export default function HomePage() {
           </div>
 
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#" className="text-white font-medium">Home</a>
-            <a href="#services" className="text-[#afafaf] hover:text-white transition-colors">Services</a>
-            <a href="#results" className="text-[#afafaf] hover:text-white transition-colors">Case Studies / Results</a>
-            <a href="#pricing" className="text-[#afafaf] hover:text-white transition-colors">Pricing</a>
-            <a href="#about" className="text-[#afafaf] hover:text-white transition-colors">About</a>
+            <a href="#" className="text-white font-medium">{t("landingPage.header.home")}</a>
+            <a href="#services" className="text-[#afafaf] hover:text-white transition-colors">{t("landingPage.header.services")}</a>
+            <a href="#results" className="text-[#afafaf] hover:text-white transition-colors">{t("landingPage.header.caseStudies")}</a>
+            <a href="#pricing" className="text-[#afafaf] hover:text-white transition-colors">{t("landingPage.header.pricing")}</a>
+            <a href="#about" className="text-[#afafaf] hover:text-white transition-colors">{t("landingPage.header.about")}</a>
           </nav>
 
           <div className="flex items-center gap-3">
+            {/* Language Switcher */}
+            <div className="flex items-center gap-1 mr-2">
+              <button
+                onClick={() => setLanguage('en')}
+                className={`px-2 py-1 text-sm rounded transition-colors ${
+                  language === 'en'
+                    ? 'bg-[#f59e0b] text-white'
+                    : 'text-[#afafaf] hover:text-white'
+                }`}
+              >
+                EN
+              </button>
+              <button
+                onClick={() => setLanguage('de')}
+                className={`px-2 py-1 text-sm rounded transition-colors ${
+                  language === 'de'
+                    ? 'bg-[#f59e0b] text-white'
+                    : 'text-[#afafaf] hover:text-white'
+                }`}
+              >
+                DE
+              </button>
+            </div>
             <Button asChild variant="ghost" className="hidden sm:inline-flex text-[#afafaf] hover:text-white">
-              <Link href="/contact">Contact</Link>
+              <Link href="/contact">{t("landingPage.header.contact")}</Link>
             </Button>
             <Button asChild className="bg-gradient-to-r from-[#f59e0b] to-[#f97316] hover:from-[#f59e0b]/90 hover:to-[#f97316]/90">
-              <Link href="/contact">Book a call</Link>
+              <Link href="/contact">{t("landingPage.header.bookCall")}</Link>
             </Button>
           </div>
         </div>
@@ -65,12 +186,11 @@ export default function HomePage() {
         <div className="container mx-auto px-4 relative z-10">
           <div className="text-center max-w-4xl mx-auto mb-16">
             <Badge className="mb-6 bg-primary text-primary-foreground border-primary">
-              Now Offering Full Funnel Reporting
+              {t("landingPage.hero.badge")}
             </Badge>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">Grow Smarter. Scale Faster.</h1>
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">{t("landingPage.hero.title")}</h1>
             <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-2xl mx-auto">
-              Unlock the full potential of your marketing with AI-powered analytics that turn data into actionable
-              insights for exponential growth.
+              {t("landingPage.hero.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -79,14 +199,14 @@ export default function HomePage() {
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
               >
                 <Link href="/auth/signup">
-                  Start Free Trial
+                  {t("landingPage.hero.startTrial")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="border-border hover:bg-muted bg-transparent">
                 <Link href="/auth/login">
                   <Play className="mr-2 h-4 w-4" />
-                  Log in
+                  {t("landingPage.hero.login")}
                 </Link>
               </Button>
             </div>
@@ -97,7 +217,7 @@ export default function HomePage() {
             <div className="bg-gradient-to-br from-card to-muted rounded-2xl p-6 border border-border shadow-2xl">
               <div className="bg-background rounded-lg p-4 mb-4">
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-semibold">Analytics Dashboard</h3>
+                  <h3 className="text-lg font-semibold">{t("landingPage.hero.analyticsTitle")}</h3>
                   <div className="flex space-x-2">
                     <div className="w-3 h-3 bg-destructive rounded-full"></div>
                     <div className="w-3 h-3 bg-chart-5 rounded-full"></div>
@@ -109,25 +229,25 @@ export default function HomePage() {
                   <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
                     <CardContent className="p-4">
                       <div className="text-2xl font-bold text-primary">$2,847</div>
-                      <div className="text-sm text-muted-foreground">Revenue</div>
+                      <div className="text-sm text-muted-foreground">{t("landingPage.hero.revenue")}</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-secondary/10 to-secondary/5 border-secondary/20">
                     <CardContent className="p-4">
                       <div className="text-2xl font-bold text-secondary">$48,392</div>
-                      <div className="text-sm text-muted-foreground">Total Sales</div>
+                      <div className="text-sm text-muted-foreground">{t("landingPage.hero.totalSales")}</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-chart-4/10 to-chart-4/5 border-chart-4/20">
                     <CardContent className="p-4">
                       <div className="text-2xl font-bold text-chart-4">2.7%</div>
-                      <div className="text-sm text-muted-foreground">Conversion</div>
+                      <div className="text-sm text-muted-foreground">{t("landingPage.hero.conversion")}</div>
                     </CardContent>
                   </Card>
                   <Card className="bg-gradient-to-br from-chart-3/10 to-chart-3/5 border-chart-3/20">
                     <CardContent className="p-4">
                       <div className="text-2xl font-bold text-chart-3">1.2M</div>
-                      <div className="text-sm text-muted-foreground">Impressions</div>
+                      <div className="text-sm text-muted-foreground">{t("landingPage.hero.impressions")}</div>
                     </CardContent>
                   </Card>
                 </div>
@@ -135,7 +255,7 @@ export default function HomePage() {
                 <div className="h-32 bg-gradient-to-r from-primary/20 via-secondary/20 to-chart-3/20 rounded-lg flex items-end justify-center p-4">
                   <div className="text-center text-muted-foreground">
                     <BarChart3 className="h-8 w-8 mx-auto mb-2" />
-                    <div className="text-sm">Interactive Charts & Analytics</div>
+                    <div className="text-sm">{t("landingPage.hero.chartsTitle")}</div>
                   </div>
                 </div>
               </div>
@@ -148,9 +268,9 @@ export default function HomePage() {
       <section id="services" className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Our Services That Power Your Growth</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("landingPage.services.title")}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              We provide modern digital solutions that transform ideas into powerful growth engines for your business.
+              {t("landingPage.services.subtitle")}
             </p>
           </div>
 
@@ -160,9 +280,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <Target className="h-6 w-6 text-primary-foreground" />
                 </div>
-                <CardTitle>Paid Ads</CardTitle>
+                <CardTitle>{t("landingPage.services.paidAds.title")}</CardTitle>
                 <CardDescription>
-                  Strategic paid advertising campaigns across platforms to maximize ROI and drive qualified traffic.
+                  {t("landingPage.services.paidAds.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -172,9 +292,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <TrendingUp className="h-6 w-6 text-primary-foreground" />
                 </div>
-                <CardTitle>SEO</CardTitle>
+                <CardTitle>{t("landingPage.services.seo.title")}</CardTitle>
                 <CardDescription>
-                  Comprehensive SEO strategies to improve organic rankings and increase sustainable traffic growth.
+                  {t("landingPage.services.seo.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -184,9 +304,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <Zap className="h-6 w-6 text-primary-foreground" />
                 </div>
-                <CardTitle>Automation</CardTitle>
+                <CardTitle>{t("landingPage.services.automation.title")}</CardTitle>
                 <CardDescription>
-                  Intelligent marketing automation workflows to nurture leads and optimize customer journeys.
+                  {t("landingPage.services.automation.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -196,9 +316,9 @@ export default function HomePage() {
                 <div className="w-12 h-12 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center mb-4">
                   <BarChart3 className="h-6 w-6 text-primary-foreground" />
                 </div>
-                <CardTitle>Reporting</CardTitle>
+                <CardTitle>{t("landingPage.services.reporting.title")}</CardTitle>
                 <CardDescription>
-                  Advanced analytics and real-time reporting to track performance and optimize campaigns.
+                  {t("landingPage.services.reporting.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -210,7 +330,7 @@ export default function HomePage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">From Challenge to Success</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("landingPage.successStories.title")}</h2>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
@@ -221,20 +341,19 @@ export default function HomePage() {
                     <Users className="h-6 w-6 text-primary-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-primary">Layers</CardTitle>
-                    <CardDescription>SaaS Platform</CardDescription>
+                    <CardTitle className="text-primary">{t("landingPage.successStories.layers.title")}</CardTitle>
+                    <CardDescription>{t("landingPage.successStories.layers.type")}</CardDescription>
                   </div>
                 </div>
                 <div className="text-3xl font-bold text-primary mb-2">300%</div>
                 <CardDescription>
-                  <strong>Challenge:</strong> Low user engagement and high churn rate affecting growth metrics.
+                  <strong>{t("landingPage.successStories.layers.challenge")}</strong> {t("landingPage.successStories.layers.challengeText")}
                   <br />
                   <br />
-                  <strong>Solution:</strong> Implemented advanced user behavior analytics and personalized onboarding
-                  flows.
+                  <strong>{t("landingPage.successStories.layers.solution")}</strong> {t("landingPage.successStories.layers.solutionText")}
                   <br />
                   <br />
-                  <strong>Result:</strong> Achieved 300% increase in user engagement within 6 months.
+                  <strong>{t("landingPage.successStories.layers.result")}</strong> {t("landingPage.successStories.layers.resultText")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -246,19 +365,19 @@ export default function HomePage() {
                     <Target className="h-6 w-6 text-secondary-foreground" />
                   </div>
                   <div>
-                    <CardTitle className="text-secondary">Sisyphus</CardTitle>
-                    <CardDescription>E-commerce</CardDescription>
+                    <CardTitle className="text-secondary">{t("landingPage.successStories.sisyphus.title")}</CardTitle>
+                    <CardDescription>{t("landingPage.successStories.sisyphus.type")}</CardDescription>
                   </div>
                 </div>
                 <div className="text-3xl font-bold text-secondary mb-2">300%</div>
                 <CardDescription>
-                  <strong>Challenge:</strong> Poor conversion rates and ineffective marketing campaigns.
+                  <strong>{t("landingPage.successStories.sisyphus.challenge")}</strong> {t("landingPage.successStories.sisyphus.challengeText")}
                   <br />
                   <br />
-                  <strong>Solution:</strong> Redesigned conversion funnels with A/B testing and targeted campaigns.
+                  <strong>{t("landingPage.successStories.sisyphus.solution")}</strong> {t("landingPage.successStories.sisyphus.solutionText")}
                   <br />
                   <br />
-                  <strong>Result:</strong> Boosted conversion rates by 300% and improved ROI significantly.
+                  <strong>{t("landingPage.successStories.sisyphus.result")}</strong> {t("landingPage.successStories.sisyphus.resultText")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -270,19 +389,19 @@ export default function HomePage() {
                     <TrendingUp className="h-6 w-6 text-background" />
                   </div>
                   <div>
-                    <CardTitle className="text-chart-4">Quotient</CardTitle>
-                    <CardDescription>Analytics Platform</CardDescription>
+                    <CardTitle className="text-chart-4">{t("landingPage.successStories.quotient.title")}</CardTitle>
+                    <CardDescription>{t("landingPage.successStories.quotient.type")}</CardDescription>
                   </div>
                 </div>
                 <div className="text-3xl font-bold text-chart-4 mb-2">300%</div>
                 <CardDescription>
-                  <strong>Challenge:</strong> Complex data visualization needs and poor user experience.
+                  <strong>{t("landingPage.successStories.quotient.challenge")}</strong> {t("landingPage.successStories.quotient.challengeText")}
                   <br />
                   <br />
-                  <strong>Solution:</strong> Built intuitive dashboards with real-time analytics and custom reporting.
+                  <strong>{t("landingPage.successStories.quotient.solution")}</strong> {t("landingPage.successStories.quotient.solutionText")}
                   <br />
                   <br />
-                  <strong>Result:</strong> Enhanced user satisfaction by 300% with streamlined data insights.
+                  <strong>{t("landingPage.successStories.quotient.result")}</strong> {t("landingPage.successStories.quotient.resultText")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -298,14 +417,14 @@ export default function HomePage() {
             <span className="inline-block rounded-full border border-[#2b2b2b] bg-[#171226] px-3 py-1 text-xs text-white/90 mb-4">
               Pricing
             </span>
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">Choose the Plan That Fits You Best</h2>
+            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">{t("landingPage.pricing.title")}</h2>
           </div>
 
           {/* Toggle tabs (visual only) */}
           <div className="mb-10 flex items-center gap-2">
-            <button onClick={() => setPricingTab("paid")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='paid' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>Paid Ads</button>
-            <button onClick={() => setPricingTab("seo")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='seo' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>SEO</button>
-            <button onClick={() => setPricingTab("full")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='full' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>Full services</button>
+            <button onClick={() => setPricingTab("paid")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='paid' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>{t("landingPage.pricing.paidAds")}</button>
+            <button onClick={() => setPricingTab("seo")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='seo' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>{t("landingPage.pricing.seo")}</button>
+            <button onClick={() => setPricingTab("full")} className={`px-6 py-2 rounded-md text-sm border border-[#2b2b2b] ${pricingTab==='full' ? 'text-white bg-gradient-to-r from-[#a545b6] to-[#cd4f9d]' : 'text-[#afafaf] hover:text-white'}`}>{t("landingPage.pricing.fullServices")}</button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:items-stretch max-w-6xl">
@@ -320,7 +439,7 @@ export default function HomePage() {
                 )}
                 <div className="my-4 text-center">
                   <div className="text-4xl font-extrabold text-white">{p.price}</div>
-                  <div className={`text-sm mt-1 ${p.highlight ? 'text-white/90' : 'text-white/70'}`}>Billed annually.</div>
+                  <div className={`text-sm mt-1 ${p.highlight ? 'text-white/90' : 'text-white/70'}`}>{t("landingPage.pricing.billedAnnually")}</div>
                 </div>
                 <ul className={`space-y-3 text-sm ${p.highlight ? 'text-white' : 'text-white/90'}`}>
                   {p.items.map((t) => (
@@ -334,7 +453,7 @@ export default function HomePage() {
                 </ul>
                 <div className="mt-6">
                   <Link className="block" href="/dashboard">
-                    <button className={`w-full rounded-md py-2 ${p.highlight ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-gradient-to-r from-[#f59e0b] to-[#f97316] text-white'}`}>Get started</button>
+                    <button className={`w-full rounded-md py-2 ${p.highlight ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-gradient-to-r from-[#f59e0b] to-[#f97316] text-white'}`}>{t("landingPage.pricing.getStarted")}</button>
                   </Link>
                 </div>
               </div>
@@ -347,10 +466,9 @@ export default function HomePage() {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Powerful Features Designed for You</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("landingPage.features.title")}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Our platform is built with simplicity, speed, and scalability in mind to help you focus on growing your
-              business.
+              {t("landingPage.features.subtitle")}
             </p>
           </div>
 
@@ -360,9 +478,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center mx-auto mb-4">
                   <BarChart3 className="h-8 w-8 text-primary-foreground" />
                 </div>
-                <CardTitle>Reporting, Tracking & Analytics</CardTitle>
+                <CardTitle>{t("landingPage.features.analytics.title")}</CardTitle>
                 <CardDescription>
-                  Comprehensive analytics dashboard with real-time tracking and detailed performance insights.
+                  {t("landingPage.features.analytics.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -372,9 +490,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-chart-5 to-chart-4 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Users className="h-8 w-8 text-background" />
                 </div>
-                <CardTitle>Omnichannel Support</CardTitle>
+                <CardTitle>{t("landingPage.features.omnichannel.title")}</CardTitle>
                 <CardDescription>
-                  Seamless customer support across all channels with integrated communication tools.
+                  {t("landingPage.features.omnichannel.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -384,9 +502,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-chart-3 to-chart-2 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Target className="h-8 w-8 text-background" />
                 </div>
-                <CardTitle>Custom Solutions</CardTitle>
+                <CardTitle>{t("landingPage.features.custom.title")}</CardTitle>
                 <CardDescription>
-                  Tailored solutions built to match your specific business needs and requirements.
+                  {t("landingPage.features.custom.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -396,9 +514,9 @@ export default function HomePage() {
                 <div className="w-16 h-16 bg-gradient-to-br from-chart-4 to-primary rounded-full flex items-center justify-center mx-auto mb-4">
                   <Zap className="h-8 w-8 text-background" />
                 </div>
-                <CardTitle>Marketing Updates</CardTitle>
+                <CardTitle>{t("landingPage.features.updates.title")}</CardTitle>
                 <CardDescription>
-                  Stay ahead with the latest marketing trends and automated campaign optimizations.
+                  {t("landingPage.features.updates.description")}
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -410,58 +528,52 @@ export default function HomePage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Choose the Plan That Fits You Best</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("landingPage.testimonials.title")}</h2>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                name: "Amanda Schmidt",
-                role: "Marketing Director",
-                company: "TechFlow Solutions",
+                name: t("landingPage.testimonials.reviews.0.name"),
+                role: t("landingPage.testimonials.reviews.0.role"),
+                company: t("landingPage.testimonials.reviews.0.company"),
                 rating: 5,
-                content:
-                  "Konvertix transformed our marketing strategy completely. The analytics insights helped us increase our conversion rate by 300% in just 3 months.",
+                content: t("landingPage.testimonials.reviews.0.content"),
               },
               {
-                name: "Marcus Chen",
-                role: "Growth Manager",
-                company: "StartupLab",
+                name: t("landingPage.testimonials.reviews.1.name"),
+                role: t("landingPage.testimonials.reviews.1.role"),
+                company: t("landingPage.testimonials.reviews.1.company"),
                 rating: 5,
-                content:
-                  "The automation features saved us countless hours while improving our lead quality. Best investment we've made for our marketing stack.",
+                content: t("landingPage.testimonials.reviews.1.content"),
               },
               {
-                name: "Sarah Williams",
-                role: "CEO",
-                company: "Digital Dynamics",
+                name: t("landingPage.testimonials.reviews.2.name"),
+                role: t("landingPage.testimonials.reviews.2.role"),
+                company: t("landingPage.testimonials.reviews.2.company"),
                 rating: 5,
-                content:
-                  "Outstanding platform with incredible support. The team helped us scale from 10K to 100K monthly visitors with their strategic guidance.",
+                content: t("landingPage.testimonials.reviews.2.content"),
               },
               {
-                name: "David Rodriguez",
-                role: "Marketing Manager",
-                company: "GrowthCorp",
+                name: t("landingPage.testimonials.reviews.3.name"),
+                role: t("landingPage.testimonials.reviews.3.role"),
+                company: t("landingPage.testimonials.reviews.3.company"),
                 rating: 5,
-                content:
-                  "The reporting capabilities are unmatched. We finally have clear visibility into our marketing ROI across all channels.",
+                content: t("landingPage.testimonials.reviews.3.content"),
               },
               {
-                name: "Lisa Thompson",
-                role: "Digital Strategist",
-                company: "InnovateLab",
+                name: t("landingPage.testimonials.reviews.4.name"),
+                role: t("landingPage.testimonials.reviews.4.role"),
+                company: t("landingPage.testimonials.reviews.4.company"),
                 rating: 5,
-                content:
-                  "Konvertix's AI-powered insights helped us identify new opportunities we never knew existed. Game-changing platform.",
+                content: t("landingPage.testimonials.reviews.4.content"),
               },
               {
-                name: "Michael Park",
-                role: "VP Marketing",
-                company: "ScaleUp Inc",
+                name: t("landingPage.testimonials.reviews.5.name"),
+                role: t("landingPage.testimonials.reviews.5.role"),
+                company: t("landingPage.testimonials.reviews.5.company"),
                 rating: 5,
-                content:
-                  "From setup to execution, everything is seamless. The platform grows with your business needs perfectly.",
+                content: t("landingPage.testimonials.reviews.5.content"),
               },
             ].map((testimonial, index) => (
               <Card key={index} className="bg-gradient-to-br from-card to-muted/50">
@@ -499,9 +611,9 @@ export default function HomePage() {
       <section className="py-20">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-4xl font-bold mb-6">Ready to Transform Your Business?</h2>
+            <h2 className="text-4xl font-bold mb-6">{t("landingPage.cta.title")}</h2>
             <p className="text-xl text-muted-foreground mb-8">
-              Join thousands of businesses that trust Konvertix to power their growth and success.
+              {t("landingPage.cta.subtitle")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button
@@ -510,12 +622,12 @@ export default function HomePage() {
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
               >
                 <Link href="/dashboard">
-                  Start Free Trial
+                  {t("landingPage.cta.startTrial")}
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="border-border hover:bg-muted bg-transparent">
-                <Link href="/dashboard">Get Started Now</Link>
+                <Link href="/dashboard">{t("landingPage.cta.getStarted")}</Link>
               </Button>
             </div>
           </div>
@@ -534,78 +646,78 @@ export default function HomePage() {
                 <span className="text-xl font-bold">Konvertix</span>
               </div>
               <p className="text-muted-foreground mb-4">
-                Empowering businesses with AI-powered marketing analytics for smarter growth and faster scaling.
+                {t("landingPage.footer.description")}
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
+              <h4 className="font-semibold mb-4">{t("landingPage.footer.product")}</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Features
+                    {t("landingPage.footer.features")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Pricing
+                    {t("landingPage.footer.pricing")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Integrations
+                    {t("landingPage.footer.integrations")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    API
+                    {t("landingPage.footer.api")}
                   </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Support</h4>
+              <h4 className="font-semibold mb-4">{t("landingPage.footer.support")}</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   <Link href="/help-center" className="hover:text-foreground transition-colors">
-                    Help Center
+                    {t("landingPage.footer.helpCenter")}
                   </Link>
                 </li>
                 <li>
                   <Link href="/contact" className="hover:text-foreground transition-colors">
-                    Contact
+                    {t("landingPage.footer.contact")}
                   </Link>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Status
+                    {t("landingPage.footer.status")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Community
+                    {t("landingPage.footer.community")}
                   </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Get Sales Consulting</h4>
+              <h4 className="font-semibold mb-4">{t("landingPage.footer.salesConsulting")}</h4>
               <p className="text-muted-foreground mb-4">
-                Need help with your marketing strategy? Our experts are here to help.
+                {t("landingPage.footer.salesDescription")}
               </p>
               <Button
                 asChild
                 className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
               >
-                <Link href="/dashboard">Book a Call</Link>
+                <Link href="/dashboard">{t("landingPage.footer.bookCall")}</Link>
               </Button>
             </div>
           </div>
 
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Konvertix. All rights reserved.</p>
+            <p>{t("landingPage.footer.copyright")}</p>
           </div>
         </div>
       </footer>

@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import AuthGuard from "@/components/auth/AuthGuard"
 import Sidebar from "@/components/nav/Sidebar"
 import { supabase } from "@/lib/supabase/client"
 
@@ -79,6 +80,14 @@ interface CampaignAnalysis {
 }
 
 export default function CampaignsPage() {
+  return (
+    <AuthGuard>
+      <CampaignsContent />
+    </AuthGuard>
+  )
+}
+
+function CampaignsContent() {
   const router = useRouter()
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [displayedCampaigns, setDisplayedCampaigns] = useState<Campaign[]>([])

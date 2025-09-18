@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import AuthGuard from "@/components/auth/AuthGuard"
 import Sidebar from "@/components/nav/Sidebar"
 import { supabase } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
@@ -64,6 +65,14 @@ interface MetricsData {
 }
 
 export default function ReportsPage() {
+  return (
+    <AuthGuard>
+      <ReportsContent />
+    </AuthGuard>
+  )
+}
+
+function ReportsContent() {
   const [isSyncing, setIsSyncing] = useState(false)
   const [userId, setUserId] = useState<string>('')
   const [loading, setLoading] = useState(true)

@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useMemo, useRef, useState } from "react"
+import AuthGuard from "@/components/auth/AuthGuard"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -54,6 +55,14 @@ async function createSignedUrls(paths: string[], expiresInSeconds = 3600) {
 }
 
 export default function DocumentsPage() {
+  return (
+    <AuthGuard>
+      <DocumentsContent />
+    </AuthGuard>
+  )
+}
+
+function DocumentsContent() {
   const [files, setFiles] = useState<FileRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>("")

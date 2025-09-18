@@ -7,6 +7,7 @@ export async function POST(request: NextRequest) {
     const {
       name,
       campaign_id,
+      facebook_campaign_id, // Direct Facebook campaign ID (preferred)
       daily_budget,
       billing_event = 'IMPRESSIONS',
       optimization_goal = 'OFFSITE_CONVERSIONS',
@@ -28,87 +29,148 @@ export async function POST(request: NextRequest) {
       image_name
     } = body
 
-    console.log('Ad set creation request:', { name, campaign_id, userId, image_name })
+    console.log('Ad set creation request:', {
+      name,
+      campaign_id,
+      facebook_campaign_id,
+      userId,
+      image_name
+    })
 
     // Validate required fields
-    if (!name || !campaign_id || !daily_budget || !userId) {
+    if (!name || !daily_budget || !userId) {
       return NextResponse.json(
-        { error: 'Name, campaign_id, daily_budget, and userId are required' },
+        { error: 'Name, daily_budget, and userId are required' },
+        { status: 400 }
+      )
+    }
+
+    if (!facebook_campaign_id && !campaign_id) {
+      return NextResponse.json(
+        { error: 'Either facebook_campaign_id or campaign_id (campaign name) is required' },
         { status: 400 }
       )
     }
 
     // Get user's capiconfig for pixel_id and access_token
-    const { data: capiConfig, error: configError } = await supabaseAdmin
+    console.log('Looking for CAPI config for userId:', userId)
+
+    const { data: capiConfigs, error: configError } = await supabaseAdmin
       .from('capiconfig')
       .select('pixel_id, token, ad_account_id')
       .eq('user_id', userId)
       .eq('provider', 'facebook')
-      .single()
+      .not('ad_account_id', 'is', null)
+      .not('ad_account_id', 'eq', '')
+      .not('token', 'is', null)
+      .not('token', 'eq', '')
 
-    if (configError || !capiConfig) {
+    console.log('CAPI config query results:', { capiConfigs, configError, count: capiConfigs?.length })
+
+    if (configError || !capiConfigs || capiConfigs.length === 0) {
+      console.log('CAPI config error:', configError)
+      console.log('Available configs:', capiConfigs)
+
+      // Get all configs for this user to debug
+      const { data: allConfigs } = await supabaseAdmin
+        .from('capiconfig')
+        .select('*')
+        .eq('user_id', userId)
+
+      console.log('All user configs for debugging:', allConfigs)
+
       return NextResponse.json(
         { error: 'Facebook CAPI configuration not found. Please configure your Facebook settings first.' },
         { status: 400 }
       )
     }
 
-    // Get Facebook campaign ID from metrics_daily table - lookup by campaign name
-    console.log('Looking up campaign in metrics_daily by name:', campaign_id, 'for user:', userId)
+    // Use the first valid configuration
+    const capiConfig = capiConfigs[0]
+    console.log('Selected CAPI config:', {
+      ad_account_id: capiConfig.ad_account_id,
+      pixel_id: capiConfig.pixel_id,
+      token_length: capiConfig.token?.length || 0
+    })
 
-    // First, let's see what campaigns exist for this user
-    const { data: allCampaigns, error: debugError } = await supabaseAdmin
-      .from('metrics_daily')
-      .select('campaign_id, campaign_name, account_id')
-      .eq('account_id', userId)
-      .not('campaign_id', 'is', null)
-      .limit(10)
+    // Determine Facebook campaign ID - prioritize direct ID over lookup
+    let finalCampaignId = null
+    let campaignLookupInfo = {}
 
-    console.log('Available campaigns for user:', allCampaigns)
+    if (facebook_campaign_id) {
+      // Direct Facebook campaign ID provided - use it directly
+      console.log('Using direct Facebook campaign ID:', facebook_campaign_id)
+      finalCampaignId = facebook_campaign_id
+      campaignLookupInfo = {
+        method: 'direct',
+        campaign_id: facebook_campaign_id,
+        campaign_name: campaign_id || 'Direct ID provided'
+      }
+    } else {
+      // Need to lookup campaign by name in metrics_daily table
+      console.log('Looking up campaign in metrics_daily by name:', campaign_id, 'for user:', userId)
 
-    // Now try to find the specific campaign
-    const { data: campaigns, error: campaignError } = await supabaseAdmin
-      .from('metrics_daily')
-      .select('campaign_id, campaign_name')
-      .eq('campaign_name', campaign_id) // campaign_id field actually contains campaign name
-      .eq('account_id', userId)
-      .not('campaign_id', 'is', null)
+      // First, let's see what campaigns exist for this user
+      const { data: allCampaigns, error: debugError } = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name, account_id')
+        .eq('account_id', userId)
+        .not('campaign_id', 'is', null)
+        .limit(10)
 
-    console.log('Campaign search result:', { campaigns, campaignError, searchTerm: campaign_id })
+      console.log('Available campaigns for user:', allCampaigns)
 
-    if (campaignError) {
-      console.log('Campaign query error:', campaignError)
-      return NextResponse.json(
-        { error: `Database error looking up campaign: ${campaignError.message}` },
-        { status: 500 }
-      )
+      // Now try to find the specific campaign
+      const { data: campaigns, error: campaignError } = await supabaseAdmin
+        .from('metrics_daily')
+        .select('campaign_id, campaign_name')
+        .eq('campaign_name', campaign_id) // campaign_id field actually contains campaign name
+        .eq('account_id', userId)
+        .not('campaign_id', 'is', null)
+
+      console.log('Campaign search result:', { campaigns, campaignError, searchTerm: campaign_id })
+
+      if (campaignError) {
+        console.log('Campaign query error:', campaignError)
+        return NextResponse.json(
+          { error: `Database error looking up campaign: ${campaignError.message}` },
+          { status: 500 }
+        )
+      }
+
+      if (!campaigns || campaigns.length === 0) {
+        console.log('No campaigns found matching name:', campaign_id)
+        return NextResponse.json(
+          { error: `Campaign "${campaign_id}" not found. Available campaigns: ${allCampaigns?.map(c => c.campaign_name).join(', ') || 'none'}` },
+          { status: 400 }
+        )
+      }
+
+      // Take the first matching campaign
+      const campaign = campaigns[0]
+
+      if (!campaign.campaign_id) {
+        console.log('Campaign found but missing Facebook campaign ID:', campaign)
+        return NextResponse.json(
+          { error: `Campaign "${campaign_id}" found but missing Facebook campaign ID` },
+          { status: 400 }
+        )
+      }
+
+      finalCampaignId = campaign.campaign_id
+      campaignLookupInfo = {
+        method: 'lookup',
+        campaign_name: campaign.campaign_name,
+        campaign_id: campaign.campaign_id
+      }
+
+      console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
     }
-
-    if (!campaigns || campaigns.length === 0) {
-      console.log('No campaigns found matching name:', campaign_id)
-      return NextResponse.json(
-        { error: `Campaign "${campaign_id}" not found. Available campaigns: ${allCampaigns?.map(c => c.campaign_name).join(', ') || 'none'}` },
-        { status: 400 }
-      )
-    }
-
-    // Take the first matching campaign
-    const campaign = campaigns[0]
-
-    if (!campaign.campaign_id) {
-      console.log('Campaign found but missing Facebook campaign ID:', campaign)
-      return NextResponse.json(
-        { error: `Campaign "${campaign_id}" found but missing Facebook campaign ID` },
-        { status: 400 }
-      )
-    }
-
-    console.log('Found campaign:', { campaign_name: campaign.campaign_name, campaign_id: campaign.campaign_id })
 
     // Prepare data for n8n webhook
     const webhookData = {
       name,
-      campaign_id: campaign.campaign_id, // Use Facebook campaign ID from metrics_daily
+      campaign_id: finalCampaignId, // Use determined Facebook campaign ID
       daily_budget: daily_budget * 100, // Convert to cents for Facebook API
       billing_event,
       optimization_goal,
@@ -135,12 +197,9 @@ export async function POST(request: NextRequest) {
       access_token: capiConfig.token
     }
 
-    console.log('API received adset data:', { name, campaign_id, daily_budget, userId, image_name })
-    console.log('Campaign lookup result:', {
-      searchedName: campaign_id,
-      foundCampaign: campaign.campaign_name,
-      facebookCampaignId: campaign.campaign_id
-    })
+    console.log('API received adset data:', { name, campaign_id, facebook_campaign_id, daily_budget, userId, image_name })
+    console.log('Campaign lookup result:', campaignLookupInfo)
+    console.log('Final campaign ID for webhook:', finalCampaignId)
     console.log('Sending to webhook with image data:', webhookData)
 
     // Call n8n webhook
@@ -156,8 +215,19 @@ export async function POST(request: NextRequest) {
 
     if (!webhookResponse.ok) {
       const errorText = await webhookResponse.text()
+      console.error('n8n webhook error:', {
+        status: webhookResponse.status,
+        statusText: webhookResponse.statusText,
+        errorText,
+        sentData: webhookData
+      })
       return NextResponse.json(
-        { error: 'Failed to create ad set via Facebook API', details: errorText },
+        {
+          error: 'Failed to create ad set via Facebook API',
+          details: errorText,
+          status: webhookResponse.status,
+          sentData: webhookData
+        },
         { status: 500 }
       )
     }

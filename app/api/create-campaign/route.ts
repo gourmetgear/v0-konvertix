@@ -29,19 +29,45 @@ export async function POST(request: NextRequest) {
     }
 
     // Get user's capiconfig for ad_account_id and token
-    const { data: capiConfig, error: configError } = await supabaseAdmin
+    console.log('Looking for CAPI config for userId:', userId)
+
+    const { data: capiConfigs, error: configError } = await supabaseAdmin
       .from('capiconfig')
       .select('ad_account_id, token, pixel_id')
       .eq('user_id', userId)
       .eq('provider', 'facebook')
-      .single()
+      .not('ad_account_id', 'is', null)
+      .not('ad_account_id', 'eq', '')
+      .not('token', 'is', null)
+      .not('token', 'eq', '')
 
-    if (configError || !capiConfig) {
+    console.log('CAPI config query results:', { capiConfigs, configError, count: capiConfigs?.length })
+
+    if (configError || !capiConfigs || capiConfigs.length === 0) {
+      console.log('CAPI config error:', configError)
+      console.log('Available configs:', capiConfigs)
+
+      // Get all configs for this user to debug
+      const { data: allConfigs } = await supabaseAdmin
+        .from('capiconfig')
+        .select('*')
+        .eq('user_id', userId)
+
+      console.log('All user configs for debugging:', allConfigs)
+
       return NextResponse.json(
         { error: 'Facebook CAPI configuration not found. Please configure your Facebook settings first.' },
         { status: 400 }
       )
     }
+
+    // Use the first valid configuration
+    const capiConfig = capiConfigs[0]
+    console.log('Selected CAPI config:', {
+      ad_account_id: capiConfig.ad_account_id,
+      pixel_id: capiConfig.pixel_id,
+      token_length: capiConfig.token?.length || 0
+    })
 
     // Prepare data for n8n webhook
     const webhookData = {
@@ -70,9 +96,19 @@ export async function POST(request: NextRequest) {
 
     if (!webhookResponse.ok) {
       const errorText = await webhookResponse.text()
-      console.error('n8n webhook error:', errorText)
+      console.error('n8n webhook error:', {
+        status: webhookResponse.status,
+        statusText: webhookResponse.statusText,
+        errorText,
+        sentData: webhookData
+      })
       return NextResponse.json(
-        { error: 'Failed to create campaign via Facebook API', details: errorText },
+        {
+          error: 'Failed to create campaign via Facebook API',
+          details: errorText,
+          status: webhookResponse.status,
+          sentData: webhookData
+        },
         { status: 500 }
       )
     }
@@ -82,6 +118,34 @@ export async function POST(request: NextRequest) {
     // TODO: Store campaign in database after running the campaigns table schema
     // For now, skip database save and return success
     console.log('Campaign created successfully on Facebook:', webhookResult)
+
+    // Automatically sync campaigns after successful creation and wait for completion
+    let syncSuccessful = false
+    try {
+      console.log('Triggering campaign sync after successful creation...')
+
+      const syncResponse = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/sync-campaigns`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId })
+      })
+
+      if (syncResponse.ok) {
+        const syncResult = await syncResponse.json()
+        console.log('Campaign sync triggered successfully:', syncResult)
+        syncSuccessful = true
+
+        // Wait a moment for the sync to process
+        await new Promise(resolve => setTimeout(resolve, 2000))
+      } else {
+        const syncError = await syncResponse.text()
+        console.warn('Campaign sync failed but campaign was created:', syncError)
+      }
+    } catch (syncError) {
+      console.warn('Failed to trigger campaign sync, but campaign was created:', syncError)
+    }
 
     // Temporary disable database save for testing
     /*
@@ -111,9 +175,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Campaign created successfully on Facebook',
+      message: syncSuccessful
+        ? 'Campaign created and synced successfully'
+        : 'Campaign created successfully (sync pending)',
       campaignName: name,
-      facebook_data: webhookResult
+      facebook_campaign_id: webhookResult.id || webhookResult.campaign_id,
+      facebook_data: webhookResult,
+      sync_completed: syncSuccessful
     })
 
   } catch (error) {

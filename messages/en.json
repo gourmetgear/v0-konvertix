@@ -1,0 +1,369 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "search": "Search",
+    "filter": "Filter",
+    "actions": "Actions",
+    "status": "Status",
+    "active": "Active",
+    "inactive": "Inactive",
+    "paused": "Paused"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "reports": "Reports",
+    "documents": "Documents",
+    "campaigns": "Campaigns",
+    "products": "Products",
+    "seo": "SEO",
+    "tools": "Tools",
+    "support": "Support",
+    "services": "Services",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Konvertix",
+    "campaignPerformance": "Campaign performance",
+    "totalRevenue": "Total Revenue",
+    "totalSpend": "Total Spend",
+    "roas": "ROAS",
+    "conversions": "Conversions",
+    "impressions": "Impressions",
+    "clicks": "Clicks",
+    "ctr": "CTR",
+    "cpc": "CPC",
+    "bestPerformingCampaigns": "Best Performing Campaigns",
+    "viewAll": "View All",
+    "revenue": "Revenue",
+    "spend": "Spend"
+  },
+  "campaigns": {
+    "title": "Campaigns",
+    "createCampaign": "Create Campaign",
+    "createAdSet": "Create Ad Set",
+    "campaignName": "Campaign Name",
+    "objective": "Objective",
+    "budget": "Budget",
+    "dailyBudget": "Daily Budget",
+    "status": "Status",
+    "performance": "Performance",
+    "analytics": "Analytics"
+  },
+  "products": {
+    "title": "Products",
+    "addProduct": "Add Product",
+    "bulkUpload": "Bulk Upload",
+    "productName": "Product Name",
+    "price": "Price",
+    "description": "Description",
+    "category": "Category",
+    "inventory": "Inventory"
+  },
+  "settings": {
+    "title": "Settings",
+    "profile": "Profile",
+    "account": "Account",
+    "preferences": "Preferences",
+    "language": "Language",
+    "notifications": "Notifications",
+    "security": "Security"
+  },
+  "forms": {
+    "required": "This field is required",
+    "invalid": "Invalid input",
+    "tooShort": "Too short",
+    "tooLong": "Too long",
+    "submit": "Submit",
+    "reset": "Reset"
+  },
+  "meta": {
+    "title": "Konvertix - Marketing Analytics Platform",
+    "description": "AI-powered marketing analytics for smarter growth and faster scaling"
+  },
+  "landingPage": {
+    "header": {
+      "home": "Home",
+      "services": "Services",
+      "caseStudies": "Case Studies / Results",
+      "pricing": "Pricing",
+      "about": "About",
+      "contact": "Contact",
+      "bookCall": "Book a call"
+    },
+    "hero": {
+      "badge": "Now Offering Full Funnel Reporting",
+      "title": "Grow Smarter. Scale Faster.",
+      "subtitle": "Unlock the full potential of your marketing with AI-powered analytics that turn data into actionable insights for exponential growth.",
+      "startTrial": "Start Free Trial",
+      "login": "Log in",
+      "analyticsTitle": "Analytics Dashboard",
+      "revenue": "Revenue",
+      "totalSales": "Total Sales",
+      "conversion": "Conversion",
+      "impressions": "Impressions",
+      "chartsTitle": "Interactive Charts & Analytics"
+    },
+    "services": {
+      "title": "Our Services That Power Your Growth",
+      "subtitle": "We provide modern digital solutions that transform ideas into powerful growth engines for your business.",
+      "paidAds": {
+        "title": "Paid Ads",
+        "description": "Strategic paid advertising campaigns across platforms to maximize ROI and drive qualified traffic."
+      },
+      "seo": {
+        "title": "SEO",
+        "description": "Comprehensive SEO strategies to improve organic rankings and increase sustainable traffic growth."
+      },
+      "automation": {
+        "title": "Automation",
+        "description": "Intelligent marketing automation workflows to nurture leads and optimize customer journeys."
+      },
+      "reporting": {
+        "title": "Reporting",
+        "description": "Advanced analytics and real-time reporting to track performance and optimize campaigns."
+      }
+    },
+    "successStories": {
+      "title": "From Challenge to Success",
+      "layers": {
+        "title": "Layers",
+        "type": "SaaS Platform",
+        "metric": "300%",
+        "challenge": "Challenge:",
+        "challengeText": "Low user engagement and high churn rate affecting growth metrics.",
+        "solution": "Solution:",
+        "solutionText": "Implemented advanced user behavior analytics and personalized onboarding flows.",
+        "result": "Result:",
+        "resultText": "Achieved 300% increase in user engagement within 6 months."
+      },
+      "sisyphus": {
+        "title": "Sisyphus",
+        "type": "E-commerce",
+        "metric": "300%",
+        "challenge": "Challenge:",
+        "challengeText": "Poor conversion rates and ineffective marketing campaigns.",
+        "solution": "Solution:",
+        "solutionText": "Redesigned conversion funnels with A/B testing and targeted campaigns.",
+        "result": "Result:",
+        "resultText": "Boosted conversion rates by 300% and improved ROI significantly."
+      },
+      "quotient": {
+        "title": "Quotient",
+        "type": "Analytics Platform",
+        "metric": "300%",
+        "challenge": "Challenge:",
+        "challengeText": "Complex data visualization needs and poor user experience.",
+        "solution": "Solution:",
+        "solutionText": "Built intuitive dashboards with real-time analytics and custom reporting.",
+        "result": "Result:",
+        "resultText": "Enhanced user satisfaction by 300% with streamlined data insights."
+      }
+    },
+    "pricing": {
+      "title": "Choose the Plan That Fits You Best",
+      "paidAds": "Paid Ads",
+      "seo": "SEO",
+      "fullServices": "Full services",
+      "billedAnnually": "Billed annually.",
+      "getStarted": "Get started",
+      "bestValue": "Best Value",
+      "paid": {
+        "basic": {
+          "title": "Basic plan",
+          "price": "$10/mth",
+          "features": [
+            "Access to all basic features",
+            "Basic reporting and analytics",
+            "Up to 10 individual users",
+            "20GB individual data each user",
+            "Basic chat and email support"
+          ]
+        },
+        "business": {
+          "title": "Business plan",
+          "price": "$20/mth",
+          "features": [
+            "200+ integrations",
+            "Advanced reporting and analytics",
+            "Up to 20 individual users",
+            "40GB individual data each user",
+            "Priority chat and email support",
+            "Cancel anytime",
+            "14- day free trial",
+            "24/7 Support"
+          ]
+        },
+        "enterprise": {
+          "title": "Enterprise plan",
+          "price": "$40/mth",
+          "features": [
+            "Advanced custom fields",
+            "Audit log and data history",
+            "Unlimited individual users",
+            "Unlimited individual data",
+            "Personalised+priority service"
+          ]
+        }
+      },
+      "seoPlans": {
+        "starter": {
+          "title": "Starter SEO",
+          "price": "$15/mth",
+          "features": [
+            "Keyword tracking (50)",
+            "Basic site audit",
+            "Monthly ranking report",
+            "Email support"
+          ]
+        },
+        "pro": {
+          "title": "Pro SEO",
+          "price": "$30/mth",
+          "features": [
+            "Keyword tracking (250)",
+            "Advanced audit + fixes",
+            "Backlink monitoring",
+            "Content ideas",
+            "Weekly reports",
+            "Priority support"
+          ]
+        },
+        "enterprise": {
+          "title": "Enterprise SEO",
+          "price": "$60/mth",
+          "features": [
+            "Unlimited keywords",
+            "Technical concierge",
+            "Custom dashboards",
+            "SLA support"
+          ]
+        }
+      },
+      "full": {
+        "starter": {
+          "title": "Growth Starter",
+          "price": "$25/mth",
+          "features": [
+            "Paid Ads + SEO lite",
+            "Automation templates",
+            "Reporting dashboard",
+            "Email support"
+          ]
+        },
+        "suite": {
+          "title": "Growth Suite",
+          "price": "$45/mth",
+          "features": [
+            "Paid Ads + SEO + Automation",
+            "Multichannel attribution",
+            "Advanced reporting",
+            "Priority support"
+          ]
+        },
+        "enterprise": {
+          "title": "Growth Enterprise",
+          "price": "$90/mth",
+          "features": [
+            "Custom playbooks",
+            "Full-funnel reporting",
+            "Unlimited users & workspaces",
+            "Dedicated success manager"
+          ]
+        }
+      }
+    },
+    "features": {
+      "title": "Powerful Features Designed for You",
+      "subtitle": "Our platform is built with simplicity, speed, and scalability in mind to help you focus on growing your business.",
+      "analytics": {
+        "title": "Reporting, Tracking & Analytics",
+        "description": "Comprehensive analytics dashboard with real-time tracking and detailed performance insights."
+      },
+      "omnichannel": {
+        "title": "Omnichannel Support",
+        "description": "Seamless customer support across all channels with integrated communication tools."
+      },
+      "custom": {
+        "title": "Custom Solutions",
+        "description": "Tailored solutions built to match your specific business needs and requirements."
+      },
+      "updates": {
+        "title": "Marketing Updates",
+        "description": "Stay ahead with the latest marketing trends and automated campaign optimizations."
+      }
+    },
+    "testimonials": {
+      "title": "Choose the Plan That Fits You Best",
+      "reviews": [
+        {
+          "name": "Amanda Schmidt",
+          "role": "Marketing Director",
+          "company": "TechFlow Solutions",
+          "content": "Konvertix transformed our marketing strategy completely. The analytics insights helped us increase our conversion rate by 300% in just 3 months."
+        },
+        {
+          "name": "Marcus Chen",
+          "role": "Growth Manager",
+          "company": "StartupLab",
+          "content": "The automation features saved us countless hours while improving our lead quality. Best investment we've made for our marketing stack."
+        },
+        {
+          "name": "Sarah Williams",
+          "role": "CEO",
+          "company": "Digital Dynamics",
+          "content": "Outstanding platform with incredible support. The team helped us scale from 10K to 100K monthly visitors with their strategic guidance."
+        },
+        {
+          "name": "David Rodriguez",
+          "role": "Marketing Manager",
+          "company": "GrowthCorp",
+          "content": "The reporting capabilities are unmatched. We finally have clear visibility into our marketing ROI across all channels."
+        },
+        {
+          "name": "Lisa Thompson",
+          "role": "Digital Strategist",
+          "company": "InnovateLab",
+          "content": "Konvertix's AI-powered insights helped us identify new opportunities we never knew existed. Game-changing platform."
+        },
+        {
+          "name": "Michael Park",
+          "role": "VP Marketing",
+          "company": "ScaleUp Inc",
+          "content": "From setup to execution, everything is seamless. The platform grows with your business needs perfectly."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Ready to Transform Your Business?",
+      "subtitle": "Join thousands of businesses that trust Konvertix to power their growth and success.",
+      "startTrial": "Start Free Trial",
+      "getStarted": "Get Started Now"
+    },
+    "footer": {
+      "description": "Empowering businesses with AI-powered marketing analytics for smarter growth and faster scaling.",
+      "product": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "integrations": "Integrations",
+      "api": "API",
+      "support": "Support",
+      "helpCenter": "Help Center",
+      "contact": "Contact",
+      "status": "Status",
+      "community": "Community",
+      "salesConsulting": "Get Sales Consulting",
+      "salesDescription": "Need help with your marketing strategy? Our experts are here to help.",
+      "bookCall": "Book a Call",
+      "copyright": "© 2024 Konvertix. All rights reserved."
+    }
+  }
+}

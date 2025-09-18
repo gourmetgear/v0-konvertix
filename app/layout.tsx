@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import AppShell from "@/components/layout/AppShell"
+import { LanguageProvider } from "@/contexts/LanguageContext"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -15,15 +16,17 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode
-}>) {
+}) {
   return (
     <html lang="en">
       <body className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}>
-        <AppShell>
-          {children}
-        </AppShell>
+        <LanguageProvider>
+          <AppShell>
+            {children}
+          </AppShell>
+        </LanguageProvider>
         <Analytics />
       </body>
     </html>

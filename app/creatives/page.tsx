@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
+import AuthGuard from '@/components/auth/AuthGuard'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -9,6 +10,14 @@ import { Plus, Image, Search, Filter } from 'lucide-react'
 import { Input } from '@/components/ui/input'
 
 export default function CreativesPage() {
+  return (
+    <AuthGuard>
+      <CreativesContent />
+    </AuthGuard>
+  )
+}
+
+function CreativesContent() {
   const [searchTerm, setSearchTerm] = useState('')
 
   return (

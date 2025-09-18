@@ -1,0 +1,369 @@
+{
+  "common": {
+    "loading": "Lädt...",
+    "error": "Fehler",
+    "success": "Erfolgreich",
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "create": "Erstellen",
+    "search": "Suchen",
+    "filter": "Filtern",
+    "actions": "Aktionen",
+    "status": "Status",
+    "active": "Aktiv",
+    "inactive": "Inaktiv",
+    "paused": "Pausiert"
+  },
+  "navigation": {
+    "dashboard": "Dashboard",
+    "reports": "Berichte",
+    "documents": "Dokumente",
+    "campaigns": "Kampagnen",
+    "products": "Produkte",
+    "seo": "SEO",
+    "tools": "Tools",
+    "support": "Support",
+    "services": "Services",
+    "settings": "Einstellungen",
+    "logout": "Abmelden"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Willkommen bei Konvertix",
+    "campaignPerformance": "Kampagnen-Performance",
+    "totalRevenue": "Gesamtumsatz",
+    "totalSpend": "Gesamtausgaben",
+    "roas": "ROAS",
+    "conversions": "Conversions",
+    "impressions": "Impressionen",
+    "clicks": "Klicks",
+    "ctr": "CTR",
+    "cpc": "CPC",
+    "bestPerformingCampaigns": "Beste Kampagnen",
+    "viewAll": "Alle anzeigen",
+    "revenue": "Umsatz",
+    "spend": "Ausgaben"
+  },
+  "campaigns": {
+    "title": "Kampagnen",
+    "createCampaign": "Kampagne erstellen",
+    "createAdSet": "Anzeigengruppe erstellen",
+    "campaignName": "Kampagnenname",
+    "objective": "Ziel",
+    "budget": "Budget",
+    "dailyBudget": "Tagesbudget",
+    "status": "Status",
+    "performance": "Performance",
+    "analytics": "Analytics"
+  },
+  "products": {
+    "title": "Produkte",
+    "addProduct": "Produkt hinzufügen",
+    "bulkUpload": "Massen-Upload",
+    "productName": "Produktname",
+    "price": "Preis",
+    "description": "Beschreibung",
+    "category": "Kategorie",
+    "inventory": "Lagerbestand"
+  },
+  "settings": {
+    "title": "Einstellungen",
+    "profile": "Profil",
+    "account": "Konto",
+    "preferences": "Einstellungen",
+    "language": "Sprache",
+    "notifications": "Benachrichtigungen",
+    "security": "Sicherheit"
+  },
+  "forms": {
+    "required": "Dieses Feld ist erforderlich",
+    "invalid": "Ungültige Eingabe",
+    "tooShort": "Zu kurz",
+    "tooLong": "Zu lang",
+    "submit": "Absenden",
+    "reset": "Zurücksetzen"
+  },
+  "meta": {
+    "title": "Konvertix - Marketing Analytics Plattform",
+    "description": "KI-gestützte Marketing-Analytics für intelligenteres Wachstum und schnellere Skalierung"
+  },
+  "landingPage": {
+    "header": {
+      "home": "Home",
+      "services": "Services",
+      "caseStudies": "Fallstudien / Ergebnisse",
+      "pricing": "Preise",
+      "about": "Über uns",
+      "contact": "Kontakt",
+      "bookCall": "Termin buchen"
+    },
+    "hero": {
+      "badge": "Jetzt mit vollständiger Funnel-Berichterstattung",
+      "title": "Wachse intelligenter. Skaliere schneller.",
+      "subtitle": "Entfalte das volle Potenzial deines Marketings mit KI-gesteuerten Analysen, die Daten in handlungsrelevante Erkenntnisse für exponentielles Wachstum verwandeln.",
+      "startTrial": "Kostenlose Testversion starten",
+      "login": "Anmelden",
+      "analyticsTitle": "Analytics Dashboard",
+      "revenue": "Umsatz",
+      "totalSales": "Gesamtumsatz",
+      "conversion": "Conversion",
+      "impressions": "Impressionen",
+      "chartsTitle": "Interaktive Charts & Analytics"
+    },
+    "services": {
+      "title": "Unsere Services, die dein Wachstum antreiben",
+      "subtitle": "Wir bieten moderne digitale Lösungen, die Ideen in kraftvolle Wachstumsmotoren für dein Unternehmen verwandeln.",
+      "paidAds": {
+        "title": "Bezahlte Anzeigen",
+        "description": "Strategische bezahlte Werbekampagnen auf verschiedenen Plattformen zur ROI-Maximierung und qualifizierten Traffic-Generierung."
+      },
+      "seo": {
+        "title": "SEO",
+        "description": "Umfassende SEO-Strategien zur Verbesserung organischer Rankings und nachhaltigen Traffic-Wachstums."
+      },
+      "automation": {
+        "title": "Automatisierung",
+        "description": "Intelligente Marketing-Automatisierungs-Workflows zur Lead-Pflege und Optimierung von Customer Journeys."
+      },
+      "reporting": {
+        "title": "Berichterstattung",
+        "description": "Fortgeschrittene Analysen und Echtzeit-Berichterstattung zur Performance-Verfolgung und Kampagnen-Optimierung."
+      }
+    },
+    "successStories": {
+      "title": "Von Herausforderung zum Erfolg",
+      "layers": {
+        "title": "Layers",
+        "type": "SaaS Plattform",
+        "metric": "300%",
+        "challenge": "Herausforderung:",
+        "challengeText": "Niedrige Benutzerinteraktion und hohe Abwanderungsrate beeinträchtigten Wachstumsmetriken.",
+        "solution": "Lösung:",
+        "solutionText": "Implementierung fortgeschrittener Benutzerverhalten-Analysen und personalisierter Onboarding-Flows.",
+        "result": "Ergebnis:",
+        "resultText": "300% Steigerung der Benutzerinteraktion innerhalb von 6 Monaten erreicht."
+      },
+      "sisyphus": {
+        "title": "Sisyphus",
+        "type": "E-Commerce",
+        "metric": "300%",
+        "challenge": "Herausforderung:",
+        "challengeText": "Schlechte Conversion-Raten und ineffektive Marketing-Kampagnen.",
+        "solution": "Lösung:",
+        "solutionText": "Neugestaltung von Conversion-Funnels mit A/B-Tests und gezielten Kampagnen.",
+        "result": "Ergebnis:",
+        "resultText": "Conversion-Raten um 300% gesteigert und ROI erheblich verbessert."
+      },
+      "quotient": {
+        "title": "Quotient",
+        "type": "Analytics Plattform",
+        "metric": "300%",
+        "challenge": "Herausforderung:",
+        "challengeText": "Komplexe Datenvisualisierungsanforderungen und schlechte Benutzererfahrung.",
+        "solution": "Lösung:",
+        "solutionText": "Aufbau intuitiver Dashboards mit Echtzeit-Analysen und benutzerdefinierten Berichten.",
+        "result": "Ergebnis:",
+        "resultText": "Benutzerzufriedenheit um 300% durch optimierte Dateneinblicke verbessert."
+      }
+    },
+    "pricing": {
+      "title": "Wähle den Plan, der am besten zu dir passt",
+      "paidAds": "Bezahlte Anzeigen",
+      "seo": "SEO",
+      "fullServices": "Vollservice",
+      "billedAnnually": "Jährlich abgerechnet.",
+      "getStarted": "Loslegen",
+      "bestValue": "Bester Wert",
+      "paid": {
+        "basic": {
+          "title": "Basic Plan",
+          "price": "10€/Monat",
+          "features": [
+            "Zugang zu allen Grundfunktionen",
+            "Einfache Berichte und Analysen",
+            "Bis zu 10 individuelle Benutzer",
+            "20GB individuelle Daten pro Benutzer",
+            "Basis Chat- und E-Mail-Support"
+          ]
+        },
+        "business": {
+          "title": "Business Plan",
+          "price": "20€/Monat",
+          "features": [
+            "200+ Integrationen",
+            "Erweiterte Berichte und Analysen",
+            "Bis zu 20 individuelle Benutzer",
+            "40GB individuelle Daten pro Benutzer",
+            "Prioritäts Chat- und E-Mail-Support",
+            "Jederzeit kündbar",
+            "14-tägige kostenlose Testversion",
+            "24/7 Support"
+          ]
+        },
+        "enterprise": {
+          "title": "Enterprise Plan",
+          "price": "40€/Monat",
+          "features": [
+            "Erweiterte benutzerdefinierte Felder",
+            "Audit-Log und Datenverlauf",
+            "Unbegrenzte individuelle Benutzer",
+            "Unbegrenzte individuelle Daten",
+            "Personalisierter + Prioritätsservice"
+          ]
+        }
+      },
+      "seoPlans": {
+        "starter": {
+          "title": "Starter SEO",
+          "price": "15€/Monat",
+          "features": [
+            "Keyword-Tracking (50)",
+            "Basis Website-Audit",
+            "Monatlicher Ranking-Bericht",
+            "E-Mail-Support"
+          ]
+        },
+        "pro": {
+          "title": "Pro SEO",
+          "price": "30€/Monat",
+          "features": [
+            "Keyword-Tracking (250)",
+            "Erweiterte Audits + Korrekturen",
+            "Backlink-Monitoring",
+            "Content-Ideen",
+            "Wöchentliche Berichte",
+            "Prioritäts-Support"
+          ]
+        },
+        "enterprise": {
+          "title": "Enterprise SEO",
+          "price": "60€/Monat",
+          "features": [
+            "Unbegrenzte Keywords",
+            "Technischer Concierge",
+            "Benutzerdefinierte Dashboards",
+            "SLA-Support"
+          ]
+        }
+      },
+      "full": {
+        "starter": {
+          "title": "Growth Starter",
+          "price": "25€/Monat",
+          "features": [
+            "Bezahlte Anzeigen + SEO lite",
+            "Automatisierungs-Templates",
+            "Berichts-Dashboard",
+            "E-Mail-Support"
+          ]
+        },
+        "suite": {
+          "title": "Growth Suite",
+          "price": "45€/Monat",
+          "features": [
+            "Bezahlte Anzeigen + SEO + Automatisierung",
+            "Multichannel-Attribution",
+            "Erweiterte Berichterstattung",
+            "Prioritäts-Support"
+          ]
+        },
+        "enterprise": {
+          "title": "Growth Enterprise",
+          "price": "90€/Monat",
+          "features": [
+            "Benutzerdefinierte Playbooks",
+            "Vollständige Funnel-Berichterstattung",
+            "Unbegrenzte Benutzer & Arbeitsbereiche",
+            "Dedizierter Success Manager"
+          ]
+        }
+      }
+    },
+    "features": {
+      "title": "Leistungsstarke Features für dich entwickelt",
+      "subtitle": "Unsere Plattform ist mit Einfachheit, Geschwindigkeit und Skalierbarkeit im Sinn entwickelt, um dir zu helfen, dich auf das Wachstum deines Unternehmens zu konzentrieren.",
+      "analytics": {
+        "title": "Berichterstattung, Tracking & Analytics",
+        "description": "Umfassendes Analytics-Dashboard mit Echtzeit-Tracking und detaillierten Performance-Einblicken."
+      },
+      "omnichannel": {
+        "title": "Omnichannel-Support",
+        "description": "Nahtloser Kundensupport über alle Kanäle mit integrierten Kommunikationstools."
+      },
+      "custom": {
+        "title": "Maßgeschneiderte Lösungen",
+        "description": "Maßgeschneiderte Lösungen, die auf deine spezifischen Geschäftsanforderungen zugeschnitten sind."
+      },
+      "updates": {
+        "title": "Marketing-Updates",
+        "description": "Bleibe mit den neuesten Marketing-Trends und automatisierten Kampagnen-Optimierungen auf dem Laufenden."
+      }
+    },
+    "testimonials": {
+      "title": "Wähle den Plan, der am besten zu dir passt",
+      "reviews": [
+        {
+          "name": "Amanda Schmidt",
+          "role": "Marketing Director",
+          "company": "TechFlow Solutions",
+          "content": "Konvertix hat unsere Marketing-Strategie komplett transformiert. Die Analytics-Einblicke halfen uns, unsere Conversion-Rate in nur 3 Monaten um 300% zu steigern."
+        },
+        {
+          "name": "Marcus Chen",
+          "role": "Growth Manager",
+          "company": "StartupLab",
+          "content": "Die Automatisierungs-Features sparten uns unzählige Stunden und verbesserten gleichzeitig unsere Lead-Qualität. Beste Investition für unseren Marketing-Stack."
+        },
+        {
+          "name": "Sarah Williams",
+          "role": "CEO",
+          "company": "Digital Dynamics",
+          "content": "Herausragende Plattform mit unglaublichem Support. Das Team half uns, von 10K auf 100K monatliche Besucher mit ihrer strategischen Beratung zu skalieren."
+        },
+        {
+          "name": "David Rodriguez",
+          "role": "Marketing Manager",
+          "company": "GrowthCorp",
+          "content": "Die Berichterstattungsfähigkeiten sind unübertroffen. Wir haben endlich klare Sichtbarkeit auf unseren Marketing-ROI über alle Kanäle."
+        },
+        {
+          "name": "Lisa Thompson",
+          "role": "Digital Strategist",
+          "company": "InnovateLab",
+          "content": "Konvertix's KI-gesteuerte Einblicke halfen uns, neue Möglichkeiten zu identifizieren, von denen wir nie wussten, dass sie existieren. Bahnbrechende Plattform."
+        },
+        {
+          "name": "Michael Park",
+          "role": "VP Marketing",
+          "company": "ScaleUp Inc",
+          "content": "Von der Einrichtung bis zur Ausführung ist alles nahtlos. Die Plattform wächst perfekt mit deinen Geschäftsanforderungen."
+        }
+      ]
+    },
+    "cta": {
+      "title": "Bereit, dein Unternehmen zu transformieren?",
+      "subtitle": "Schließe dich Tausenden von Unternehmen an, die Konvertix vertrauen, um ihr Wachstum und ihren Erfolg anzutreiben.",
+      "startTrial": "Kostenlose Testversion starten",
+      "getStarted": "Jetzt loslegen"
+    },
+    "footer": {
+      "description": "Wir befähigen Unternehmen mit KI-gesteuerten Marketing-Analysen für intelligenteres Wachstum und schnellere Skalierung.",
+      "product": "Produkt",
+      "features": "Features",
+      "pricing": "Preise",
+      "integrations": "Integrationen",
+      "api": "API",
+      "support": "Support",
+      "helpCenter": "Hilfe-Center",
+      "contact": "Kontakt",
+      "status": "Status",
+      "community": "Community",
+      "salesConsulting": "Verkaufsberatung erhalten",
+      "salesDescription": "Brauchst du Hilfe mit deiner Marketing-Strategie? Unsere Experten sind hier, um zu helfen.",
+      "bookCall": "Termin buchen",
+      "copyright": "© 2024 Konvertix. Alle Rechte vorbehalten."
+    }
+  }
+}

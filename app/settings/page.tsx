@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
+import AuthGuard from "@/components/auth/AuthGuard"
 import { supabase } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -20,6 +21,14 @@ import {
 import Link from "next/link"
 
 export default function SettingsPage() {
+  return (
+    <AuthGuard>
+      <SettingsContent />
+    </AuthGuard>
+  )
+}
+
+function SettingsContent() {
   // account_members rows for this user
   const [accounts, setAccounts] = useState<Array<{ account_id: string; ad_account_id: string | null; business_id: string | null; ad_token: string | null }>>([])
   const [loading, setLoading] = useState(true)

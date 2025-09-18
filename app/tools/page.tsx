@@ -1,4 +1,5 @@
 "use client"
+import AuthGuard from "@/components/auth/AuthGuard"
 import Sidebar from "@/components/nav/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -17,9 +18,7 @@ import {
   HeadphonesIcon,
   SearchIcon,
   Wrench,
-  Link2,
   Calculator,
-  Hash,
   Calendar,
   Zap,
   Copy,
@@ -27,26 +26,21 @@ import {
   Download,
   RefreshCw,
   Wand2,
-  Package,
 } from "lucide-react"
 import Link from "next/link"
 
 export default function ToolsPage() {
+  return (
+    <AuthGuard>
+      <ToolsContent />
+    </AuthGuard>
+  )
+}
+
+function ToolsContent() {
   const navItems = [] as any
 
   const tools = [
-    {
-      title: "URL Shortener",
-      description: "Create short, trackable links for your campaigns",
-      icon: Link2,
-      category: "Link Management",
-    },
-    {
-      title: "UTM Builder",
-      description: "Generate UTM parameters for campaign tracking",
-      icon: Hash,
-      category: "Analytics",
-    },
     {
       title: "ROI Calculator",
       description: "Calculate return on investment for your campaigns",
@@ -192,30 +186,6 @@ export default function ToolsPage() {
                   </CardContent>
                 </Card>
               </Link>
-              <Link href="/products/upload">
-                <Card className="bg-[#2b2b2b] border-[#3f3f3f] hover:border-[#a545b6] transition-colors cursor-pointer">
-                  <CardHeader>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-gradient-to-br from-[#a545b6] to-[#cd4f9d] rounded-lg flex items-center justify-center">
-                        <Package className="h-5 w-5 text-white" />
-                      </div>
-                      <div>
-                        <CardTitle className="text-white text-lg">Product Uploader</CardTitle>
-                        <Badge variant="secondary" className="bg-[#3f3f3f] text-[#afafaf] text-xs">
-                          WooCommerce
-                        </Badge>
-                      </div>
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-[#afafaf] mb-4">Upload products directly to your WooCommerce store</p>
-                    <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Launch Tool
-                      <ExternalLink className="h-4 w-4 ml-2" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Link>
               {tools.map((tool, index) => (
                 <Card
                   key={index}
@@ -245,108 +215,6 @@ export default function ToolsPage() {
               ))}
             </div>
 
-            {/* Featured Tools Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* URL Shortener Tool */}
-              <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center">
-                    <Link2 className="h-5 w-5 mr-2" />
-                    URL Shortener
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="long-url" className="text-[#afafaf]">
-                      Long URL
-                    </Label>
-                    <Input
-                      id="long-url"
-                      placeholder="https://example.com/very-long-url"
-                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="custom-alias" className="text-[#afafaf]">
-                      Custom Alias (Optional)
-                    </Label>
-                    <Input
-                      id="custom-alias"
-                      placeholder="my-campaign"
-                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                    />
-                  </div>
-                  <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                    <Link2 className="h-4 w-4 mr-2" />
-                    Shorten URL
-                  </Button>
-                  <div className="p-3 bg-[#3f3f3f] rounded-lg flex items-center justify-between">
-                    <span className="text-white text-sm">knvx.co/abc123</span>
-                    <Button variant="ghost" size="sm" className="text-[#afafaf] hover:text-white">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* UTM Builder Tool */}
-              <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
-                <CardHeader>
-                  <CardTitle className="text-white flex items-center">
-                    <Hash className="h-5 w-5 mr-2" />
-                    UTM Builder
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="website-url" className="text-[#afafaf]">
-                      Website URL
-                    </Label>
-                    <Input
-                      id="website-url"
-                      placeholder="https://example.com"
-                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="utm-source" className="text-[#afafaf]">
-                        Source
-                      </Label>
-                      <Input
-                        id="utm-source"
-                        placeholder="google"
-                        className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="utm-medium" className="text-[#afafaf]">
-                        Medium
-                      </Label>
-                      <Input
-                        id="utm-medium"
-                        placeholder="cpc"
-                        className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="utm-campaign" className="text-[#afafaf]">
-                      Campaign
-                    </Label>
-                    <Input
-                      id="utm-campaign"
-                      placeholder="summer-sale-2024"
-                      className="bg-[#3f3f3f] border-[#4f4f4f] text-white placeholder-[#afafaf]"
-                    />
-                  </div>
-                  <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                    <Hash className="h-4 w-4 mr-2" />
-                    Generate UTM URL
-                  </Button>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* ROI Calculator */}
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">

@@ -183,14 +183,17 @@ export default function CreateCampaignPage() {
       console.log('=== CAMPAIGN SUCCESS DEBUG ===')
       console.log('API response result:', result)
       console.log('result.campaignName:', result.campaignName)
+      console.log('result.facebook_campaign_id:', result.facebook_campaign_id)
       console.log('result.facebook_data:', result.facebook_data)
+      console.log('result.sync_completed:', result.sync_completed)
       console.log('campaignData.name:', campaignData.name)
 
       const campaignNameToUse = result.campaignName || campaignData.name
-      const facebookCampaignId = result.facebook_data?.campaign_id || result.facebook_data?.id
+      const facebookCampaignId = result.facebook_campaign_id || result.facebook_data?.campaign_id || result.facebook_data?.id
 
       console.log('Campaign name to use for ad set lookup:', campaignNameToUse)
       console.log('Facebook campaign ID:', facebookCampaignId)
+      console.log('Sync completed:', result.sync_completed)
       console.log('Setting createdCampaignName to:', campaignNameToUse)
       console.log('Setting createdCampaignId to:', facebookCampaignId)
 
@@ -238,6 +241,7 @@ export default function CreateCampaignPage() {
         userId: user.id,
         name: adSetData.name,
         campaign_id: createdCampaignName, // Campaign name for lookup in metrics_daily
+        facebook_campaign_id: createdCampaignId, // Direct Facebook campaign ID (preferred)
         daily_budget: parseFloat(adSetData.daily_budget),
         billing_event: adSetData.billing_event,
         optimization_goal: adSetData.optimization_goal,

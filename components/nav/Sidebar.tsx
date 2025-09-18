@@ -2,27 +2,30 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { BarChart3, TrendingUp, Users, Target, Search, Wrench, Briefcase, Settings, LogOut } from "lucide-react"
+import { BarChart3, TrendingUp, Users, Target, Search, Wrench, Briefcase, Settings, LogOut, Package } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { supabase } from "@/lib/supabase/client"
+import { useLanguage } from '@/contexts/LanguageContext'
 
-type Item = { name: string; href: string; icon: any }
+type Item = { nameKey: string; href: string; icon: any }
 
 const items: Item[] = [
-  { name: "Dashboard", icon: BarChart3, href: "/dashboard" },
-  { name: "Reports", icon: TrendingUp, href: "/reports" },
-  { name: "Documents", icon: Users, href: "/documents" },
-  { name: "Campaigns", icon: Target, href: "/campaigns" },
-  { name: "SEO", icon: Search, href: "/seo" },
-  { name: "Tools", icon: Wrench, href: "/tools" },
-  { name: "Support", icon: Users, href: "/support" },
-  { name: "Services", icon: Briefcase, href: "/services" },
-  { name: "Settings", icon: Settings, href: "/settings" },
+  { nameKey: "navigation.dashboard", icon: BarChart3, href: "/dashboard" },
+  { nameKey: "navigation.reports", icon: TrendingUp, href: "/reports" },
+  { nameKey: "navigation.documents", icon: Users, href: "/documents" },
+  { nameKey: "navigation.campaigns", icon: Target, href: "/campaigns" },
+  { nameKey: "navigation.products", icon: Package, href: "/products" },
+  { nameKey: "navigation.seo", icon: Search, href: "/seo" },
+  { nameKey: "navigation.tools", icon: Wrench, href: "/tools" },
+  { nameKey: "navigation.support", icon: Users, href: "/support" },
+  { nameKey: "navigation.services", icon: Briefcase, href: "/services" },
+  { nameKey: "navigation.settings", icon: Settings, href: "/settings" },
 ]
 
 export default function Sidebar() {
   const pathname = usePathname()
   const router = useRouter()
+  const { t } = useLanguage()
 
   const handleLogout = async () => {
     try {
@@ -48,7 +51,7 @@ export default function Sidebar() {
           const active = pathname?.startsWith(item.href)
           const Icon = item.icon
           return (
-            <Link key={item.name} href={item.href}>
+            <Link key={item.nameKey} href={item.href}>
               <button
                 className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-all ${
                   active
@@ -57,7 +60,7 @@ export default function Sidebar() {
                 }`}
               >
                 <Icon className="h-5 w-5" />
-                <span>{item.name}</span>
+                <span>{t(item.nameKey)}</span>
               </button>
             </Link>
           )
@@ -67,7 +70,7 @@ export default function Sidebar() {
       {/* Logout */}
       <div className="pt-6">
         <Button variant="ghost" className="w-full justify-start text-[#afafaf] hover:text-white" onClick={handleLogout}>
-          <LogOut className="h-4 w-4 mr-2" /> Logout
+          <LogOut className="h-4 w-4 mr-2" /> {t('navigation.logout')}
         </Button>
       </div>
     </div>

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import AuthGuard from '@/components/auth/AuthGuard'
 import { supabase } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -40,6 +41,14 @@ interface ProductFormData {
 }
 
 export default function ProductUploaderPage() {
+  return (
+    <AuthGuard>
+      <ProductUploaderContent />
+    </AuthGuard>
+  )
+}
+
+function ProductUploaderContent() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -47,6 +56,7 @@ export default function ProductUploaderPage() {
   const [userId, setUserId] = useState<string>('')
   const [userImages, setUserImages] = useState<string[]>([])
   const [loadingImages, setLoadingImages] = useState(false)
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
 
   const [formData, setFormData] = useState<ProductFormData>({
     name: '',
@@ -114,6 +124,10 @@ export default function ProductUploaderPage() {
       ...prev,
       [field]: value
     }))
+  }
+
+  const handleImageError = (imageUrl: string) => {
+    setFailedImages(prev => new Set([...prev, imageUrl]))
   }
 
   const validateForm = (): string | null => {
@@ -436,68 +450,74 @@ export default function ProductUploaderPage() {
 
                   {/* Image Selection */}
                   <div className="space-y-2">
-                    <Label htmlFor="image_url" className="text-white">
+                    <Label className="text-white">
                       <ImageIcon className="h-4 w-4 inline mr-1" />
                       Product Image <span className="text-red-400">*</span>
                     </Label>
                     {loadingImages ? (
-                      <div className="flex items-center justify-center p-4 bg-[#1a1a1a] border border-[#3f3f3f] rounded-md">
+                      <div className="flex items-center justify-center p-8 bg-[#1a1a1a] border border-[#3f3f3f] rounded-md">
                         <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-white mr-2"></div>
                         <span className="text-[#afafaf]">Loading your images...</span>
                       </div>
                     ) : userImages.length > 0 ? (
                       <div>
-                        <Select
-                          value={formData.image_url}
-                          onValueChange={(value) => handleInputChange('image_url', value)}
-                        >
-                          <SelectTrigger className="bg-[#1a1a1a] border-[#3f3f3f] text-white">
-                            <SelectValue placeholder="Select an image from your storage" />
-                          </SelectTrigger>
-                          <SelectContent className="bg-[#2b2b2b] border-[#3f3f3f] max-h-60">
-                            {userImages.map((imageUrl, index) => {
-                              const fileName = imageUrl.split('/').pop() || `Image ${index + 1}`
-                              return (
-                                <SelectItem
-                                  key={imageUrl}
-                                  value={imageUrl}
-                                  className="text-white hover:bg-[#3f3f3f] cursor-pointer"
-                                >
-                                  <div className="flex items-center space-x-2">
-                                    <div className="w-8 h-8 bg-[#3f3f3f] rounded overflow-hidden flex-shrink-0">
-                                      <img
-                                        src={imageUrl}
-                                        alt={fileName}
-                                        className="w-full h-full object-cover"
-                                        onError={(e) => {
-                                          (e.target as HTMLImageElement).style.display = 'none'
-                                        }}
-                                      />
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 p-4 bg-[#1a1a1a] border border-[#3f3f3f] rounded-md max-h-96 overflow-y-auto">
+                          {userImages.map((imageUrl, index) => {
+                            const fileName = imageUrl.split('/').pop() || `Image ${index + 1}`
+                            const isSelected = formData.image_url === imageUrl
+
+                            return (
+                              <div
+                                key={imageUrl}
+                                className={`relative group cursor-pointer rounded-lg overflow-hidden border-2 transition-all duration-200 ${
+                                  isSelected
+                                    ? 'border-[#a545b6] shadow-lg shadow-[#a545b6]/20'
+                                    : 'border-[#3f3f3f] hover:border-[#6f6f6f]'
+                                }`}
+                                onClick={() => handleInputChange('image_url', imageUrl)}
+                              >
+                                <div className="aspect-square bg-[#2b2b2b] relative">
+                                  {failedImages.has(imageUrl) ? (
+                                    <div className="w-full h-full flex items-center justify-center bg-[#3f3f3f]">
+                                      <svg className="w-8 h-8 text-[#6f6f6f]" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fillRule="evenodd" d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" clipRule="evenodd" />
+                                      </svg>
                                     </div>
-                                    <span className="truncate">{fileName}</span>
-                                  </div>
-                                </SelectItem>
-                              )
-                            })}
-                          </SelectContent>
-                        </Select>
-                        {formData.image_url && (
-                          <div className="mt-2 p-2 bg-[#1a1a1a] border border-[#3f3f3f] rounded-md">
-                            <p className="text-xs text-[#afafaf] mb-2">Selected image preview:</p>
-                            <img
-                              src={formData.image_url}
-                              alt="Selected product image"
-                              className="w-32 h-32 object-cover rounded border border-[#3f3f3f]"
-                              onError={(e) => {
-                                (e.target as HTMLImageElement).style.display = 'none'
-                              }}
-                            />
-                          </div>
-                        )}
+                                  ) : (
+                                    <img
+                                      src={imageUrl}
+                                      alt={fileName}
+                                      className="w-full h-full object-cover"
+                                      onError={() => handleImageError(imageUrl)}
+                                    />
+                                  )}
+                                  {/* Selection Overlay */}
+                                  {isSelected && (
+                                    <div className="absolute inset-0 bg-[#a545b6]/20 flex items-center justify-center">
+                                      <div className="w-6 h-6 bg-[#a545b6] rounded-full flex items-center justify-center">
+                                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {/* Hover Overlay */}
+                                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-all duration-200" />
+                                </div>
+                                {/* Image Name */}
+                                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2">
+                                  <p className="text-white text-xs truncate font-medium">
+                                    {fileName}
+                                  </p>
+                                </div>
+                              </div>
+                            )
+                          })}
+                        </div>
                       </div>
                     ) : (
-                      <div className="p-4 bg-[#1a1a1a] border border-[#3f3f3f] rounded-md text-center">
-                        <ImageIcon className="h-8 w-8 text-[#afafaf] mx-auto mb-2" />
+                      <div className="p-8 bg-[#1a1a1a] border border-[#3f3f3f] rounded-md text-center">
+                        <ImageIcon className="h-12 w-12 text-[#afafaf] mx-auto mb-3" />
                         <p className="text-[#afafaf] text-sm mb-2">No images found in your storage</p>
                         <p className="text-xs text-[#afafaf]">
                           Upload images to your private storage folder first
@@ -505,7 +525,7 @@ export default function ProductUploaderPage() {
                       </div>
                     )}
                     <p className="text-xs text-[#afafaf]">
-                      Select an image from your private storage bucket
+                      Click on an image to select it for your product
                     </p>
                   </div>
 
