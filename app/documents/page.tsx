@@ -8,10 +8,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
 import { Search, Bell, ChevronDown, BarChart3, TrendingUp, Users, Target, FileText, Download, ImageIcon, Pencil, Trash2, Maximize2, X } from "lucide-react"
-import Sidebar from "@/components/nav/Sidebar"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
 import { supabase } from "@/lib/supabase/client"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 type FileRow = {
   name: string
@@ -63,6 +63,7 @@ export default function DocumentsPage() {
 }
 
 function DocumentsContent() {
+  const { t } = useLanguage()
   const [files, setFiles] = useState<FileRow[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string>("")
@@ -147,7 +148,7 @@ function DocumentsContent() {
         const { data: userRes } = await supabase.auth.getUser()
         const uid = userRes.user?.id
         if (!uid) {
-          setError("Please log in to view your documents.")
+          setError(t("documents.messages.loginRequired"))
           setFiles([])
           setUserPrefix("")
           return
@@ -186,7 +187,7 @@ function DocumentsContent() {
           await fetchQuota()
         }
       } catch (e: any) {
-        setError(e?.message || "Failed to load documents from storage.")
+        setError(e?.message || t("documents.messages.loadFailed"))
       } finally {
         setLoading(false)
       }
@@ -251,7 +252,7 @@ function DocumentsContent() {
       }
       await refresh(userPrefix)
     } catch (err: any) {
-      setError(err?.message || "Upload failed")
+      setError(err?.message || t("documents.messages.uploadFailed"))
     } finally {
       setUploading(false)
       if (fileInputRef.current) fileInputRef.current.value = ""
@@ -267,7 +268,7 @@ function DocumentsContent() {
     } else {
       // Ensure accountId is set before uploading
       if (!accountId) {
-        throw new Error("Account ID not yet resolved. Please wait and try again.")
+        throw new Error(t("documents.messages.accountIdMissing"))
       }
       // Use uploadViaEdge for user prefix mode with assets/private structure
       await uploadViaEdge(file, accountId)
@@ -311,7 +312,7 @@ function DocumentsContent() {
       }
       await refresh(userPrefix)
     } catch (err: any) {
-      setError(err?.message || "Upload failed")
+      setError(err?.message || t("documents.messages.uploadFailed"))
     } finally {
       setUploading(false)
     }
@@ -381,7 +382,7 @@ function DocumentsContent() {
       }
       await refresh(userPrefix)
     } catch (e: any) {
-      setError(e?.message || "Delete failed")
+      setError(e?.message || t("documents.messages.deleteFailed"))
     } finally {
       setPending(null)
     }
@@ -389,7 +390,7 @@ function DocumentsContent() {
 
   async function handleRename(name: string) {
     if (!userPrefix) return
-    const next = prompt("Rename file", name)
+    const next = prompt(t("documents.files.renameFile"), name)
     if (!next || next === name) return
     setPending(name)
     try {
@@ -404,7 +405,7 @@ function DocumentsContent() {
       }
       await refresh(userPrefix)
     } catch (e: any) {
-      setError(e?.message || "Rename failed")
+      setError(e?.message || t("documents.messages.renameFailed"))
     } finally {
       setPending(null)
     }
@@ -421,7 +422,7 @@ function DocumentsContent() {
         <main className="flex-1 p-6 space-y-6">
           {/* Page Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Documents</h1>
+            <h1 className="text-3xl font-bold">{t("documents.title")}</h1>
           </div>
 
           {/* Search and Filter Bar */}
@@ -431,34 +432,34 @@ function DocumentsContent() {
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Search documents"
+                placeholder={t("documents.search.placeholder")}
                 className="pl-10 bg-[#2b2b2b] border-[#3f3f3f] text-white placeholder-[#afafaf]"
               />
             </div>
             <Select value={dateRange} onValueChange={(v: any) => setDateRange(v)}>
               <SelectTrigger className="w-40 bg-[#2b2b2b] border-[#3f3f3f] text-white">
-                <SelectValue placeholder="Date Range" />
+                <SelectValue placeholder={t("documents.filters.dateRange")} />
               </SelectTrigger>
               <SelectContent className="bg-[#2b2b2b] text-white border-[#3f3f3f]">
-                <SelectItem value="all">All Time</SelectItem>
-                <SelectItem value="24h">Last 24h</SelectItem>
-                <SelectItem value="7d">Last 7 days</SelectItem>
-                <SelectItem value="30d">Last 30 days</SelectItem>
-                <SelectItem value="90d">Last 90 days</SelectItem>
+                <SelectItem value="all">{t("documents.filters.allTime")}</SelectItem>
+                <SelectItem value="24h">{t("documents.filters.last24h")}</SelectItem>
+                <SelectItem value="7d">{t("documents.filters.last7days")}</SelectItem>
+                <SelectItem value="30d">{t("documents.filters.last30days")}</SelectItem>
+                <SelectItem value="90d">{t("documents.filters.last90days")}</SelectItem>
               </SelectContent>
             </Select>
             <Select value={docType} onValueChange={(v: any) => setDocType(v)}>
               <SelectTrigger className="w-48 bg-[#2b2b2b] border-[#3f3f3f] text-white">
-                <SelectValue placeholder="Document Type" />
+                <SelectValue placeholder={t("documents.filters.documentType")} />
               </SelectTrigger>
               <SelectContent className="bg-[#2b2b2b] text-white border-[#3f3f3f]">
-                <SelectItem value="all">Document Type: All</SelectItem>
-                <SelectItem value="image">Images</SelectItem>
-                <SelectItem value="other">Other</SelectItem>
+                <SelectItem value="all">{t("documents.filters.documentTypeAll")}</SelectItem>
+                <SelectItem value="image">{t("documents.filters.images")}</SelectItem>
+                <SelectItem value="other">{t("documents.filters.other")}</SelectItem>
               </SelectContent>
             </Select>
             <Button onClick={() => userPrefix && refresh(userPrefix)} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-              Search
+              {t("documents.search.button")}
             </Button>
             <Button
               disabled={!userPrefix}
@@ -469,10 +470,10 @@ function DocumentsContent() {
               }}
               className="bg-gradient-to-r from-[#6fbf3a] to-[#38a169] hover:from-[#6fbf3a]/90 hover:to-[#38a169]/90"
             >
-              Generate Images
+              {t("documents.generate.button")}
             </Button>
             {quotaRemaining !== null && (
-              <Badge className="bg-[#4b5563] text-white ml-2">Remaining: {quotaRemaining}/{quotaLimit}</Badge>
+              <Badge className="bg-[#4b5563] text-white ml-2">{t("documents.generate.remaining")}: {quotaRemaining}/{quotaLimit}</Badge>
             )}
           </div>
 
@@ -489,12 +490,12 @@ function DocumentsContent() {
             <CardContent className="flex flex-col items-center justify-center py-16 select-none">
               <FileText className="h-16 w-16 text-[#afafaf] mb-4" />
               <p className="text-lg text-[#afafaf] mb-2">
-                {isDragging ? "Release to upload" : "Drop your documents here, or select"}
+                {isDragging ? t("documents.upload.releaseToUpload") : t("documents.upload.dropHere")}
               </p>
               <input id="file-input" type="file" multiple className="hidden" onChange={onUpload} ref={fileInputRef} />
               <label htmlFor="file-input">
                 <Button asChild disabled={!userPrefix || uploading} variant="ghost" className="text-white hover:text-[#a545b6] font-semibold">
-                  <span>{uploading ? "Uploading..." : "Click to Browse"}</span>
+                  <span>{uploading ? t("documents.upload.uploading") : t("documents.upload.clickToBrowse")}</span>
                 </Button>
               </label>
             </CardContent>
@@ -534,7 +535,7 @@ function DocumentsContent() {
                 await refresh(userPrefix)
                 await fetchQuota()
               } catch (e: any) {
-                setError(e?.message || "Image generation failed")
+                setError(e?.message || t("documents.messages.generateFailed"))
               } finally {
                 setGenerating(false)
               }
@@ -544,12 +545,12 @@ function DocumentsContent() {
           {/* Preview Grid (Google Drive-like) */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold">Your Files</h2>
-              {loading && <span className="text-[#afafaf]">Loading...</span>}
+              <h2 className="text-xl font-semibold">{t("documents.files.yourFiles")}</h2>
+              {loading && <span className="text-[#afafaf]">{t("documents.files.loading")}</span>}
             </div>
             {error && <div className="text-red-400 text-sm">{error}</div>}
             {!loading && files.length === 0 && !error && (
-              <div className="text-[#afafaf]">No files found in bucket "{BUCKET}".</div>
+              <div className="text-[#afafaf]">{t("documents.files.noFiles").replace("{bucket}", BUCKET)}</div>
             )}
 
             {/* Card grid for all files with edit/delete */}
@@ -560,14 +561,14 @@ function DocumentsContent() {
                     <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         className="p-1 rounded bg-black/50 hover:bg-black/70"
-                        title="Full screen"
+                        title={t("documents.files.fullScreen")}
                         onClick={() => setPreviewUrl(item.url)}
                       >
                         <Maximize2 className="w-4 h-4" />
                       </button>
                       <button
                         className="p-1 rounded bg-black/50 hover:bg-black/70"
-                        title="Rename"
+                        title={t("documents.files.rename")}
                         onClick={() => handleRename(item.name)}
                         disabled={pending === item.name}
                       >
@@ -575,7 +576,7 @@ function DocumentsContent() {
                       </button>
                       <button
                         className="p-1 rounded bg-black/50 hover:bg-black/70"
-                        title="Delete"
+                        title={t("documents.files.delete")}
                         onClick={() => handleDelete(item.name)}
                         disabled={pending === item.name}
                       >
@@ -603,7 +604,7 @@ function DocumentsContent() {
                     <div className="absolute right-2 top-2 z-10 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                       <button
                         className="p-1 rounded bg-black/50 hover:bg-black/70"
-                        title="Rename"
+                        title={t("documents.files.rename")}
                         onClick={() => handleRename(item.name)}
                         disabled={pending === item.name}
                       >
@@ -611,7 +612,7 @@ function DocumentsContent() {
                       </button>
                       <button
                         className="p-1 rounded bg-black/50 hover:bg-black/70"
-                        title="Delete"
+                        title={t("documents.files.delete")}
                         onClick={() => handleDelete(item.name)}
                         disabled={pending === item.name}
                       >
@@ -639,7 +640,7 @@ function DocumentsContent() {
                 <button
                   className="absolute -top-10 right-0 p-2 rounded bg-white/10 hover:bg-white/20"
                   onClick={() => setPreviewUrl(null)}
-                  aria-label="Close preview"
+                  aria-label={t("documents.files.closePreview")}
                 >
                   <X className="w-5 h-5 text-white" />
                 </button>
@@ -729,6 +730,7 @@ function GenerateModal(props: {
   limit?: number
   remaining?: number
 }) {
+  const { t } = useLanguage()
   const { open, onClose, prompt, setPrompt, count, setCount, onConfirm, busy, limit = 100, remaining = 0 } = props
 
   // Form fields for detailed prompt generation
@@ -770,17 +772,17 @@ function GenerateModal(props: {
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="absolute inset-0 bg-black/60" onClick={() => (!busy ? onClose() : undefined)} />
       <div className="relative w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-lg border border-[#3f3f3f] bg-[#201b2d] p-6 shadow-xl">
-        <h3 className="text-lg font-semibold mb-4">Generate Product Images</h3>
+        <h3 className="text-lg font-semibold mb-4">{t("documents.generate.modal.title")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Left Column */}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm text-[#afafaf] mb-1">Name of Product *</label>
+              <label className="block text-sm text-[#afafaf] mb-1">{t("documents.generate.modal.productName")}</label>
               <Input
                 value={productName}
                 onChange={(e) => setProductName(e.target.value)}
                 className="bg-[#2b2b2b] border-[#3f3f3f] text-white"
-                placeholder="e.g. Minimalist ceramic coffee mug"
+                placeholder={t("documents.generate.modal.productNamePlaceholder")}
               />
             </div>
 
@@ -931,15 +933,15 @@ function GenerateModal(props: {
             }}
             className="bg-[#2b2b2b] border-[#3f3f3f] text-white w-32"
           />
-          <div className="text-xs text-[#afafaf] mt-1">Remaining this month: {remaining}/{limit}</div>
+          <div className="text-xs text-[#afafaf] mt-1">{t("documents.generate.modal.remainingThisMonth")}: {remaining}/{limit}</div>
         </div>
 
         <div className="mt-6 flex justify-end gap-2">
           <Button variant="ghost" className="text-[#afafaf]" onClick={onClose} disabled={busy}>
-            Cancel
+            {t("documents.generate.modal.cancel")}
           </Button>
           <Button onClick={handleConfirm} disabled={busy || count > remaining || !productName.trim()} className="bg-gradient-to-r from-[#6fbf3a] to-[#38a169]">
-            {busy ? "Generating..." : "Generate"}
+            {busy ? t("documents.generate.modal.generating") : t("documents.generate.modal.generate")}
           </Button>
         </div>
       </div>

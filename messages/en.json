@@ -27,12 +27,28 @@
     "support": "Support",
     "services": "Services",
     "settings": "Settings",
-    "logout": "Logout"
+    "logout": "Logout",
+    "backToHome": "Back to Home",
+    "home": "Home",
+    "contact": "Contact",
+    "pricing": "Pricing"
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Welcome to Konvertix",
+    "greeting": "Hi User,",
+    "welcome": "Welcome to Konvertix!",
+    "dateRange": "28 June - 31 August 2025",
     "campaignPerformance": "Campaign performance",
+    "metrics": {
+      "totalSpend": "Total Spend",
+      "totalSpendDesc": "Total ad spend this month",
+      "revenue": "Revenue",
+      "revenueDesc": "Total revenue generated",
+      "roas": "Return on Ad Spend",
+      "roasDesc": "Revenue earned per $1 spent",
+      "conversions": "Conversions",
+      "conversionsDesc": "Total conversions tracked"
+    },
     "totalRevenue": "Total Revenue",
     "totalSpend": "Total Spend",
     "roas": "ROAS",
@@ -44,7 +60,26 @@
     "bestPerformingCampaigns": "Best Performing Campaigns",
     "viewAll": "View All",
     "revenue": "Revenue",
-    "spend": "Spend"
+    "spend": "Spend",
+    "performanceChart": "Performance Chart",
+    "lastSevenDays": "Last 7 Days",
+    "download": "Download",
+    "view": "View",
+    "table": {
+      "campaignName": "CAMPAIGN NAME",
+      "spend": "SPEND (₹)",
+      "revenue": "REVENUE (₹)",
+      "roas": "ROAS",
+      "conversions": "CONVERSIONS",
+      "status": "STATUS",
+      "action": "ACTION"
+    },
+    "campaigns": {
+      "summerSale": "Summer Sale 2025",
+      "backToSchool": "Back-to-School",
+      "festiveOffers": "Festive offers",
+      "newArrival": "New Arrival Campaign"
+    }
   },
   "campaigns": {
     "title": "Campaigns",
@@ -56,17 +91,217 @@
     "dailyBudget": "Daily Budget",
     "status": "Status",
     "performance": "Performance",
-    "analytics": "Analytics"
+    "analytics": "Analytics",
+    "filter": "Filter",
+    "export": "Export",
+    "hideInsights": "Hide Insights",
+    "viewInsights": "View Insights",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing...",
+    "sync": "Sync",
+    "loading": "Loading...",
+    "searchPlaceholder": "Search campaigns...",
+    "statusFilter": "Status",
+    "stats": {
+      "totalCampaigns": "Total Campaigns",
+      "totalCampaignsDesc": "From Facebook Ads",
+      "activeCampaigns": "Active Campaigns",
+      "activeCampaignsDesc": "With spend data",
+      "totalSpend": "Total Spend",
+      "totalSpendDesc": "All campaigns",
+      "avgRoas": "Avg ROAS",
+      "avgRoasDesc": "Return on ad spend"
+    },
+    "insights": {
+      "title": "Campaign Insights",
+      "refresh": "Refresh",
+      "loadingAnalysis": "Loading analysis...",
+      "noAnalysis": "No analysis available",
+      "noAnalysisDesc": "Click \"Analyze\" to generate AI-powered insights for your campaigns",
+      "confidence": "confidence",
+      "keyInsights": "Key Insights:",
+      "recommendations": "Recommendations:"
+    },
+    "table": {
+      "campaignName": "Campaign Name",
+      "status": "Status",
+      "dailyBudget": "Daily Budget",
+      "spent": "Spent",
+      "revenue": "Revenue",
+      "conversions": "Conversions",
+      "roas": "ROAS",
+      "ctr": "CTR",
+      "cpc": "CPC",
+      "cpm": "CPM",
+      "cpp": "CPP",
+      "actions": "Actions"
+    },
+    "actions": {
+      "edit": "Edit",
+      "viewInFacebook": "View in Facebook",
+      "analyzeCampaign": "Analyze Campaign"
+    },
+    "messages": {
+      "loadingCampaigns": "Loading campaigns...",
+      "noCampaignsFound": "No campaigns found",
+      "noCampaignsDesc": "Sync your Facebook Ads data to see campaigns here",
+      "showingResults": "Showing {count} of {total} campaigns",
+      "matching": "matching \"{term}\"",
+      "withStatus": "with status \"{status}\"",
+      "loadMore": "Load More Campaigns ({remaining} remaining)",
+      "analysisStarted": "Campaign analysis started successfully! Check your reports for insights.",
+      "userNotAuthenticated": "User not authenticated",
+      "failedToAnalyze": "Failed to analyze campaign \"{name}\"",
+      "errorLoadingUser": "Error loading user:",
+      "failedToLoadUser": "Failed to load user data",
+      "errorFetchingCampaigns": "Error fetching campaigns:",
+      "failedToFetchCampaigns": "Failed to fetch campaigns",
+      "errorAnalyzingCampaigns": "Error analyzing campaigns:",
+      "failedToAnalyzeCampaigns": "Failed to analyze campaigns",
+      "errorAnalyzingSingleCampaign": "Error analyzing single campaign:",
+      "errorOpeningFacebook": "Error opening Facebook Ads Manager:"
+    },
+    "csvHeaders": {
+      "campaignName": "Campaign Name",
+      "status": "Status",
+      "dailyBudget": "Daily Budget",
+      "spent": "Spent",
+      "revenue": "Revenue",
+      "conversions": "Conversions",
+      "roas": "ROAS",
+      "ctr": "CTR",
+      "cpc": "CPC",
+      "cpm": "CPM",
+      "cpp": "CPP",
+      "date": "Date",
+      "objective": "Objective"
+    }
   },
   "products": {
     "title": "Products",
-    "addProduct": "Add Product",
-    "bulkUpload": "Bulk Upload",
-    "productName": "Product Name",
-    "price": "Price",
-    "description": "Description",
-    "category": "Category",
-    "inventory": "Inventory"
+    "actions": {
+      "filter": "Filter",
+      "syncProducts": "Sync Products",
+      "syncing": "Syncing...",
+      "bulkUpload": "Bulk Upload",
+      "uploadProduct": "Upload Product",
+      "refresh": "Refresh",
+      "view": "View",
+      "viewInStore": "View in Store"
+    },
+    "stats": {
+      "totalProducts": "Total Products",
+      "totalProductsDesc": "WooCommerce products",
+      "published": "Published",
+      "publishedDesc": "Live products",
+      "draft": "Draft",
+      "draftDesc": "Unpublished",
+      "totalValue": "Total Value",
+      "totalValueDesc": "Product value"
+    },
+    "search": {
+      "placeholder": "Search products...",
+      "noResults": "No products match your search.",
+      "noProductsFound": "No products found"
+    },
+    "status": {
+      "publish": "Published",
+      "draft": "Draft",
+      "private": "Private",
+      "featured": "Featured",
+      "inStock": "In Stock",
+      "outOfStock": "Out of Stock",
+      "onBackorder": "On Backorder"
+    },
+    "details": {
+      "id": "ID",
+      "sku": "SKU",
+      "sale": "Sale",
+      "lastSynced": "Last synced"
+    },
+    "states": {
+      "loadingProducts": "Loading products...",
+      "syncingProducts": "Syncing products...",
+      "noProductsDesc": "Sync your WooCommerce products to get started."
+    },
+    "sync": {
+      "success": "Products sync initiated successfully. Your products will be updated shortly.",
+      "userAuthRequired": "User authentication required"
+    },
+    "errors": {
+      "failedToLoadUser": "Failed to load user data",
+      "failedToLoadProducts": "Failed to load products",
+      "failedToSyncProducts": "Failed to sync products"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "dataPointsAvailable": "{count} data points available",
+    "dateRange": {
+      "last7Days": "Last 7 days",
+      "last14Days": "Last 14 days",
+      "last30Days": "Last 30 days",
+      "last90Days": "Last 90 days"
+    },
+    "actions": {
+      "syncNow": "Sync Now",
+      "syncing": "Syncing...",
+      "loading": "Loading...",
+      "export": "Export",
+      "syncCampaigns": "Sync Campaigns"
+    },
+    "states": {
+      "loadingCampaignData": "Loading campaign data...",
+      "noCampaignData": "No campaign data available",
+      "noCampaignDataDesc": "Sync your campaigns to start seeing performance data",
+      "noCampaignDataForPeriod": "No campaign data available for the selected period"
+    },
+    "kpis": {
+      "totalSpend": "Total Spend",
+      "totalRevenue": "Total Revenue",
+      "averageRoas": "Average ROAS",
+      "averageCtr": "Average CTR",
+      "lastDays": "Last {days} days",
+      "conversions": "conversions",
+      "clicks": "clicks",
+      "good": "Good",
+      "needsImprovement": "Needs improvement"
+    },
+    "charts": {
+      "dailySpend": "Daily Spend",
+      "totalSpend": "Total Spend",
+      "campaignPerformance": "Campaign Performance",
+      "clickThroughRate": "Click-Through Rate",
+      "campaignRoas": "Campaign ROAS",
+      "returnOnAdSpend": "Return on Ad Spend",
+      "dailyRevenue": "Daily Revenue",
+      "totalRevenue": "Total Revenue",
+      "days": "Days",
+      "campaignCtr": "Campaign CTR (%)",
+      "higherRoasIndicates": "Higher ROAS indicates better performance"
+    },
+    "table": {
+      "campaignPerformanceDetails": "Campaign Performance Details",
+      "detailedBreakdown": "Detailed breakdown of each campaign's key metrics",
+      "campaign": "Campaign",
+      "spend": "Spend",
+      "revenue": "Revenue",
+      "roas": "ROAS",
+      "ctr": "CTR",
+      "conversions": "Conversions",
+      "clicks": "Clicks",
+      "impressions": "Impressions"
+    },
+    "errors": {
+      "failedToLoadUser": "Failed to load user data",
+      "failedToFetchMetrics": "Failed to fetch metrics data",
+      "syncFailed": "Sync failed",
+      "failedToSyncCampaigns": "Failed to sync campaigns",
+      "configurationNotFound": "Please configure your Facebook Ads connection first in Settings",
+      "configurationIncomplete": "Facebook Ads configuration is incomplete. Please check your CAPI setup",
+      "accountSetupIncomplete": "Account setup incomplete. Please complete your onboarding first",
+      "noUserIdAvailable": "No user ID available"
+    }
   },
   "settings": {
     "title": "Settings",
@@ -77,7 +312,425 @@
     "notifications": "Notifications",
     "security": "Security",
     "languageSelection": "Select your preferred language",
-    "languageDescription": "This will change the language for the entire application interface."
+    "languageDescription": "This will change the language for the entire application interface.",
+    "personalProfile": "Personal Profile",
+    "businessProfile": "Business Profile",
+    "marketingPreferences": "Marketing Preferences",
+    "marketAnalysis": "Market Analysis",
+    "customerIntelligence": "Customer Intelligence",
+    "metaConversionsApi": "Meta Conversions API",
+    "companyInfo": "Company Info",
+    "goalsAndBudgets": "Goals & Budgets",
+    "personal": {
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "email": "Email Address",
+      "profilePicture": "Profile Picture",
+      "uploadImage": "Upload Image",
+      "changePassword": "Change Password"
+    },
+    "business": {
+      "basicInformation": "Basic Information",
+      "companyName": "Company Name",
+      "businessName": "Business Name",
+      "websiteUrl": "Website URL",
+      "industry": "Industry",
+      "companySize": "Company Size",
+      "businessModel": "Business Model",
+      "productType": "Product Type",
+      "productDescription": "Product Description",
+      "productDescriptionPlaceholder": "Detailed description of what you sell and how it works",
+      "uniqueSellingProposition": "Unique Selling Proposition (USP)",
+      "uspPlaceholder": "What makes your product/service unique? Why should customers choose you?",
+      "revenueStreams": "Revenue Streams (comma separated)",
+      "revenueStreamsPlaceholder": "Product sales, Subscription fees, Licensing, Consulting",
+      "priceRange": "Price Range"
+    },
+    "marketing": {
+      "primaryGoal": "Primary Goal",
+      "selectGoal": "Select goal",
+      "brandAwareness": "Brand Awareness",
+      "leadGeneration": "Lead Generation",
+      "increaseSales": "Increase Sales",
+      "driveTraffic": "Drive Website Traffic",
+      "improveEngagement": "Improve Engagement",
+      "customerRetention": "Customer Retention",
+      "monthlyBudget": "Monthly Budget",
+      "selectBudget": "Select budget",
+      "under1k": "Under $1,000",
+      "1k5k": "$1,000 - $5,000",
+      "5k10k": "$5,000 - $10,000",
+      "10k25k": "$10,000 - $25,000",
+      "25k50k": "$25,000 - $50,000",
+      "over50k": "Over $50,000",
+      "targetAudience": "Target Audience",
+      "targetAudiencePlaceholder": "Describe your ideal customer demographics and psychographics",
+      "marketingChallenges": "Marketing Challenges",
+      "challengesPlaceholder": "Biggest obstacles (attribution, CAC, tracking, creative, etc.)",
+      "currentChannels": "Current Channels (comma separated)",
+      "currentChannelsPlaceholder": "Google Ads, Facebook Ads, SEO",
+      "interestedChannels": "Interested Channels (comma separated)",
+      "interestedChannelsPlaceholder": "LinkedIn Ads, Email Marketing",
+      "reportingFrequency": "Reporting Frequency",
+      "selectFrequency": "Select frequency",
+      "weekly": "Weekly",
+      "biweekly": "Bi-Weekly",
+      "monthly": "Monthly"
+    },
+    "market": {
+      "targetMarket": "Target Market",
+      "targetMarketPlaceholder": "Who is your ideal customer? (e.g., Small business owners, Tech professionals, Parents)",
+      "geographicReach": "Geographic Reach",
+      "selectReach": "Select reach",
+      "local": "Local (City/Region)",
+      "national": "National",
+      "international": "International",
+      "global": "Global",
+      "onlineOnly": "Online Only",
+      "marketPosition": "Market Position",
+      "selectPosition": "Select position",
+      "marketLeader": "Market Leader",
+      "challenger": "Challenger",
+      "follower": "Follower",
+      "nichePlayer": "Niche Player",
+      "disruptor": "Disruptor",
+      "newEntrant": "New Entrant",
+      "mainCompetitors": "Main Competitors",
+      "competitorsPlaceholder": "List your top 3-5 competitors and what they do",
+      "competitiveAdvantage": "Competitive Advantage",
+      "advantagePlaceholder": "What gives you an edge over competitors? (price, quality, service, innovation, etc.)"
+    },
+    "customer": {
+      "demographics": "Customer Demographics",
+      "demographicsPlaceholder": "Age, gender, income, location, education, job titles",
+      "journeyStage": "Customer Journey Stage",
+      "selectStage": "Select stage focus",
+      "awareness": "Awareness (People don't know the problem exists)",
+      "interest": "Interest (People are researching solutions)",
+      "consideration": "Consideration (People are comparing options)",
+      "purchase": "Purchase (People are ready to buy)",
+      "retention": "Retention (Existing customers)",
+      "advocacy": "Advocacy (Customers refer others)",
+      "fullFunnel": "Full Funnel (All stages)",
+      "averageValue": "Average Customer Value",
+      "selectValue": "Select value range",
+      "under50": "Under $50",
+      "50250": "$50 - $250",
+      "2501000": "$250 - $1,000",
+      "10005000": "$1,000 - $5,000",
+      "500025000": "$5,000 - $25,000",
+      "over25000": "Over $25,000",
+      "varies": "Varies significantly",
+      "lifetimeValue": "Customer Lifetime Value",
+      "selectCLV": "Select CLV range",
+      "under100": "Under $100",
+      "100500": "$100 - $500",
+      "5002500": "$500 - $2,500",
+      "250010000": "$2,500 - $10,000",
+      "1000050000": "$10,000 - $50,000",
+      "over50000": "Over $50,000",
+      "unknown": "Unknown/Calculating",
+      "painPoints": "Customer Pain Points",
+      "painPointsPlaceholder": "What problems do your customers face that your product/service solves?"
+    },
+    "actions": {
+      "save": "Save",
+      "saved": "Saved",
+      "savePersonalProfile": "Save Personal Profile",
+      "saveBusinessProfile": "Save business profile",
+      "savePreferences": "Save preferences",
+      "saveMarketAnalysis": "Save market analysis",
+      "saveCustomerIntelligence": "Save customer intelligence",
+      "saveCAPI": "Save CAPI",
+      "saveGoogleAds": "Save Google Ads Config",
+      "saveWooCommerce": "Save WooCommerce Config",
+      "delete": "Delete",
+      "deleted": "Deleted",
+      "editProfile": "Edit Profile",
+      "changePassword": "Change Password"
+    },
+    "messages": {
+      "notSignedIn": "Not signed in",
+      "notAuthenticated": "Not authenticated",
+      "profilePictureUploaded": "Profile picture uploaded successfully",
+      "uploadFailed": "Upload failed. Please try again.",
+      "selectValidImage": "Please select a valid image file",
+      "imageTooLarge": "Image must be smaller than 5MB",
+      "savedLocalStorage": "Saved (localStorage)",
+      "errorOccurred": "Error occurred",
+      "deleteErrorOccurred": "Delete error occurred",
+      "uploading": "Uploading...",
+      "remove": "Remove"
+    },
+    "capi": {
+      "title": "Meta Conversions API",
+      "description": "Configure Pixel and CAPI credentials for your accounts.",
+      "noAccounts": "No accounts available. You can configure CAPI settings by adding an account manually.",
+      "facebookAccounts": "Facebook Ads Accounts",
+      "googleAccounts": "Google Ads Accounts",
+      "wooCommerceAccount": "WooCommerce Account",
+      "addFacebookAccount": "Add Facebook Account",
+      "addGoogleAccount": "Add Google Ads Account",
+      "enterFacebookId": "Enter your Facebook account ID manually:",
+      "enterGoogleId": "Enter your Google Ads account ID manually:",
+      "manual": "(Manual)",
+      "pixelId": "Pixel ID",
+      "accessToken": "Access Token (server)",
+      "accessTokenPlaceholder": "enter to replace stored token",
+      "domain": "Domain",
+      "events": "Events (comma separated)",
+      "testEventCode": "Test Event Code",
+      "customerId": "Customer ID",
+      "oauthToken": "OAuth token",
+      "conversionActions": "Conversion Actions",
+      "developerToken": "Developer Token",
+      "consumerKey": "Consumer Key",
+      "consumerSecret": "Consumer Secret",
+      "storeUrl": "Store URL",
+      "apiConfiguration": "API Configuration",
+      "setupInstructions": "Setup Instructions:",
+      "wooInstructions": {
+        "step1": "Go to your WooCommerce store admin → WooCommerce → Settings → Advanced → REST API",
+        "step2": "Click \"Add key\" and set permissions to \"Read/Write\"",
+        "step3": "Copy the Consumer key and Consumer secret here",
+        "step4": "Enter your store URL (e.g., https://yourstore.com)"
+      },
+      "lastSaved": "Last saved:",
+      "confirmDelete": "Delete {type} configuration for account {id}?",
+      "confirmDeleteWoo": "Delete WooCommerce configuration?"
+    },
+    "company": {
+      "password": "Password",
+      "websiteAddress": "Website address",
+      "httpsPlaceholder": "https://",
+      "desiredRoas": "Desired ROAS",
+      "roasPlaceholder": "ROAS",
+      "maxDailySpend": "Max Daily Spend",
+      "spendPlaceholder": "Spend"
+    }
+  },
+  "documents": {
+    "title": "Documents",
+    "search": {
+      "placeholder": "Search documents",
+      "button": "Search"
+    },
+    "filters": {
+      "dateRange": "Date Range",
+      "allTime": "All Time",
+      "last24h": "Last 24h",
+      "last7days": "Last 7 days",
+      "last30days": "Last 30 days",
+      "last90days": "Last 90 days",
+      "documentType": "Document Type",
+      "documentTypeAll": "Document Type: All",
+      "images": "Images",
+      "other": "Other"
+    },
+    "upload": {
+      "dropHere": "Drop your documents here, or select",
+      "releaseToUpload": "Release to upload",
+      "clickToBrowse": "Click to Browse",
+      "uploading": "Uploading..."
+    },
+    "generate": {
+      "button": "Generate Images",
+      "remaining": "Remaining",
+      "modal": {
+        "title": "Generate Product Images",
+        "productName": "Name of Product *",
+        "productNamePlaceholder": "e.g. Minimalist ceramic coffee mug",
+        "productDescription": "Description of Product",
+        "productDescriptionPlaceholder": "materials, color, size, special features",
+        "imageAngle": "Angle of Image",
+        "chooseAngle": "Choose angle",
+        "frontView": "Front view",
+        "sideView": "Side view",
+        "topDown": "Top-down",
+        "threeQuarter": "45° three-quarter",
+        "diagonal": "Diagonal",
+        "birdsEye": "Bird's eye",
+        "backgroundSetting": "Background / Setting",
+        "chooseBackground": "Choose background",
+        "plainWhite": "Plain white",
+        "lifestyleScene": "Lifestyle scene",
+        "studioLighting": "Studio lighting",
+        "outdoor": "Outdoor",
+        "woodenTable": "Wooden table",
+        "marbleSurface": "Marble surface",
+        "gradient": "Gradient",
+        "lightingStyle": "Lighting Style",
+        "chooseLighting": "Choose lighting",
+        "softDaylight": "Soft daylight",
+        "dramaticShadows": "Dramatic shadows",
+        "neonGlow": "Neon glow",
+        "flatCatalog": "Flat catalog-style",
+        "warmAmbient": "Warm ambient",
+        "brightStudio": "Bright studio",
+        "goldenHour": "Golden hour",
+        "moodStyle": "Mood / Style",
+        "chooseMood": "Choose mood",
+        "luxury": "Luxury",
+        "playful": "Playful",
+        "futuristic": "Futuristic",
+        "rustic": "Rustic",
+        "minimalist": "Minimalist",
+        "elegant": "Elegant",
+        "modern": "Modern",
+        "vintage": "Vintage",
+        "additionalElements": "Additional Elements",
+        "additionalElementsPlaceholder": "props, human hand holding, scale objects",
+        "imageQuality": "Image Quality Specs",
+        "chooseQuality": "Choose quality",
+        "highRes": "High resolution, photorealistic",
+        "8k": "8K, hyper-detailed",
+        "4k": "4K, ultra-sharp",
+        "professional": "Professional photography",
+        "commercial": "Commercial grade",
+        "promptPreview": "Generated Prompt Preview",
+        "promptPlaceholder": "Your generated prompt will appear here...",
+        "updatePreview": "Update Preview",
+        "numberOfImages": "Number of images (1-8)",
+        "remainingThisMonth": "Remaining this month",
+        "cancel": "Cancel",
+        "generate": "Generate",
+        "generating": "Generating..."
+      }
+    },
+    "files": {
+      "yourFiles": "Your Files",
+      "loading": "Loading...",
+      "noFiles": "No files found in bucket \"{bucket}\".",
+      "fullScreen": "Full screen",
+      "rename": "Rename",
+      "delete": "Delete",
+      "download": "Download",
+      "closePreview": "Close preview",
+      "renameFile": "Rename file"
+    },
+    "table": {
+      "fileName": "FILE NAME",
+      "type": "TYPE",
+      "dateUpdated": "DATE UPDATED",
+      "size": "SIZE",
+      "action": "ACTION",
+      "image": "Image",
+      "file": "File"
+    },
+    "messages": {
+      "loginRequired": "Please log in to view your documents.",
+      "loadFailed": "Failed to load documents from storage.",
+      "uploadFailed": "Upload failed",
+      "deleteFailed": "Delete failed",
+      "renameFailed": "Rename failed",
+      "generateFailed": "Image generation failed",
+      "accountIdMissing": "Account ID not yet resolved. Please wait and try again."
+    }
+  },
+  "seo": {
+    "title": "SEO Dashboard",
+    "actions": {
+      "exportReport": "Export Report",
+      "addKeywords": "Add Keywords",
+      "filterByStatus": "Filter by Status",
+      "createIdeas": "Create Ideas",
+      "creatingIdeas": "Creating Ideas...",
+      "createBlogPost": "Create Blog Post",
+      "filter": "Filter",
+      "cancel": "Cancel"
+    },
+    "stats": {
+      "organicTraffic": "Organic Traffic",
+      "organicTrafficChange": "+15.2% vs last month",
+      "keywordsRanking": "Keywords Ranking",
+      "keywordsRankingChange": "+8 new rankings",
+      "avgPosition": "Avg. Position",
+      "avgPositionChange": "+2.1 improvement",
+      "domainAuthority": "Domain Authority",
+      "domainAuthorityChange": "+3 points"
+    },
+    "blogPosts": {
+      "title": "Blog Post Ideas & Content Calendar",
+      "modal": {
+        "title": "Create New Blog Post",
+        "blogIdea": "Blog Idea",
+        "placeholder": "Describe your blog post idea here...",
+        "cancel": "Cancel",
+        "create": "Create Blog Post"
+      },
+      "table": {
+        "title": "Blog Post Title",
+        "category": "Category",
+        "searchVolume": "Search Volume",
+        "difficulty": "Difficulty",
+        "estTraffic": "Est. Traffic",
+        "status": "Status",
+        "priority": "Priority",
+        "actions": "Actions"
+      },
+      "status": {
+        "published": "Published",
+        "inProgress": "In Progress",
+        "draft": "Draft",
+        "outline": "Outline",
+        "planned": "Planned",
+        "unknown": "Unknown"
+      },
+      "priority": {
+        "high": "High",
+        "medium": "Medium",
+        "low": "Low"
+      }
+    },
+    "charts": {
+      "organicTrafficTrend": "Organic Traffic Trend",
+      "siteHealthScore": "Site Health Score",
+      "overallScore": "Overall Score",
+      "technicalSeo": "Technical SEO",
+      "contentQuality": "Content Quality",
+      "userExperience": "User Experience"
+    },
+    "keywords": {
+      "title": "Keyword Rankings",
+      "table": {
+        "keyword": "Keyword",
+        "position": "Position",
+        "searchVolume": "Search Volume",
+        "difficulty": "Difficulty",
+        "actions": "Actions"
+      }
+    },
+    "audit": {
+      "title": "Site Audit Issues",
+      "table": {
+        "issueType": "Issue Type",
+        "description": "Description",
+        "count": "Count",
+        "priority": "Priority",
+        "actions": "Actions"
+      },
+      "issues": {
+        "missingMetaDescriptions": "Missing meta descriptions",
+        "slowPageLoad": "Slow page load times",
+        "missingAltText": "Missing alt text",
+        "brokenInternalLinks": "Broken internal links",
+        "duplicateTitleTags": "Duplicate title tags"
+      },
+      "types": {
+        "critical": "Critical",
+        "warning": "Warning",
+        "notice": "Notice"
+      }
+    },
+    "messages": {
+      "blogIdeasSuccess": "Blog post ideas created successfully!",
+      "blogIdeasError": "Failed to create blog post ideas",
+      "unexpectedError": "An unexpected error occurred",
+      "enterBlogIdea": "Please enter a blog idea",
+      "blogPostSuccess": "Blog post request sent successfully!",
+      "blogPostError": "Failed to send blog post request",
+      "requestError": "An error occurred while sending the request"
+    }
   },
   "forms": {
     "required": "This field is required",
@@ -90,6 +743,27 @@
   "meta": {
     "title": "Konvertix - Marketing Analytics Platform",
     "description": "AI-powered marketing analytics for smarter growth and faster scaling"
+  },
+  "cta": {
+    "getStarted": "Get Started"
+  },
+  "footer": {
+    "description": "AI-powered marketing analytics for smarter growth and faster scaling",
+    "product": "Product",
+    "features": "Features",
+    "pricing": "Pricing",
+    "integrations": "Integrations",
+    "api": "API",
+    "support": "Support",
+    "helpCenter": "Help Center",
+    "contact": "Contact",
+    "status": "Status",
+    "community": "Community",
+    "company": "Company",
+    "about": "About",
+    "careers": "Careers",
+    "privacy": "Privacy",
+    "copyright": "© 2024 Konvertix. All rights reserved."
   },
   "landingPage": {
     "header": {
@@ -373,6 +1047,644 @@
       "gdpr": "GDPR Compliance",
       "dataProcessing": "Data Processing",
       "copyright": "© 2024 Konvertix. All rights reserved."
+    }
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "subtitle": "Find answers to common questions about Konvertix",
+    "searchPlaceholder": "Search for answers...",
+    "noResults": "No results found. Try different keywords or contact support.",
+    "stillNeedHelp": "Still need help?",
+    "contactSupport": "Contact Support",
+    "emailSupport": "Email Support",
+    "callUs": "Call Us",
+    "categories": {
+      "0": {
+        "name": "Getting Started",
+        "faqs": {
+          "0": {
+            "question": "What is Konvertix and how does it work?",
+            "answer": "Konvertix is a comprehensive marketing analytics platform that helps businesses track, analyze, and optimize their marketing campaigns across multiple channels. It integrates with your existing tools to provide unified insights and actionable recommendations."
+          },
+          "1": {
+            "question": "How do I get started with Konvertix?",
+            "answer": "Getting started is easy! Sign up for a free trial, connect your marketing accounts (Google Ads, Facebook, etc.), and our onboarding wizard will guide you through the setup process. You'll have insights flowing within minutes."
+          },
+          "2": {
+            "question": "What integrations does Konvertix support?",
+            "answer": "Konvertix integrates with 200+ marketing tools including Google Ads, Facebook Ads, Instagram, LinkedIn, Twitter, Google Analytics, Shopify, WooCommerce, HubSpot, Salesforce, and many more."
+          },
+          "3": {
+            "question": "Is there a free trial available?",
+            "answer": "Yes! We offer a 14-day free trial with full access to all features. No credit card required to start your trial."
+          }
+        }
+      },
+      "1": {
+        "name": "Features & Functionality",
+        "faqs": {
+          "0": {
+            "question": "What kind of reports can I generate?",
+            "answer": "Konvertix offers comprehensive reporting including campaign performance, ROI analysis, attribution modeling, conversion tracking, audience insights, and custom dashboards. All reports can be automated and scheduled for delivery."
+          },
+          "1": {
+            "question": "Can I track conversions across multiple channels?",
+            "answer": "Absolutely! Our cross-channel attribution modeling tracks the entire customer journey from first touch to conversion, giving you a complete picture of how your marketing channels work together."
+          },
+          "2": {
+            "question": "Does Konvertix offer automation features?",
+            "answer": "Yes, Konvertix includes powerful automation features like automated bid management, budget optimization, alert systems, and automated reporting. You can set rules to optimize campaigns automatically based on your KPIs."
+          },
+          "3": {
+            "question": "How accurate is the data in Konvertix?",
+            "answer": "Our platform uses advanced data reconciliation and validation techniques to ensure 99.9% data accuracy. We cross-reference data from multiple sources and apply machine learning to detect and correct discrepancies."
+          }
+        }
+      },
+      "2": {
+        "name": "Pricing & Plans",
+        "faqs": {
+          "0": {
+            "question": "What pricing plans are available?",
+            "answer": "We offer flexible pricing plans starting from $10/month for basic analytics up to enterprise solutions. Plans include Basic ($10/month), Business ($20/month), and Enterprise ($40/month) for general analytics, plus specialized SEO and Full Service plans."
+          },
+          "1": {
+            "question": "Can I change my plan at any time?",
+            "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and we'll prorate any billing adjustments on your next invoice."
+          },
+          "2": {
+            "question": "Is there a setup fee?",
+            "answer": "No setup fees! All our plans include free onboarding and setup assistance. Our team will help you get up and running at no additional cost."
+          },
+          "3": {
+            "question": "Do you offer custom enterprise solutions?",
+            "answer": "Yes, we offer custom enterprise solutions with dedicated support, custom integrations, advanced security features, and SLA guarantees. Contact our sales team to discuss your specific requirements."
+          }
+        }
+      },
+      "3": {
+        "name": "Support & Security",
+        "faqs": {
+          "0": {
+            "question": "What support options are available?",
+            "answer": "We offer 24/7 chat support, email support with 4-hour response time, phone support for enterprise customers, comprehensive documentation, video tutorials, and webinar training sessions."
+          },
+          "1": {
+            "question": "Is my data secure with Konvertix?",
+            "answer": "Absolutely. We use enterprise-grade security including SSL encryption, SOC 2 compliance, GDPR compliance, regular security audits, and data centers with 99.9% uptime. Your data is never shared with third parties."
+          },
+          "2": {
+            "question": "Can I export my data?",
+            "answer": "Yes, you can export all your data at any time in multiple formats including CSV, Excel, PDF, and via our API. We believe your data belongs to you and should always be accessible."
+          }
+        }
+      }
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "subtitle": "Ready to transform your marketing? Let's talk!",
+    "description": "Our expert team is here to help you get the most out of your marketing efforts.",
+    "form": {
+      "title": "Get in Touch",
+      "description": "Fill out the form below and we'll get back to you within 24 hours.",
+      "name": "Full Name",
+      "namePlaceholder": "Your full name",
+      "email": "Email Address",
+      "emailPlaceholder": "your@email.com",
+      "company": "Company Name",
+      "companyPlaceholder": "Your company name",
+      "subject": "Subject",
+      "subjectPlaceholder": "Choose a subject",
+      "message": "Message",
+      "messagePlaceholder": "Tell us about your marketing goals and challenges...",
+      "budget": "Monthly Marketing Budget",
+      "budgetPlaceholder": "Select your budget",
+      "submit": "Send Message",
+      "sending": "Sending..."
+    },
+    "subjects": {
+      "general": "General Inquiry",
+      "demo": "Request Demo",
+      "pricing": "Pricing & Plans",
+      "technical": "Technical Support",
+      "partnership": "Partnership",
+      "other": "Other"
+    },
+    "budgets": {
+      "under5k": "Under $5,000",
+      "5k-15k": "$5,000 - $15,000",
+      "15k-50k": "$15,000 - $50,000",
+      "50k-100k": "$50,000 - $100,000",
+      "over100k": "Over $100,000"
+    },
+    "budgetOptions": {
+      "under5k": "Under $5,000",
+      "5k-15k": "$5,000 - $15,000",
+      "15k-50k": "$15,000 - $50,000",
+      "over100k": "Over $100,000"
+    },
+    "contactInfo": {
+      "title": "Let's Start a Conversation",
+      "email": "Email Us",
+      "phone": "Call Us",
+      "address": "Visit Us",
+      "hours": "Business Hours",
+      "addressValue": "123 Marketing St, Growth City, GC 12345",
+      "hoursValue": "Mon-Fri: 9AM-6PM PST"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "bookDemo": "Book a Demo",
+      "bookDemoDesc": "Schedule a personalized demo with our team",
+      "startTrial": "Start Free Trial",
+      "startTrialDesc": "Get started immediately with a 14-day free trial",
+      "viewPricing": "View Pricing",
+      "viewPricingDesc": "Explore our flexible pricing plans"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Have questions? We've got answers. Here are some common questions about our services.",
+      "questions": {
+        "0": {
+          "question": "How quickly can we get started?",
+          "answer": "We can typically get you set up within 24-48 hours after our initial consultation. Our onboarding process is streamlined to get you seeing results fast."
+        },
+        "1": {
+          "question": "What's included in the free trial?",
+          "answer": "Our 14-day free trial includes full access to all features, dedicated support, and a strategy session with our team to help you get the most out of the platform."
+        },
+        "2": {
+          "question": "Do you offer custom integrations?",
+          "answer": "Yes! We offer custom integrations with your existing tools and platforms. Our technical team can work with you to ensure seamless data flow across your marketing stack."
+        },
+        "3": {
+          "question": "What kind of support do you provide?",
+          "answer": "We provide 24/7 chat support, dedicated account management for enterprise clients, and comprehensive onboarding with training sessions for your team."
+        }
+      }
+    }
+  },
+  "helpCenter": {
+    "title": "How can we help you?",
+    "subtitle": "Find answers, get support, and learn how to make the most of Konvertix",
+    "searchPlaceholder": "Search for articles, guides, and more...",
+    "browseByCategory": "Browse by Category",
+    "browseByDescription": "Find the information you need organized by topic",
+    "popularArticlesTitle": "Popular Articles",
+    "popularArticlesSubtitle": "Most viewed and helpful articles from our community",
+    "categories": {
+      "gettingStarted": {
+        "title": "Getting Started",
+        "description": "Learn the basics of Konvertix",
+        "articles": "12 articles"
+      },
+      "analytics": {
+        "title": "Analytics & Reporting",
+        "description": "Understanding your data and metrics",
+        "articles": "18 articles"
+      },
+      "account": {
+        "title": "Account & Billing",
+        "description": "Manage your account and subscription",
+        "articles": "8 articles"
+      },
+      "teamManagement": {
+        "title": "Team Management",
+        "description": "Collaborate with your team",
+        "articles": "6 articles"
+      },
+      "integrations": {
+        "title": "Integrations",
+        "description": "Connect your marketing tools",
+        "articles": "15 articles"
+      },
+      "campaigns": {
+        "title": "Campaign Management",
+        "description": "Create and optimize campaigns",
+        "articles": "22 articles"
+      },
+      "troubleshooting": {
+        "title": "Troubleshooting",
+        "description": "Resolve common issues",
+        "articles": "10 articles"
+      }
+    },
+    "popularArticles": [
+      {
+        "title": "How to set up your first campaign",
+        "category": "Getting Started",
+        "readTime": "5 min read",
+        "views": "2.1k views"
+      },
+      {
+        "title": "Understanding conversion tracking",
+        "category": "Analytics",
+        "readTime": "8 min read",
+        "views": "1.8k views"
+      },
+      {
+        "title": "Integrating with Google Analytics",
+        "category": "Integrations",
+        "readTime": "6 min read",
+        "views": "1.5k views"
+      },
+      {
+        "title": "Setting up team permissions",
+        "category": "Team Management",
+        "readTime": "4 min read",
+        "views": "1.2k views"
+      }
+    ],
+    "quickActions": [
+      {
+        "title": "Contact Support",
+        "description": "Get help from our support team",
+        "action": "Start Chat"
+      },
+      {
+        "title": "Video Tutorials",
+        "description": "Watch step-by-step guides",
+        "action": "Watch Now"
+      },
+      {
+        "title": "API Documentation",
+        "description": "Technical documentation for developers",
+        "action": "View Docs"
+      }
+    ],
+    "quickStart": {
+      "title": "Quick Start Guide",
+      "description": "Get productive with Konvertix in minutes",
+      "steps": [
+        "Create account and verify email",
+        "Connect marketing accounts",
+        "Set up your first dashboard",
+        "Analyze your first campaign"
+      ]
+    },
+    "support": {
+      "title": "Still need help?",
+      "description": "Can't find what you're looking for? Our support team is here to help you succeed.",
+      "contact": "Contact Support",
+      "demo": "Schedule a Demo",
+      "chat": "Start Live Chat",
+      "email": "Send Email",
+      "schedule": "Schedule Call"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Quick answers to common questions",
+      "questions": [
+        {
+          "question": "How do I get started with Konvertix?",
+          "answer": "Simply sign up for a free account, complete the onboarding process, and start creating your first campaign. Our setup wizard will guide you through each step."
+        },
+        {
+          "question": "What integrations are available?",
+          "answer": "Konvertix integrates with Google Analytics, Facebook Ads, Google Ads, Shopify, WooCommerce, and many other popular marketing and e-commerce platforms."
+        },
+        {
+          "question": "Can I upgrade or downgrade my plan anytime?",
+          "answer": "Yes, you can change your subscription plan at any time. Changes take effect immediately, and billing is prorated accordingly."
+        },
+        {
+          "question": "Is there a mobile app available?",
+          "answer": "Currently, Konvertix is available as a web application optimized for mobile browsers. A dedicated mobile app is in development."
+        }
+      ]
+    },
+    "footer": {
+      "title": "Konvertix Help Center",
+      "backToKonvertix": "Back to Konvertix"
+    }
+  },
+  "legal": {
+    "privacyPolicy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated: January 15, 2024",
+      "contactText": "For questions about this policy, contact us at"
+    },
+    "termsOfService": {
+      "title": "Terms of Service",
+      "lastUpdated": "Last updated: January 15, 2024",
+      "contactText": "For questions about these terms, contact us at"
+    },
+    "cookiePolicy": {
+      "title": "Cookie Policy",
+      "lastUpdated": "Last updated: January 15, 2024",
+      "contactText": "For questions about our cookie practices, contact us at"
+    },
+    "gdpr": {
+      "title": "GDPR Compliance",
+      "lastUpdated": "Last updated: January 15, 2024",
+      "contactText": "For GDPR-related questions, contact our DPO at"
+    },
+    "dataProcessing": {
+      "title": "Data Processing Agreement",
+      "lastUpdated": "Last updated: January 15, 2024",
+      "contactText": "For data processing questions, contact us at"
+    }
+  },
+  "pricing": {
+    "title": "Pricing",
+    "heading": "Choose the Plan That Fits You Best",
+    "getStarted": "Get started",
+    "tabs": {
+      "paidAds": "Paid Ads",
+      "seo": "SEO",
+      "fullServices": "Full services"
+    },
+    "plans": {
+      "paid": {
+        "basic": {
+          "title": "Basic plan",
+          "price": "$10/mth",
+          "features": {
+            "0": "Access to all basic features",
+            "1": "Basic reporting and analytics",
+            "2": "Up to 10 individual users",
+            "3": "20GB individual data each user",
+            "4": "Basic chat and email support"
+          }
+        },
+        "business": {
+          "title": "Business plan",
+          "price": "$20/mth",
+          "badge": "Best Value",
+          "features": {
+            "0": "200+ integrations",
+            "1": "Advanced reporting and analytics",
+            "2": "Up to 20 individual users",
+            "3": "40GB individual data each user",
+            "4": "Priority chat and email support",
+            "5": "Cancel anytime",
+            "6": "14-day free trial",
+            "7": "24/7 Support"
+          }
+        },
+        "enterprise": {
+          "title": "Enterprise plan",
+          "price": "$40/mth",
+          "features": {
+            "0": "Advanced custom fields",
+            "1": "Audit log and data history",
+            "2": "Unlimited individual users",
+            "3": "Unlimited individual data",
+            "4": "Personalised+priority service"
+          }
+        }
+      }
+    }
+  },
+  "services": {
+    "title": "Services",
+    "requestUpgrade": "Request Upgrade",
+    "paidAds": {
+      "name": "Paid Ads",
+      "status": "Active",
+      "description": "Run and optimize ad campaigns across Google, Meta & LinkedIn platforms effectively.",
+      "buttonText": "Included in your plan"
+    },
+    "seo": {
+      "name": "SEO",
+      "status": "Inactive",
+      "description": "Improve your website's search engine ranking and organic traffic with comprehensive SEO strategies.",
+      "buttonText": "Add SEO"
+    },
+    "automation": {
+      "name": "Automation",
+      "status": "Inactive",
+      "description": "Streamline your marketing processes with intelligent automation tools and workflows.",
+      "buttonText": "Add Automation"
+    },
+    "reporting": {
+      "name": "Reporting",
+      "status": "Active",
+      "description": "Get detailed insights and analytics reports to track your marketing performance and ROI.",
+      "buttonText": "Included in your plan"
+    },
+    "emailMarketing": {
+      "name": "Email Marketing",
+      "status": "Inactive",
+      "description": "Create and manage effective email campaigns to engage your audience and drive conversions.",
+      "buttonText": "Add Email Marketing"
+    },
+    "analytics": {
+      "name": "Analytics",
+      "status": "Active",
+      "description": "Advanced analytics and data visualization tools to understand your marketing performance.",
+      "buttonText": "Included in your plan"
+    }
+  },
+  "support": {
+    "title": "Support",
+    "createTicket": {
+      "title": "Create a New Ticket",
+      "subject": "Subject",
+      "subjectPlaceholder": "Subject",
+      "description": "Description",
+      "descriptionPlaceholder": "Short description",
+      "priority": {
+        "label": "Priority",
+        "low": "Low",
+        "medium": "Medium",
+        "high": "High",
+        "urgent": "Urgent"
+      },
+      "submit": "Create Ticket"
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Find quick answers to common questions about Konvertix",
+      "searchPlaceholder": "Search FAQ...",
+      "noResults": "No results found. Try different keywords.",
+      "categories": {
+        "accounting": {
+          "title": "Accounting & Billing",
+          "questions": {
+            "0": {
+              "question": "How does billing work?",
+              "answer": "Billing is processed monthly on the date you signed up. You'll receive an invoice via email 3 days before your billing date. All major credit cards and PayPal are accepted."
+            },
+            "1": {
+              "question": "Can I change my plan anytime?",
+              "answer": "Yes, you can upgrade or downgrade your plan at any time. Changes take effect immediately, and billing is prorated based on your usage."
+            },
+            "2": {
+              "question": "Do you offer refunds?",
+              "answer": "We offer a 30-day money-back guarantee for all new subscriptions. If you're not satisfied, contact our support team for a full refund."
+            },
+            "3": {
+              "question": "What payment methods do you accept?",
+              "answer": "We accept all major credit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for enterprise accounts."
+            }
+          }
+        },
+        "campaigns": {
+          "title": "Campaigns & Analytics",
+          "questions": {
+            "0": {
+              "question": "How do I connect my advertising accounts?",
+              "answer": "Go to Settings > Integrations and click 'Connect' next to your advertising platform. You'll be redirected to authorize Konvertix to access your account data."
+            },
+            "1": {
+              "question": "Why is my campaign data not showing?",
+              "answer": "Data sync can take 15-30 minutes after connecting an account. If data is still missing after an hour, check your account permissions and try reconnecting."
+            },
+            "2": {
+              "question": "How often is campaign data updated?",
+              "answer": "Campaign data is updated every 15 minutes for real-time insights. Historical data is refreshed daily to ensure accuracy."
+            },
+            "3": {
+              "question": "Can I track multiple ad accounts?",
+              "answer": "Yes, you can connect multiple ad accounts from the same platform or different platforms. Each account will appear separately in your dashboard."
+            }
+          }
+        },
+        "reports": {
+          "title": "Reports & Data",
+          "questions": {
+            "0": {
+              "question": "How do I export my data?",
+              "answer": "Click the 'Export' button on any report page. You can export data in CSV, Excel, or PDF format. Custom date ranges and filters are preserved in exports."
+            },
+            "1": {
+              "question": "Can I schedule automated reports?",
+              "answer": "Yes, go to Reports > Scheduled Reports to set up daily, weekly, or monthly automated reports. Reports will be emailed to specified recipients."
+            },
+            "2": {
+              "question": "What's the data retention period?",
+              "answer": "We retain your data for 2 years on all paid plans. Free trial data is kept for 90 days after trial expiration."
+            },
+            "3": {
+              "question": "How accurate is the attribution data?",
+              "answer": "Our attribution model uses advanced algorithms with 95%+ accuracy. We track cross-device and cross-platform interactions for comprehensive attribution."
+            }
+          }
+        },
+        "technical": {
+          "title": "Technical Support",
+          "questions": {
+            "0": {
+              "question": "What browsers are supported?",
+              "answer": "Konvertix works best on Chrome, Firefox, Safari, and Edge (latest versions). We recommend Chrome for optimal performance."
+            },
+            "1": {
+              "question": "Is there an API available?",
+              "answer": "Yes, we offer a comprehensive REST API for enterprise customers. API documentation and access keys are available in your account settings."
+            },
+            "2": {
+              "question": "Do you offer custom integrations?",
+              "answer": "Yes, our technical team can build custom integrations for enterprise clients. Contact sales to discuss your specific requirements."
+            },
+            "3": {
+              "question": "What's your uptime guarantee?",
+              "answer": "We guarantee 99.9% uptime with redundant servers and automatic failover. Any downtime is credited to your account automatically."
+            }
+          }
+        },
+        "general": {
+          "title": "General Questions",
+          "questions": {
+            "0": {
+              "question": "How do I get started?",
+              "answer": "Sign up for a free trial, connect your marketing accounts, and our onboarding wizard will guide you through the setup process. You'll have insights flowing within minutes."
+            },
+            "1": {
+              "question": "Is my data secure?",
+              "answer": "Absolutely. We use enterprise-grade security including SSL encryption, SOC 2 compliance, GDPR compliance, and regular security audits. Your data is never shared with third parties."
+            },
+            "2": {
+              "question": "Do you offer training?",
+              "answer": "Yes, we provide comprehensive onboarding, video tutorials, webinar training sessions, and dedicated customer success managers for enterprise accounts."
+            },
+            "3": {
+              "question": "Can I cancel anytime?",
+              "answer": "Yes, you can cancel your subscription at any time. Your account will remain active until the end of your current billing period."
+            }
+          }
+        }
+      }
+    },
+    "chat": {
+      "title": "Chat with us",
+      "botName": "Chatbot",
+      "welcomeMessage": "Hi there! I am Tidus, a bot working for Konvertix. How can I help you today?",
+      "messagePlaceholder": "Write Your message",
+      "actions": {
+        "startTrial": "Start 14-day Free trial",
+        "question": "Question",
+        "support": "Support",
+        "bookDemo": "Book a Demo",
+        "liveAgent": "Chat with live agent"
+      }
+    }
+  },
+  "tools": {
+    "title": "Marketing Tools",
+    "exportAllData": "Export All Data",
+    "launchTool": "Launch Tool",
+    "badges": {
+      "aiPowered": "AI-Powered"
+    },
+    "categories": {
+      "finance": "Finance",
+      "testing": "Testing",
+      "socialMedia": "Social Media",
+      "optimization": "Optimization"
+    },
+    "adGenerator": {
+      "title": "Ad Generator",
+      "description": "Create perfect Facebook product ads with AI assistance"
+    },
+    "targetAudienceAnalyzer": {
+      "title": "Target Audience Analyzer",
+      "description": "Discover optimal audiences with ChatGPT analysis"
+    },
+    "competitorAnalysis": {
+      "title": "Competitor Analysis",
+      "description": "Analyze competitors and discover market opportunities"
+    },
+    "roiCalculator": {
+      "title": "ROI Calculator",
+      "description": "Calculate return on investment for your campaigns",
+      "investment": "Investment ($)",
+      "revenue": "Revenue ($)",
+      "roi": "ROI",
+      "calculate": "Calculate"
+    },
+    "abTestCalculator": {
+      "title": "A/B Test Calculator",
+      "description": "Determine statistical significance of your tests"
+    },
+    "socialMediaScheduler": {
+      "title": "Social Media Scheduler",
+      "description": "Schedule and manage social media posts"
+    },
+    "conversionOptimizer": {
+      "title": "Conversion Rate Optimizer",
+      "description": "Analyze and optimize conversion funnels"
+    }
+  },
+  "auth": {
+    "login": {
+      "backToHome": "Back to home",
+      "welcomeBack": "Welcome back",
+      "signInDescription": "Sign in to your Konvertix account",
+      "email": "Email",
+      "emailPlaceholder": "Enter your email",
+      "password": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPassword": "Forgot password?",
+      "signIn": "Sign in",
+      "signingIn": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "signUp": "Sign up",
+      "errors": {
+        "fillAllFields": "Please fill in all fields",
+        "invalidCredentials": "Invalid email or password"
+      }
     }
   }
 }

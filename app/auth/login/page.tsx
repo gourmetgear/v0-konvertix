@@ -12,8 +12,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Eye, EyeOff, ArrowLeft } from "lucide-react"
 import { supabase } from "@/lib/supabase/client"
+import { useLanguage } from '@/contexts/LanguageContext'
 
 export default function LoginPage() {
+  const { t } = useLanguage()
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -29,7 +31,7 @@ export default function LoginPage() {
 
     // Basic validation
     if (!email || !password) {
-      setError("Please fill in all fields")
+      setError(t("auth.login.errors.fillAllFields"))
       setLoading(false)
       return
     }
@@ -37,12 +39,12 @@ export default function LoginPage() {
     try {
       const { error: signInError } = await supabase.auth.signInWithPassword({ email, password })
       if (signInError) {
-        setError(signInError.message || "Invalid email or password")
+        setError(signInError.message || t("auth.login.errors.invalidCredentials"))
         return
       }
       window.location.href = redirectTo
     } catch (err) {
-      setError("Invalid email or password")
+      setError(t("auth.login.errors.invalidCredentials"))
     } finally {
       setLoading(false)
     }
@@ -57,7 +59,7 @@ export default function LoginPage() {
             className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to home
+            {t("auth.login.backToHome")}
           </Link>
         </div>
 
@@ -68,8 +70,8 @@ export default function LoginPage() {
                 <span className="text-primary-foreground font-bold text-lg">K</span>
               </div>
             </div>
-            <CardTitle className="text-2xl font-bold">Welcome back</CardTitle>
-            <CardDescription>Sign in to your Konvertix account</CardDescription>
+            <CardTitle className="text-2xl font-bold">{t("auth.login.welcomeBack")}</CardTitle>
+            <CardDescription>{t("auth.login.signInDescription")}</CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -80,11 +82,11 @@ export default function LoginPage() {
               )}
 
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email">{t("auth.login.email")}</Label>
                 <Input
                   id="email"
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder={t("auth.login.emailPlaceholder")}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="bg-background/50"
@@ -93,12 +95,12 @@ export default function LoginPage() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t("auth.login.password")}</Label>
                 <div className="relative">
                   <Input
                     id="password"
                     type={showPassword ? "text" : "password"}
-                    placeholder="Enter your password"
+                    placeholder={t("auth.login.passwordPlaceholder")}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="bg-background/50 pr-10"
@@ -119,7 +121,7 @@ export default function LoginPage() {
                   href="/auth/forgot-password"
                   className="text-sm text-primary hover:text-primary/80 transition-colors"
                 >
-                  Forgot password?
+                  {t("auth.login.forgotPassword")}
                 </Link>
               </div>
 
@@ -128,15 +130,15 @@ export default function LoginPage() {
                 className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                 disabled={loading}
               >
-                {loading ? "Signing in..." : "Sign in"}
+                {loading ? t("auth.login.signingIn") : t("auth.login.signIn")}
               </Button>
             </form>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                {t("auth.login.noAccount")}{" "}
                 <Link href="/auth/signup" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                  Sign up
+                  {t("auth.login.signUp")}
                 </Link>
               </p>
             </div>

@@ -1,5 +1,4 @@
 "use client"
-import Sidebar from "@/components/nav/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -26,12 +25,80 @@ import {
   Eye,
   Edit,
   Wrench,
+  Loader2,
 } from "lucide-react"
 import Link from "next/link"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { useLanguage } from "@/contexts/LanguageContext"
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
+import { useState } from "react"
+import { createBlogPostIdeas } from "@/lib/services/blogIdeaService"
+import { toast } from "sonner"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog"
+import { Textarea } from "@/components/ui/textarea"
+import { Label } from "@/components/ui/label"
 
 export default function SEOPage() {
+  const { t } = useLanguage()
+  const [isCreatingIdeas, setIsCreatingIdeas] = useState(false)
+  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [blogIdea, setBlogIdea] = useState("")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleCreateIdeas = async () => {
+    setIsCreatingIdeas(true)
+    try {
+      const result = await createBlogPostIdeas()
+
+      if (result.success) {
+        toast.success(result.message || t("seo.messages.blogIdeasSuccess"))
+        // You might want to refresh the ideas list here or show the new ideas
+      } else {
+        toast.error(result.message || t("seo.messages.blogIdeasError"))
+      }
+    } catch (error) {
+      console.error("Error creating blog post ideas:", error)
+      toast.error(t("seo.messages.unexpectedError"))
+    } finally {
+      setIsCreatingIdeas(false)
+    }
+  }
+
+  const handleSubmitBlogPost = async () => {
+    if (!blogIdea.trim()) {
+      toast.error(t("seo.messages.enterBlogIdea"))
+      return
+    }
+
+    setIsSubmitting(true)
+    try {
+      const response = await fetch("/api/blog", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          blogIdea: blogIdea.trim(),
+          timestamp: new Date().toISOString(),
+        }),
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        toast.success(t("seo.messages.blogPostSuccess"))
+        setBlogIdea("")
+        setIsDialogOpen(false)
+      } else {
+        toast.error(result.message || t("seo.messages.blogPostError"))
+      }
+    } catch (error) {
+      console.error("Error sending blog post request:", error)
+      toast.error(t("seo.messages.requestError"))
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   const organicTrafficData = [
     { month: "Jan", traffic: 12500 },
@@ -51,11 +118,11 @@ export default function SEOPage() {
   ]
 
   const siteAuditIssues = [
-    { type: "Critical", issue: "Missing meta descriptions", count: 12, status: "error" },
-    { type: "Warning", issue: "Slow page load times", count: 8, status: "warning" },
-    { type: "Notice", issue: "Missing alt text", count: 24, status: "info" },
-    { type: "Critical", issue: "Broken internal links", count: 3, status: "error" },
-    { type: "Warning", issue: "Duplicate title tags", count: 6, status: "warning" },
+    { type: t("seo.audit.types.critical"), issue: t("seo.audit.issues.missingMetaDescriptions"), count: 12, status: "error" },
+    { type: t("seo.audit.types.warning"), issue: t("seo.audit.issues.slowPageLoad"), count: 8, status: "warning" },
+    { type: t("seo.audit.types.notice"), issue: t("seo.audit.issues.missingAltText"), count: 24, status: "info" },
+    { type: t("seo.audit.types.critical"), issue: t("seo.audit.issues.brokenInternalLinks"), count: 3, status: "error" },
+    { type: t("seo.audit.types.warning"), issue: t("seo.audit.issues.duplicateTitleTags"), count: 6, status: "warning" },
   ]
 
   const getStatusIcon = (status: string) => {
@@ -159,30 +226,30 @@ export default function SEOPage() {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "published":
-        return <Badge className="bg-green-600 hover:bg-green-700">Published</Badge>
+        return <Badge className="bg-green-600 hover:bg-green-700">{t("seo.blogPosts.status.published")}</Badge>
       case "in-progress":
-        return <Badge className="bg-blue-600 hover:bg-blue-700">In Progress</Badge>
+        return <Badge className="bg-blue-600 hover:bg-blue-700">{t("seo.blogPosts.status.inProgress")}</Badge>
       case "draft":
-        return <Badge className="bg-yellow-600 hover:bg-yellow-700">Draft</Badge>
+        return <Badge className="bg-yellow-600 hover:bg-yellow-700">{t("seo.blogPosts.status.draft")}</Badge>
       case "outline":
-        return <Badge className="bg-purple-600 hover:bg-purple-700">Outline</Badge>
+        return <Badge className="bg-purple-600 hover:bg-purple-700">{t("seo.blogPosts.status.outline")}</Badge>
       case "planned":
-        return <Badge className="bg-gray-600 hover:bg-gray-700">Planned</Badge>
+        return <Badge className="bg-gray-600 hover:bg-gray-700">{t("seo.blogPosts.status.planned")}</Badge>
       default:
-        return <Badge className="bg-gray-600 hover:bg-gray-700">Unknown</Badge>
+        return <Badge className="bg-gray-600 hover:bg-gray-700">{t("seo.blogPosts.status.unknown")}</Badge>
     }
   }
 
   const getPriorityBadge = (priority: string) => {
     switch (priority) {
       case "high":
-        return <Badge variant="destructive">High</Badge>
+        return <Badge variant="destructive">{t("seo.blogPosts.priority.high")}</Badge>
       case "medium":
-        return <Badge className="bg-yellow-600 hover:bg-yellow-700">Medium</Badge>
+        return <Badge className="bg-yellow-600 hover:bg-yellow-700">{t("seo.blogPosts.priority.medium")}</Badge>
       case "low":
-        return <Badge variant="secondary">Low</Badge>
+        return <Badge variant="secondary">{t("seo.blogPosts.priority.low")}</Badge>
       default:
-        return <Badge variant="secondary">Low</Badge>
+        return <Badge variant="secondary">{t("seo.blogPosts.priority.low")}</Badge>
     }
   }
 
@@ -191,15 +258,15 @@ export default function SEOPage() {
           <div className="space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">SEO Dashboard</h1>
+              <h1 className="text-3xl font-bold">{t("seo.title")}</h1>
               <div className="flex items-center space-x-3">
                 <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
                   <Download className="h-4 w-4 mr-2" />
-                  Export Report
+                  {t("seo.actions.exportReport")}
                 </Button>
                 <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                   <Plus className="h-4 w-4 mr-2" />
-                  Add Keywords
+                  {t("seo.actions.addKeywords")}
                 </Button>
               </div>
             </div>
@@ -208,41 +275,41 @@ export default function SEOPage() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Organic Traffic</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("seo.stats.organicTraffic")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">21,300</div>
-                  <p className="text-xs text-green-500">+15.2% vs last month</p>
+                  <p className="text-xs text-green-500">{t("seo.stats.organicTrafficChange")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Keywords Ranking</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("seo.stats.keywordsRanking")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">147</div>
-                  <p className="text-xs text-green-500">+8 new rankings</p>
+                  <p className="text-xs text-green-500">{t("seo.stats.keywordsRankingChange")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Avg. Position</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("seo.stats.avgPosition")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">8.4</div>
-                  <p className="text-xs text-green-500">+2.1 improvement</p>
+                  <p className="text-xs text-green-500">{t("seo.stats.avgPositionChange")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Domain Authority</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("seo.stats.domainAuthority")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">68</div>
-                  <p className="text-xs text-green-500">+3 points</p>
+                  <p className="text-xs text-green-500">{t("seo.stats.domainAuthorityChange")}</p>
                 </CardContent>
               </Card>
             </div>
@@ -251,20 +318,78 @@ export default function SEOPage() {
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-white">Blog Post Ideas & Content Calendar</CardTitle>
+                  <CardTitle className="text-white">{t("seo.blogPosts.title")}</CardTitle>
                   <div className="flex items-center space-x-3">
                     <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
                       <Filter className="h-4 w-4 mr-2" />
-                      Filter by Status
+                      {t("seo.actions.filterByStatus")}
                     </Button>
-                    <Button variant="outline" className="border-[#a545b6] text-[#a545b6] hover:bg-[#a545b6] hover:text-white bg-transparent">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Ideas
+                    <Button
+                      variant="outline"
+                      className="border-[#a545b6] text-[#a545b6] hover:bg-[#a545b6] hover:text-white bg-transparent"
+                      onClick={handleCreateIdeas}
+                      disabled={isCreatingIdeas}
+                    >
+                      {isCreatingIdeas ? (
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      ) : (
+                        <Plus className="h-4 w-4 mr-2" />
+                      )}
+                      {isCreatingIdeas ? t("seo.actions.creatingIdeas") : t("seo.actions.createIdeas")}
                     </Button>
-                    <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      <Plus className="h-4 w-4 mr-2" />
-                      Create Blog Post
-                    </Button>
+                    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
+                          <Plus className="h-4 w-4 mr-2" />
+                          {t("seo.actions.createBlogPost")}
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="bg-[#2b2b2b] border-[#3f3f3f] text-white">
+                        <DialogHeader>
+                          <DialogTitle className="text-white">{t("seo.blogPosts.modal.title")}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="blog-idea" className="text-white">
+                              {t("seo.blogPosts.modal.blogIdea")}
+                            </Label>
+                            <Textarea
+                              id="blog-idea"
+                              placeholder={t("seo.blogPosts.modal.placeholder")}
+                              value={blogIdea}
+                              onChange={(e) => setBlogIdea(e.target.value)}
+                              className="bg-[#1a1a1a] border-[#3f3f3f] text-white placeholder:text-gray-400 min-h-32"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            variant="outline"
+                            onClick={() => setIsDialogOpen(false)}
+                            className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent"
+                          >
+                            {t("seo.blogPosts.modal.cancel")}
+                          </Button>
+                          <Button
+                            onClick={handleSubmitBlogPost}
+                            disabled={isSubmitting || !blogIdea.trim()}
+                            className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90"
+                          >
+                            {isSubmitting ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Sending...
+                              </>
+                            ) : (
+                              <>
+                                <Plus className="h-4 w-4 mr-2" />
+                                {t("seo.blogPosts.modal.create")}
+                              </>
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                 </div>
               </CardHeader>
@@ -272,14 +397,14 @@ export default function SEOPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
-                      <TableHead className="text-[#afafaf]">Blog Post Title</TableHead>
-                      <TableHead className="text-[#afafaf]">Category</TableHead>
-                      <TableHead className="text-[#afafaf]">Search Volume</TableHead>
-                      <TableHead className="text-[#afafaf]">Difficulty</TableHead>
-                      <TableHead className="text-[#afafaf]">Est. Traffic</TableHead>
-                      <TableHead className="text-[#afafaf]">Status</TableHead>
-                      <TableHead className="text-[#afafaf]">Priority</TableHead>
-                      <TableHead className="text-[#afafaf]">Actions</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.title")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.category")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.searchVolume")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.difficulty")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.estTraffic")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.status")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.priority")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.blogPosts.table.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -321,7 +446,7 @@ export default function SEOPage() {
               {/* Organic Traffic Chart */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader>
-                  <CardTitle className="text-white">Organic Traffic Trend</CardTitle>
+                  <CardTitle className="text-white">{t("seo.charts.organicTrafficTrend")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
@@ -352,12 +477,12 @@ export default function SEOPage() {
               {/* Site Health Score */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader>
-                  <CardTitle className="text-white">Site Health Score</CardTitle>
+                  <CardTitle className="text-white">{t("seo.charts.siteHealthScore")}</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#afafaf]">Overall Score</span>
+                      <span className="text-[#afafaf]">{t("seo.charts.overallScore")}</span>
                       <span className="text-white font-medium">85/100</span>
                     </div>
                     <Progress value={85} className="h-2" />
@@ -365,7 +490,7 @@ export default function SEOPage() {
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#afafaf]">Technical SEO</span>
+                      <span className="text-[#afafaf]">{t("seo.charts.technicalSeo")}</span>
                       <span className="text-white font-medium">92/100</span>
                     </div>
                     <Progress value={92} className="h-2" />
@@ -373,7 +498,7 @@ export default function SEOPage() {
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#afafaf]">Content Quality</span>
+                      <span className="text-[#afafaf]">{t("seo.charts.contentQuality")}</span>
                       <span className="text-white font-medium">78/100</span>
                     </div>
                     <Progress value={78} className="h-2" />
@@ -381,7 +506,7 @@ export default function SEOPage() {
 
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="text-[#afafaf]">User Experience</span>
+                      <span className="text-[#afafaf]">{t("seo.charts.userExperience")}</span>
                       <span className="text-white font-medium">88/100</span>
                     </div>
                     <Progress value={88} className="h-2" />
@@ -394,10 +519,10 @@ export default function SEOPage() {
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle className="text-white">Keyword Rankings</CardTitle>
+                  <CardTitle className="text-white">{t("seo.keywords.title")}</CardTitle>
                   <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
                     <Filter className="h-4 w-4 mr-2" />
-                    Filter
+                    {t("seo.actions.filter")}
                   </Button>
                 </div>
               </CardHeader>
@@ -405,11 +530,11 @@ export default function SEOPage() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
-                      <TableHead className="text-[#afafaf]">Keyword</TableHead>
-                      <TableHead className="text-[#afafaf]">Position</TableHead>
-                      <TableHead className="text-[#afafaf]">Search Volume</TableHead>
-                      <TableHead className="text-[#afafaf]">Difficulty</TableHead>
-                      <TableHead className="text-[#afafaf]">Actions</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.keywords.table.keyword")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.keywords.table.position")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.keywords.table.searchVolume")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.keywords.table.difficulty")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.keywords.table.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -439,17 +564,17 @@ export default function SEOPage() {
             {/* Site Audit Issues */}
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardHeader>
-                <CardTitle className="text-white">Site Audit Issues</CardTitle>
+                <CardTitle className="text-white">{t("seo.audit.title")}</CardTitle>
               </CardHeader>
               <CardContent className="p-0">
                 <Table>
                   <TableHeader>
                     <TableRow className="border-[#3f3f3f] hover:bg-[#3f3f3f]">
-                      <TableHead className="text-[#afafaf]">Issue Type</TableHead>
-                      <TableHead className="text-[#afafaf]">Description</TableHead>
-                      <TableHead className="text-[#afafaf]">Count</TableHead>
-                      <TableHead className="text-[#afafaf]">Priority</TableHead>
-                      <TableHead className="text-[#afafaf]">Actions</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.audit.table.issueType")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.audit.table.description")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.audit.table.count")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.audit.table.priority")}</TableHead>
+                      <TableHead className="text-[#afafaf]">{t("seo.audit.table.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>

@@ -360,7 +360,7 @@ function SettingsContent() {
       }
     const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
     if (error) setProfileMsg(error.message)
-    else setProfileMsg("Saved")
+    else setProfileMsg(t("settings.actions.saved"))
   }
 
   const saveMarketProfile = async () => {
@@ -410,7 +410,7 @@ function SettingsContent() {
       }
     const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
     if (error) setMarketMsg(error.message)
-    else setMarketMsg("Saved")
+    else setMarketMsg(t("settings.actions.saved"))
   }
 
   const saveMarketingPreferences = async () => {
@@ -460,7 +460,7 @@ function SettingsContent() {
       }
     const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
     if (error) setMarketingMsg(error.message)
-    else setMarketingMsg("Saved")
+    else setMarketingMsg(t("settings.actions.saved"))
   }
 
   const saveCustomerProfile = async () => {
@@ -510,7 +510,7 @@ function SettingsContent() {
       }
     const { error } = await supabase.from("profiles").upsert(payload, { onConflict: "id" })
     if (error) setCustomerMsg(error.message)
-    else setCustomerMsg("Saved")
+    else setCustomerMsg(t("settings.actions.saved"))
   }
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -519,13 +519,13 @@ function SettingsContent() {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      setPersonalProfileMsg("Please select a valid image file")
+      setPersonalProfileMsg(t("settings.messages.selectValidImage"))
       return
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setPersonalProfileMsg("Image must be smaller than 5MB")
+      setPersonalProfileMsg(t("settings.messages.imageTooLarge"))
       return
     }
 
@@ -536,7 +536,7 @@ function SettingsContent() {
       const { data: userRes } = await supabase.auth.getUser()
       const uid = userRes.user?.id
       if (!uid) {
-        setPersonalProfileMsg("Not signed in")
+        setPersonalProfileMsg(t("settings.messages.notSignedIn"))
         setUploadingImage(false)
         return
       }
@@ -588,9 +588,9 @@ function SettingsContent() {
         profile_picture_url: publicUrl
       }))
 
-      setPersonalProfileMsg("Profile picture uploaded successfully")
+      setPersonalProfileMsg(t("settings.messages.profilePictureUploaded"))
     } catch (error) {
-      setPersonalProfileMsg("Upload failed. Please try again.")
+      setPersonalProfileMsg(t("settings.messages.uploadFailed"))
     } finally {
       setUploadingImage(false)
     }
@@ -903,14 +903,14 @@ function SettingsContent() {
         <main className="flex-1 p-6">
           <div className="w-full space-y-8">
             {/* Page Header */}
-            <h1 className="text-3xl font-bold">Settings</h1>
+            <h1 className="text-3xl font-bold">{t("settings.title")}</h1>
 
             {/* Profile Sections - Two Columns */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
               {/* Personal Profile Section */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardContent className="p-6 space-y-6">
-                  <h2 className="text-xl font-semibold">Personal Profile</h2>
+                  <h2 className="text-xl font-semibold">{t("settings.personalProfile")}</h2>
 
                   {/* Profile Picture Upload */}
                   <div className="flex items-center space-x-4">
@@ -944,7 +944,7 @@ function SettingsContent() {
                         onClick={() => document.getElementById('profile-picture-upload')?.click()}
                         disabled={uploadingImage}
                       >
-                        {uploadingImage ? "Uploading..." : "Upload"}
+                        {uploadingImage ? t("settings.messages.uploading") : t("settings.personal.uploadImage")}
                       </Button>
                       {personalProfile.profile_picture_url && (
                         <Button
@@ -952,7 +952,7 @@ function SettingsContent() {
                           className="border-red-500 text-red-400 hover:bg-red-500/10"
                           onClick={() => setPersonalProfile(prev => ({ ...prev, profile_picture_url: "" }))}
                         >
-                          Remove
+                          {t("settings.messages.remove")}
                         </Button>
                       )}
                     </div>
@@ -962,7 +962,7 @@ function SettingsContent() {
                   <div className="space-y-4">
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2">First Name</label>
+                        <label className="block text-sm font-medium mb-2">{t("settings.personal.firstName")}</label>
                         <Input
                           value={personalProfile.first_name}
                           onChange={(e) => setPersonalProfile((p) => ({ ...p, first_name: e.target.value }))}
@@ -971,7 +971,7 @@ function SettingsContent() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-2">Last Name</label>
+                        <label className="block text-sm font-medium mb-2">{t("settings.personal.lastName")}</label>
                         <Input
                           value={personalProfile.last_name}
                           onChange={(e) => setPersonalProfile((p) => ({ ...p, last_name: e.target.value }))}
@@ -981,7 +981,7 @@ function SettingsContent() {
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Email</label>
+                      <label className="block text-sm font-medium mb-2">{t("settings.personal.email")}</label>
                       <Input
                         value={personalProfile.email}
                         onChange={(e) => setPersonalProfile((p) => ({ ...p, email: e.target.value }))}
@@ -994,7 +994,7 @@ function SettingsContent() {
 
                   {/* Password Field */}
                   <div>
-                    <label className="block text-sm font-medium mb-2">Password</label>
+                    <label className="block text-sm font-medium mb-2">{t("settings.personal.changePassword")}</label>
                     <div className="flex items-center space-x-4">
                       <Input
                         type="password"
@@ -1003,7 +1003,7 @@ function SettingsContent() {
                         className="flex-1 bg-[#3f3f3f] border-[#4f4f4f] text-white"
                       />
                       <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
-                        Change
+                        {t("settings.actions.changePassword")}
                       </Button>
                     </div>
                   </div>
@@ -1011,7 +1011,7 @@ function SettingsContent() {
                   {/* Save Personal Profile Button */}
                   <div className="flex items-center gap-3">
                     <Button onClick={savePersonalProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Save Personal Profile
+                      {t("settings.actions.savePersonalProfile")}
                     </Button>
                     {personalProfileMsg && <span className={`text-sm ${personalProfileMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{personalProfileMsg}</span>}
                   </div>
@@ -1021,14 +1021,14 @@ function SettingsContent() {
               {/* Business Profile */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardContent className="p-6 space-y-6">
-                  <h2 className="text-xl font-semibold">Business Profile</h2>
+                  <h2 className="text-xl font-semibold">{t("settings.businessProfile")}</h2>
 
                   {/* Basic Business Information */}
                   <div className="space-y-4">
-                    <h3 className="text-lg font-medium text-[#a545b6]">Basic Information</h3>
+                    <h3 className="text-lg font-medium text-[#a545b6]">{t("settings.business.basicInformation")}</h3>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-sm font-medium mb-2">Business Name</label>
+                        <label className="block text-sm font-medium mb-2">{t("settings.business.businessName")}</label>
                         <Input
                           value={profile.business_name ?? ""}
                           onChange={(e) => setProfile((p) => ({ ...p, business_name: e.target.value }))}
@@ -1037,7 +1037,7 @@ function SettingsContent() {
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium mb-2">Website URL</label>
+                        <label className="block text-sm font-medium mb-2">{t("settings.business.websiteUrl")}</label>
                         <Input
                           value={profile.website_url ?? ""}
                           onChange={(e) => setProfile((p) => ({ ...p, website_url: e.target.value }))}
@@ -1204,7 +1204,7 @@ function SettingsContent() {
 
                   <div className="flex items-center gap-3">
                     <Button onClick={saveProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Save business profile
+                      {t("settings.actions.saveBusinessProfile")}
                     </Button>
                     {profileMsg && <span className={`text-sm ${profileMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{profileMsg}</span>}
                   </div>
@@ -1215,7 +1215,7 @@ function SettingsContent() {
             {/* Marketing Preferences */}
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardContent className="p-6 space-y-6">
-                <h2 className="text-xl font-semibold">Marketing Preferences</h2>
+                <h2 className="text-xl font-semibold">{t("settings.marketingPreferences")}</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
                     <label className="block text-sm font-medium mb-2">Primary Goal</label>
@@ -1317,7 +1317,7 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Button onClick={saveMarketingPreferences} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                    Save preferences
+                    {t("settings.actions.savePreferences")}
                   </Button>
                   {marketingMsg && <span className={`text-sm ${marketingMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{marketingMsg}</span>}
                 </div>
@@ -1393,7 +1393,7 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Button onClick={saveMarketProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                    Save market analysis
+                    {t("settings.actions.saveMarketAnalysis")}
                   </Button>
                   {marketMsg && <span className={`text-sm ${marketMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{marketMsg}</span>}
                 </div>
@@ -1479,7 +1479,7 @@ function SettingsContent() {
                 </div>
                 <div className="flex items-center gap-3">
                   <Button onClick={saveCustomerProfile} className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                    Save customer intelligence
+                    {t("settings.actions.saveCustomerIntelligence")}
                   </Button>
                   {customerMsg && <span className={`text-sm ${customerMsg === 'Saved' ? 'text-green-400' : 'text-red-400'}`}>{customerMsg}</span>}
                 </div>
@@ -1966,7 +1966,7 @@ function SettingsContent() {
 
             {/* Edit Profile Button */}
             <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90 px-8">
-              Edit Profile
+              {t("settings.actions.editProfile")}
             </Button>
           </div>
         </main>

@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { ArrowRight, BarChart3, Users, Zap, Target, TrendingUp, Star, Check, Play } from "lucide-react"
 import Link from "next/link"
 import { useLanguage } from "@/contexts/LanguageContext"
+import LanguageSwitcher from "@/components/LanguageSwitcher"
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -147,6 +148,7 @@ export default function HomePage() {
           </nav>
 
           <div className="flex items-center gap-3">
+            <LanguageSwitcher />
             <Button asChild variant="ghost" className="hidden sm:inline-flex text-[#afafaf] hover:text-white">
               <Link href="/contact">{t("landingPage.header.contact")}</Link>
             </Button>

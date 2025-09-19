@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import AuthGuard from "@/components/auth/AuthGuard"
 import Sidebar from "@/components/nav/Sidebar"
 import { supabase } from "@/lib/supabase/client"
+import { useLanguage } from '@/contexts/LanguageContext'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -73,6 +74,7 @@ export default function ReportsPage() {
 }
 
 function ReportsContent() {
+  const { t } = useLanguage()
   const [isSyncing, setIsSyncing] = useState(false)
   const [userId, setUserId] = useState<string>('')
   const [loading, setLoading] = useState(true)
@@ -89,7 +91,7 @@ function ReportsContent() {
         }
       } catch (error) {
         console.error('Error loading user:', error)
-        setError('Failed to load user data')
+        setError(t('reports.errors.failedToLoadUser'))
       } finally {
         setLoading(false)
       }
@@ -115,13 +117,13 @@ function ReportsContent() {
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Failed to fetch metrics data')
+        throw new Error(result.error || t('reports.errors.failedToFetchMetrics'))
       }
 
       setMetricsData(result.data)
     } catch (error) {
       console.error('Error fetching metrics:', error)
-      setError(error.message || 'Failed to fetch metrics data')
+      setError(error.message || t('reports.errors.failedToFetchMetrics'))
     } finally {
       setLoading(false)
     }
@@ -129,7 +131,7 @@ function ReportsContent() {
 
   const handleSync = async () => {
     if (!userId) {
-      console.error('No user ID available')
+      console.error(t('reports.errors.noUserIdAvailable'))
       return
     }
 
@@ -148,7 +150,7 @@ function ReportsContent() {
       const result = await response.json()
 
       if (!response.ok) {
-        throw new Error(result.error || 'Sync failed')
+        throw new Error(result.error || t('reports.errors.syncFailed'))
       }
 
       console.log("Data synced successfully:", result)
@@ -160,15 +162,15 @@ function ReportsContent() {
       console.error("Sync failed:", error)
 
       // Show more helpful error messages
-      let errorMessage = 'Failed to sync campaigns'
+      let errorMessage = t('reports.errors.failedToSyncCampaigns')
       if (error.message.includes('configuration not found')) {
-        errorMessage = 'Please configure your Facebook Ads connection first in Settings'
+        errorMessage = t('reports.errors.configurationNotFound')
       } else if (error.message.includes('missing ad_account_id or token')) {
-        errorMessage = 'Facebook Ads configuration is incomplete. Please check your CAPI setup'
+        errorMessage = t('reports.errors.configurationIncomplete')
       } else if (error.message.includes('No account found')) {
-        errorMessage = 'Account setup incomplete. Please complete your onboarding first'
+        errorMessage = t('reports.errors.accountSetupIncomplete')
       } else {
-        errorMessage = `Sync failed: ${error.message}`
+        errorMessage = `${t('reports.errors.syncFailed')}: ${error.message}`
       }
 
       setError(errorMessage)
@@ -209,10 +211,10 @@ function ReportsContent() {
           {/* Page Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold">Reports</h1>
+              <h1 className="text-3xl font-bold">{t("reports.title")}</h1>
               {metricsData && (
                 <p className="text-sm text-[#afafaf] mt-1">
-                  {metricsData.dataCount} data points available
+                  {t("reports.dataPointsAvailable").replace('{count}', metricsData.dataCount.toString())}
                 </p>
               )}
             </div>
@@ -223,10 +225,10 @@ function ReportsContent() {
                 className="bg-[#2b2b2b] border border-[#3f3f3f] text-white px-3 py-2 rounded-md"
                 disabled={loading}
               >
-                <option value="7">Last 7 Days</option>
-                <option value="14">Last 14 Days</option>
-                <option value="30">Last 30 Days</option>
-                <option value="90">Last 90 Days</option>
+                <option value="7">{t("reports.dateRange.last7Days")}</option>
+                <option value="14">{t("reports.dateRange.last14Days")}</option>
+                <option value="30">{t("reports.dateRange.last30Days")}</option>
+                <option value="90">{t("reports.dateRange.last90Days")}</option>
               </select>
               <Button
                 variant="outline"
@@ -235,14 +237,14 @@ function ReportsContent() {
                 className="border-[#3f3f3f] text-[#afafaf] hover:text-white hover:border-[#a545b6] disabled:opacity-50"
               >
                 <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                {loading ? 'Loading...' : isSyncing ? 'Syncing...' : 'Sync Now'}
+                {loading ? t("reports.actions.loading") : isSyncing ? t("reports.actions.syncing") : t("reports.actions.syncNow")}
               </Button>
               <Button
                 className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90"
                 disabled={!metricsData}
               >
                 <Download className="mr-2 h-4 w-4" />
-                Export
+                {t("reports.actions.export")}
               </Button>
             </div>
           </div>
@@ -264,7 +266,7 @@ function ReportsContent() {
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardContent className="p-8 text-center">
                 <RefreshCw className="h-8 w-8 animate-spin mx-auto mb-4 text-[#a545b6]" />
-                <p className="text-[#afafaf]">Loading campaign data...</p>
+                <p className="text-[#afafaf]">{t("reports.states.loadingCampaignData")}</p>
               </CardContent>
             </Card>
           )}
@@ -274,9 +276,9 @@ function ReportsContent() {
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardContent className="p-8 text-center">
                 <BarChart3 className="h-12 w-12 mx-auto mb-4 text-[#afafaf]" />
-                <p className="text-white font-semibold mb-2">No campaign data available</p>
+                <p className="text-white font-semibold mb-2">{t("reports.states.noCampaignData")}</p>
                 <p className="text-[#afafaf] mb-4">
-                  Sync your campaigns to start seeing performance data
+                  {t("reports.states.noCampaignDataDesc")}
                 </p>
                 <Button
                   onClick={handleSync}
@@ -284,7 +286,7 @@ function ReportsContent() {
                   className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90"
                 >
                   <RefreshCw className={`mr-2 h-4 w-4 ${isSyncing ? 'animate-spin' : ''}`} />
-                  {isSyncing ? 'Syncing...' : 'Sync Campaigns'}
+                  {isSyncing ? t("reports.actions.syncing") : t("reports.actions.syncCampaigns")}
                 </Button>
               </CardContent>
             </Card>
@@ -297,7 +299,7 @@ function ReportsContent() {
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <div className="flex items-center space-x-2">
                     <DollarSign className="h-5 w-5 text-[#f8c140]" />
-                    <CardTitle className="text-sm font-medium text-[#afafaf]">Total Spend</CardTitle>
+                    <CardTitle className="text-sm font-medium text-[#afafaf]">{t("reports.kpis.totalSpend")}</CardTitle>
                   </div>
                   <Button variant="ghost" size="icon" className="h-6 w-6">
                     <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -308,7 +310,7 @@ function ReportsContent() {
                     {formatCurrency(metricsData.totalMetrics.totalSpend)}
                   </div>
                   <div className="flex items-center space-x-1 text-sm">
-                    <span className="text-[#afafaf]">Last {dateRange} days</span>
+                    <span className="text-[#afafaf]">{t("reports.kpis.lastDays").replace('{days}', dateRange)}</span>
                   </div>
                 </CardContent>
               </Card>
@@ -317,7 +319,7 @@ function ReportsContent() {
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <div className="flex items-center space-x-2">
                     <BarChart3 className="h-5 w-5 text-[#03ba2b]" />
-                    <CardTitle className="text-sm font-medium text-[#afafaf]">Total Revenue</CardTitle>
+                    <CardTitle className="text-sm font-medium text-[#afafaf]">{t("reports.kpis.totalRevenue")}</CardTitle>
                   </div>
                   <Button variant="ghost" size="icon" className="h-6 w-6">
                     <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -329,7 +331,7 @@ function ReportsContent() {
                   </div>
                   <div className="flex items-center space-x-1 text-sm">
                     <span className="text-[#afafaf]">
-                      {formatNumber(metricsData.totalMetrics.totalConversions)} conversions
+                      {formatNumber(metricsData.totalMetrics.totalConversions)} {t("reports.kpis.conversions")}
                     </span>
                   </div>
                 </CardContent>
@@ -339,7 +341,7 @@ function ReportsContent() {
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <div className="flex items-center space-x-2">
                     <Target className="h-5 w-5 text-[#f8c140]" />
-                    <CardTitle className="text-sm font-medium text-[#afafaf]">Average ROAS</CardTitle>
+                    <CardTitle className="text-sm font-medium text-[#afafaf]">{t("reports.kpis.averageRoas")}</CardTitle>
                   </div>
                   <Button variant="ghost" size="icon" className="h-6 w-6">
                     <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -356,7 +358,7 @@ function ReportsContent() {
                       <TrendingDown className="h-3 w-3 text-[#f73c3c]" />
                     )}
                     <span className={metricsData.totalMetrics.averageROAS > 2 ? "text-[#03ba2b]" : "text-[#f73c3c]"}>
-                      {metricsData.totalMetrics.averageROAS > 2 ? "Good" : "Needs improvement"}
+                      {metricsData.totalMetrics.averageROAS > 2 ? t("reports.kpis.good") : t("reports.kpis.needsImprovement")}
                     </span>
                   </div>
                 </CardContent>
@@ -366,7 +368,7 @@ function ReportsContent() {
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
                   <div className="flex items-center space-x-2">
                     <Users className="h-5 w-5 text-[#a545b6]" />
-                    <CardTitle className="text-sm font-medium text-[#afafaf]">Average CTR</CardTitle>
+                    <CardTitle className="text-sm font-medium text-[#afafaf]">{t("reports.kpis.averageCtr")}</CardTitle>
                   </div>
                   <Button variant="ghost" size="icon" className="h-6 w-6">
                     <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -378,7 +380,7 @@ function ReportsContent() {
                   </div>
                   <div className="flex items-center space-x-1 text-sm">
                     <span className="text-[#afafaf]">
-                      {formatNumber(metricsData.totalMetrics.totalClicks)} clicks
+                      {formatNumber(metricsData.totalMetrics.totalClicks)} {t("reports.kpis.clicks")}
                     </span>
                   </div>
                 </CardContent>
@@ -392,9 +394,9 @@ function ReportsContent() {
               {/* Total Spend Chart */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader>
-                  <CardTitle className="text-white">Daily Spend</CardTitle>
+                  <CardTitle className="text-white">{t("reports.charts.dailySpend")}</CardTitle>
                   <div className="flex items-center space-x-2 text-sm text-[#afafaf]">
-                    <span>Total Spend</span>
+                    <span>{t("reports.charts.totalSpend")}</span>
                     <span className="text-white font-semibold">
                       {formatCurrency(metricsData.totalMetrics.totalSpend)}
                     </span>
@@ -417,16 +419,16 @@ function ReportsContent() {
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="text-xs text-[#afafaf] text-center mt-2">Days</div>
+                  <div className="text-xs text-[#afafaf] text-center mt-2">{t("reports.charts.days")}</div>
                 </CardContent>
               </Card>
 
               {/* Campaign Performance Chart */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader>
-                  <CardTitle className="text-white">Campaign Performance</CardTitle>
+                  <CardTitle className="text-white">{t("reports.charts.campaignPerformance")}</CardTitle>
                   <div className="flex items-center space-x-2 text-sm text-[#afafaf]">
-                    <span>Click-Through Rate</span>
+                    <span>{t("reports.charts.clickThroughRate")}</span>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -440,7 +442,7 @@ function ReportsContent() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="text-xs text-[#afafaf] text-center mt-2">Campaign CTR (%)</div>
+                  <div className="text-xs text-[#afafaf] text-center mt-2">{t("reports.charts.campaignCtr")}</div>
                 </CardContent>
               </Card>
             </div>
@@ -452,9 +454,9 @@ function ReportsContent() {
               {/* ROAS Chart */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader>
-                  <CardTitle className="text-white">Campaign ROAS</CardTitle>
+                  <CardTitle className="text-white">{t("reports.charts.campaignRoas")}</CardTitle>
                   <div className="flex items-center space-x-2 text-sm text-[#afafaf]">
-                    <span>Return on Ad Spend</span>
+                    <span>{t("reports.charts.returnOnAdSpend")}</span>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -480,7 +482,7 @@ function ReportsContent() {
                     })}
                   </div>
                   <div className="text-xs text-[#afafaf] text-center mt-4">
-                    Higher ROAS indicates better performance
+                    {t("reports.charts.higherRoasIndicates")}
                   </div>
                 </CardContent>
               </Card>
@@ -488,9 +490,9 @@ function ReportsContent() {
               {/* Revenue Chart */}
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader>
-                  <CardTitle className="text-white">Daily Revenue</CardTitle>
+                  <CardTitle className="text-white">{t("reports.charts.dailyRevenue")}</CardTitle>
                   <div className="flex items-center space-x-2 text-sm text-[#afafaf]">
-                    <span>Total Revenue</span>
+                    <span>{t("reports.charts.totalRevenue")}</span>
                     <span className="text-white font-semibold">
                       {formatCurrency(metricsData.totalMetrics.totalRevenue)}
                     </span>
@@ -507,7 +509,7 @@ function ReportsContent() {
                       </BarChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="text-xs text-[#afafaf] text-center mt-2">Days</div>
+                  <div className="text-xs text-[#afafaf] text-center mt-2">{t("reports.charts.days")}</div>
                 </CardContent>
               </Card>
             </div>
@@ -517,9 +519,9 @@ function ReportsContent() {
           {metricsData && metricsData.dataCount > 0 && metricsData.campaigns.length > 0 && (
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardHeader>
-                <CardTitle className="text-white">Campaign Performance Details</CardTitle>
+                <CardTitle className="text-white">{t("reports.table.campaignPerformanceDetails")}</CardTitle>
                 <p className="text-sm text-[#afafaf]">
-                  Detailed breakdown of each campaign's key metrics
+                  {t("reports.table.detailedBreakdown")}
                 </p>
               </CardHeader>
               <CardContent>
@@ -527,14 +529,14 @@ function ReportsContent() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-[#3f3f3f]">
-                        <th className="text-left py-3 px-4 font-semibold text-[#afafaf]">Campaign</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">Spend</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">Revenue</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">ROAS</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">CTR</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">Conversions</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">Clicks</th>
-                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">Impressions</th>
+                        <th className="text-left py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.campaign")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.spend")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.revenue")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.roas")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.ctr")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.conversions")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.clicks")}</th>
+                        <th className="text-right py-3 px-4 font-semibold text-[#afafaf]">{t("reports.table.impressions")}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -587,7 +589,7 @@ function ReportsContent() {
                 {metricsData.campaigns.length === 0 && (
                   <div className="text-center py-8">
                     <BarChart3 className="h-12 w-12 mx-auto mb-4 text-[#afafaf]" />
-                    <p className="text-[#afafaf]">No campaign data available for the selected period</p>
+                    <p className="text-[#afafaf]">{t("reports.states.noCampaignDataForPeriod")}</p>
                   </div>
                 )}
               </CardContent>

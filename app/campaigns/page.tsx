@@ -1,8 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
 import AuthGuard from "@/components/auth/AuthGuard"
-import Sidebar from "@/components/nav/Sidebar"
 import { supabase } from "@/lib/supabase/client"
+import { useLanguage } from '@/contexts/LanguageContext'
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -90,6 +90,7 @@ export default function CampaignsPage() {
 }
 
 function CampaignsContent() {
+  const { t } = useLanguage()
   const router = useRouter()
   const [campaigns, setCampaigns] = useState<Campaign[]>([])
   const [displayedCampaigns, setDisplayedCampaigns] = useState<Campaign[]>([])
@@ -506,7 +507,7 @@ function CampaignsContent() {
       const result = await response.json()
 
       // Show success message and refresh analyses
-      alert('Campaign analysis started successfully! Check your reports for insights.')
+      alert(t("campaigns.messages.analysisStarted"))
 
       // Refresh analyses after a short delay to allow processing
       setTimeout(() => {
@@ -617,19 +618,19 @@ function CampaignsContent() {
 
     // Create CSV headers
     const headers = [
-      'Campaign Name',
-      'Status',
-      'Daily Budget',
-      'Spent',
-      'Revenue',
-      'Conversions',
-      'ROAS',
-      'CTR',
-      'CPC',
-      'CPM',
-      'CPP',
-      'Date',
-      'Objective'
+      t("campaigns.csvHeaders.campaignName"),
+      t("campaigns.csvHeaders.status"),
+      t("campaigns.csvHeaders.dailyBudget"),
+      t("campaigns.csvHeaders.spent"),
+      t("campaigns.csvHeaders.revenue"),
+      t("campaigns.csvHeaders.conversions"),
+      t("campaigns.csvHeaders.roas"),
+      t("campaigns.csvHeaders.ctr"),
+      t("campaigns.csvHeaders.cpc"),
+      t("campaigns.csvHeaders.cpm"),
+      t("campaigns.csvHeaders.cpp"),
+      t("campaigns.csvHeaders.date"),
+      t("campaigns.csvHeaders.objective")
     ]
 
     // Create CSV rows
@@ -686,11 +687,11 @@ function CampaignsContent() {
           <div className="space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Campaigns</h1>
+              <h1 className="text-3xl font-bold">{t("campaigns.title")}</h1>
               <div className="flex items-center space-x-3">
                 <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
                   <Filter className="h-4 w-4 mr-2" />
-                  Filter
+                  {t("campaigns.filter")}
                 </Button>
                 <Button
                   variant="outline"
@@ -699,7 +700,7 @@ function CampaignsContent() {
                   className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent disabled:opacity-50"
                 >
                   <Download className="h-4 w-4 mr-2" />
-                  Export
+                  {t("campaigns.export")}
                 </Button>
                 <Button
                   variant="outline"
@@ -707,7 +708,7 @@ function CampaignsContent() {
                   className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent"
                 >
                   {showAnalyses ? <EyeOff className="mr-2 h-4 w-4" /> : <Eye className="mr-2 h-4 w-4" />}
-                  {showAnalyses ? 'Hide Insights' : `View Insights ${analyses.length > 0 ? `(${analyses.length})` : ''}`}
+                  {showAnalyses ? t("campaigns.hideInsights") : `${t("campaigns.viewInsights")} ${analyses.length > 0 ? `(${analyses.length})` : ''}`}
                 </Button>
                 <Button
                   variant="outline"
@@ -716,7 +717,7 @@ function CampaignsContent() {
                   className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent disabled:opacity-50"
                 >
                   <BarChart4 className={`mr-2 h-4 w-4 ${analyzingCampaigns ? 'animate-pulse' : ''}`} />
-                  {analyzingCampaigns ? 'Analyzing...' : 'Analyze'}
+                  {analyzingCampaigns ? t("campaigns.analyzing") : t("campaigns.analyze")}
                 </Button>
                 <Button
                   variant="outline"
@@ -725,12 +726,12 @@ function CampaignsContent() {
                   className="border-[#3f3f3f] text-[#afafaf] hover:text-white hover:border-[#a545b6] disabled:opacity-50"
                 >
                   <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-                  {loading ? 'Loading...' : 'Sync'}
+                  {loading ? t("campaigns.loading") : t("campaigns.sync")}
                 </Button>
                 <Link href="/campaigns/create">
                   <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                     <Plus className="h-4 w-4 mr-2" />
-                    Create Campaign
+                    {t("campaigns.createCampaign")}
                   </Button>
                 </Link>
               </div>
@@ -752,41 +753,41 @@ function CampaignsContent() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Total Campaigns</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("campaigns.stats.totalCampaigns")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{campaignStats.totalCampaigns}</div>
-                  <p className="text-xs text-[#afafaf]">From Facebook Ads</p>
+                  <p className="text-xs text-[#afafaf]">{t("campaigns.stats.totalCampaignsDesc")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Active Campaigns</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("campaigns.stats.activeCampaigns")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{campaignStats.activeCampaigns}</div>
-                  <p className="text-xs text-[#afafaf]">With spend data</p>
+                  <p className="text-xs text-[#afafaf]">{t("campaigns.stats.activeCampaignsDesc")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Total Spend</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("campaigns.stats.totalSpend")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{formatCurrency(campaignStats.totalSpend)}</div>
-                  <p className="text-xs text-[#afafaf]">All campaigns</p>
+                  <p className="text-xs text-[#afafaf]">{t("campaigns.stats.totalSpendDesc")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Avg ROAS</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("campaigns.stats.avgRoas")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{formatNumber(campaignStats.avgRoas, 2)}x</div>
-                  <p className="text-xs text-[#afafaf]">Return on ad spend</p>
+                  <p className="text-xs text-[#afafaf]">{t("campaigns.stats.avgRoasDesc")}</p>
                 </CardContent>
               </Card>
             </div>
@@ -797,7 +798,7 @@ function CampaignsContent() {
                 <div className="flex items-center justify-between">
                   <h2 className="text-xl font-semibold flex items-center">
                     <Lightbulb className="mr-2 h-5 w-5 text-yellow-400" />
-                    Campaign Insights
+                    {t("campaigns.insights.title")}
                   </h2>
                   <Button
                     variant="ghost"
@@ -807,7 +808,7 @@ function CampaignsContent() {
                     className="text-[#afafaf] hover:text-white"
                   >
                     <RefreshCw className={`mr-2 h-4 w-4 ${loadingAnalyses ? 'animate-spin' : ''}`} />
-                    Refresh
+                    {t("campaigns.insights.refresh")}
                   </Button>
                 </div>
 
@@ -815,16 +816,16 @@ function CampaignsContent() {
                   <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                     <CardContent className="p-6 text-center">
                       <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-[#a545b6]" />
-                      <p className="text-[#afafaf]">Loading analysis...</p>
+                      <p className="text-[#afafaf]">{t("campaigns.insights.loadingAnalysis")}</p>
                     </CardContent>
                   </Card>
                 ) : analyses.length === 0 ? (
                   <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                     <CardContent className="p-6 text-center">
                       <BarChart4 className="h-12 w-12 mx-auto mb-4 text-[#afafaf]" />
-                      <p className="text-white font-semibold mb-2">No analysis available</p>
+                      <p className="text-white font-semibold mb-2">{t("campaigns.insights.noAnalysis")}</p>
                       <p className="text-[#afafaf] mb-4">
-                        Click "Analyze" to generate AI-powered insights for your campaigns
+                        {t("campaigns.insights.noAnalysisDesc")}
                       </p>
                     </CardContent>
                   </Card>
@@ -840,7 +841,7 @@ function CampaignsContent() {
                             </CardTitle>
                             <div className="flex items-center space-x-2">
                               <Badge variant="outline" className="text-xs">
-                                {Math.round(analysis.confidence_score * 100)}% confidence
+                                {Math.round(analysis.confidence_score * 100)}% {t("campaigns.insights.confidence")}
                               </Badge>
                               <div className="flex items-center text-xs text-[#afafaf]">
                                 <Calendar className="mr-1 h-3 w-3" />
@@ -856,7 +857,7 @@ function CampaignsContent() {
 
                           {analysis.insights && analysis.insights.length > 0 && (
                             <div className="mb-4">
-                              <h4 className="text-sm font-semibold mb-2 text-white">Key Insights:</h4>
+                              <h4 className="text-sm font-semibold mb-2 text-white">{t("campaigns.insights.keyInsights")}</h4>
                               <ul className="space-y-1">
                                 {analysis.insights.slice(0, 3).map((insight, index) => (
                                   <li key={index} className="text-sm text-[#afafaf] flex items-start">
@@ -870,7 +871,7 @@ function CampaignsContent() {
 
                           {analysis.recommendations && analysis.recommendations.length > 0 && (
                             <div>
-                              <h4 className="text-sm font-semibold mb-2 text-white">Recommendations:</h4>
+                              <h4 className="text-sm font-semibold mb-2 text-white">{t("campaigns.insights.recommendations")}</h4>
                               <ul className="space-y-1">
                                 {analysis.recommendations.slice(0, 2).map((rec, index) => (
                                   <li key={index} className="text-sm text-green-400 flex items-start">
@@ -894,7 +895,7 @@ function CampaignsContent() {
               <div className="relative flex-1 max-w-md">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#afafaf]" />
                 <Input
-                  placeholder="Search campaigns..."
+                  placeholder={t("campaigns.searchPlaceholder")}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10 bg-[#2b2b2b] border-[#3f3f3f] text-white placeholder-[#afafaf]"
@@ -913,7 +914,7 @@ function CampaignsContent() {
                     setIsDropdownOpen(!isDropdownOpen)
                   }}
                 >
-                  Status: {statusFilter}
+                  {t("campaigns.statusFilter")}: {statusFilter}
                   <ChevronDown className={`ml-2 h-4 w-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} />
                 </Button>
 
@@ -951,59 +952,59 @@ function CampaignsContent() {
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[200px]"
                         onClick={() => handleSort('campaign_name')}
                       >
-                        Campaign Name {getSortIcon('campaign_name')}
+                        {t("campaigns.table.campaignName")} {getSortIcon('campaign_name')}
                       </TableHead>
-                      <TableHead className="text-[#afafaf] min-w-[80px]">Status</TableHead>
-                      <TableHead className="text-[#afafaf] min-w-[80px]">Daily Budget</TableHead>
+                      <TableHead className="text-[#afafaf] min-w-[80px]">{t("campaigns.table.status")}</TableHead>
+                      <TableHead className="text-[#afafaf] min-w-[80px]">{t("campaigns.table.dailyBudget")}</TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('spend')}
                       >
-                        Spent {getSortIcon('spend')}
+                        {t("campaigns.table.spent")} {getSortIcon('spend')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('revenue')}
                       >
-                        Revenue {getSortIcon('revenue')}
+                        {t("campaigns.table.revenue")} {getSortIcon('revenue')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[100px]"
                         onClick={() => handleSort('conversions')}
                       >
-                        Conversions {getSortIcon('conversions')}
+                        {t("campaigns.table.conversions")} {getSortIcon('conversions')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('roas')}
                       >
-                        ROAS {getSortIcon('roas')}
+                        {t("campaigns.table.roas")} {getSortIcon('roas')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('ctr')}
                       >
-                        CTR {getSortIcon('ctr')}
+                        {t("campaigns.table.ctr")} {getSortIcon('ctr')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('cpc')}
                       >
-                        CPC {getSortIcon('cpc')}
+                        {t("campaigns.table.cpc")} {getSortIcon('cpc')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('cpm')}
                       >
-                        CPM {getSortIcon('cpm')}
+                        {t("campaigns.table.cpm")} {getSortIcon('cpm')}
                       </TableHead>
                       <TableHead
                         className="text-[#afafaf] cursor-pointer hover:text-white select-none min-w-[80px]"
                         onClick={() => handleSort('cpp')}
                       >
-                        CPP {getSortIcon('cpp')}
+                        {t("campaigns.table.cpp")} {getSortIcon('cpp')}
                       </TableHead>
-                      <TableHead className="text-[#afafaf] min-w-[100px]">Actions</TableHead>
+                      <TableHead className="text-[#afafaf] min-w-[100px]">{t("campaigns.table.actions")}</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -1011,16 +1012,16 @@ function CampaignsContent() {
                       <TableRow>
                         <TableCell colSpan={12} className="text-center py-8">
                           <RefreshCw className="h-6 w-6 animate-spin mx-auto mb-2 text-[#a545b6]" />
-                          <p className="text-[#afafaf]">Loading campaigns...</p>
+                          <p className="text-[#afafaf]">{t("campaigns.messages.loadingCampaigns")}</p>
                         </TableCell>
                       </TableRow>
                     ) : displayedCampaigns.length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={12} className="text-center py-8">
                           <BarChart3 className="h-12 w-12 mx-auto mb-4 text-[#afafaf]" />
-                          <p className="text-white font-semibold mb-2">No campaigns found</p>
+                          <p className="text-white font-semibold mb-2">{t("campaigns.messages.noCampaignsFound")}</p>
                           <p className="text-[#afafaf] mb-4">
-                            Sync your Facebook Ads data to see campaigns here
+                            {t("campaigns.messages.noCampaignsDesc")}
                           </p>
                         </TableCell>
                       </TableRow>
@@ -1081,7 +1082,7 @@ function CampaignsContent() {
                                     }}
                                   >
                                     <ExternalLink className="mr-2 h-4 w-4" />
-                                    View in Facebook
+                                    {t("campaigns.actions.viewInFacebook")}
                                   </DropdownMenuItem>
                                   <DropdownMenuItem
                                     className="text-white hover:bg-[#3f3f3f] cursor-pointer"
@@ -1107,12 +1108,12 @@ function CampaignsContent() {
                                     {analyzingSingleCampaign === campaign.campaign_name ? (
                                       <>
                                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                                        Analyzing...
+                                        {t("campaigns.analyzing")}
                                       </>
                                     ) : (
                                       <>
                                         <BarChart4 className="mr-2 h-4 w-4" />
-                                        Analyze Campaign
+                                        {t("campaigns.actions.analyzeCampaign")}
                                       </>
                                     )}
                                   </DropdownMenuItem>
@@ -1132,12 +1133,12 @@ function CampaignsContent() {
             {/* Results Summary */}
             {!loading && (searchTerm || statusFilter !== 'All') && (
               <div className="text-center text-[#afafaf] text-sm">
-                Showing {displayedCampaigns.length} of {filteredCampaigns.length} campaigns
+                {t("campaigns.messages.showingResults").replace('{count}', displayedCampaigns.length.toString()).replace('{total}', filteredCampaigns.length.toString())}
                 {searchTerm && (
-                  <span> matching "<span className="text-white">{searchTerm}</span>"</span>
+                  <span> {t("campaigns.messages.matching").replace('{term}', `"${searchTerm}"`)}</span>
                 )}
                 {statusFilter !== 'All' && (
-                  <span> with status "<span className="text-white">{statusFilter}</span>"</span>
+                  <span> {t("campaigns.messages.withStatus").replace('{status}', `"${statusFilter}"`)}</span>
                 )}
               </div>
             )}
@@ -1151,7 +1152,7 @@ function CampaignsContent() {
                   className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent px-8 py-2"
                 >
                   <BarChart3 className="mr-2 h-4 w-4" />
-                  Load More Campaigns ({filteredCampaigns.length - displayedCampaigns.length} remaining)
+                  {t("campaigns.messages.loadMore").replace('{remaining}', (filteredCampaigns.length - displayedCampaigns.length).toString())}
                 </Button>
               </div>
             )}

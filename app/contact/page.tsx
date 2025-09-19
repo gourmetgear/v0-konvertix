@@ -11,8 +11,11 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Mail, Phone, MapPin, Clock, Send, MessageSquare } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function ContactPage() {
+  const { t } = useLanguage()
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -46,22 +49,22 @@ export default function ContactPage() {
 
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              Home
+              {t("navigation.home")}
             </Link>
             <a href="/#services" className="text-muted-foreground hover:text-foreground transition-colors">
-              Services
+              {t("navigation.services")}
             </a>
             <a href="/#pricing" className="text-muted-foreground hover:text-foreground transition-colors">
-              Pricing
+              {t("navigation.pricing")}
             </a>
             <Link href="/contact" className="text-foreground font-medium">
-              Contact
+              {t("navigation.contact")}
             </Link>
           </nav>
 
           <Link href="/auth/signup">
             <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
-              Get Started
+              {t("cta.getStarted")}
             </Button>
           </Link>
         </div>
@@ -70,10 +73,9 @@ export default function ContactPage() {
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-balance">Get in Touch</h1>
+          <h1 className="text-5xl md:text-6xl font-bold mb-6 text-balance">{t("contact.title")}</h1>
           <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-2xl mx-auto">
-            Ready to transform your marketing strategy? Let's discuss how Konvertix can help your business grow smarter
-            and scale faster.
+            {t("contact.subtitle")}
           </p>
         </div>
       </section>
@@ -84,7 +86,7 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-3 gap-12">
             {/* Contact Information */}
             <div className="lg:col-span-1">
-              <h2 className="text-3xl font-bold mb-8">Let's Start a Conversation</h2>
+              <h2 className="text-3xl font-bold mb-8">{t("contact.contactInfo.title")}</h2>
 
               <div className="space-y-6">
                 <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
@@ -94,7 +96,7 @@ export default function ContactPage() {
                         <Mail className="h-6 w-6 text-primary-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Email Us</h3>
+                        <h3 className="font-semibold">{t("contact.contactInfo.email")}</h3>
                         <p className="text-muted-foreground">hello@konvertix.com</p>
                       </div>
                     </div>
@@ -108,7 +110,7 @@ export default function ContactPage() {
                         <Phone className="h-6 w-6 text-secondary-foreground" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Call Us</h3>
+                        <h3 className="font-semibold">{t("contact.contactInfo.phone")}</h3>
                         <p className="text-muted-foreground">+1 (555) 123-4567</p>
                       </div>
                     </div>
@@ -122,8 +124,8 @@ export default function ContactPage() {
                         <MapPin className="h-6 w-6 text-background" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Visit Us</h3>
-                        <p className="text-muted-foreground">123 Marketing St, Growth City, GC 12345</p>
+                        <h3 className="font-semibold">{t("contact.contactInfo.address")}</h3>
+                        <p className="text-muted-foreground">{t("contact.contactInfo.addressValue")}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -136,8 +138,8 @@ export default function ContactPage() {
                         <Clock className="h-6 w-6 text-background" />
                       </div>
                       <div>
-                        <h3 className="font-semibold">Business Hours</h3>
-                        <p className="text-muted-foreground">Mon-Fri: 9AM-6PM PST</p>
+                        <h3 className="font-semibold">{t("contact.contactInfo.hours")}</h3>
+                        <p className="text-muted-foreground">{t("contact.contactInfo.hoursValue")}</p>
                       </div>
                     </div>
                   </CardContent>
@@ -149,28 +151,28 @@ export default function ContactPage() {
             <div className="lg:col-span-2">
               <Card className="bg-gradient-to-br from-card to-muted/30 border-border">
                 <CardHeader>
-                  <CardTitle className="text-2xl">Send us a Message</CardTitle>
-                  <CardDescription>Fill out the form below and we'll get back to you within 24 hours.</CardDescription>
+                  <CardTitle className="text-2xl">{t("contact.form.title")}</CardTitle>
+                  <CardDescription>{t("contact.form.description")}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <form onSubmit={handleSubmit} className="space-y-6">
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="name">Full Name *</Label>
+                        <Label htmlFor="name">{t("contact.form.name")} *</Label>
                         <Input
                           id="name"
-                          placeholder="Your full name"
+                          placeholder={t("contact.form.namePlaceholder")}
                           value={formData.name}
                           onChange={(e) => handleInputChange("name", e.target.value)}
                           required
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
+                        <Label htmlFor="email">{t("contact.form.email")} *</Label>
                         <Input
                           id="email"
                           type="email"
-                          placeholder="your@email.com"
+                          placeholder={t("contact.form.emailPlaceholder")}
                           value={formData.email}
                           onChange={(e) => handleInputChange("email", e.target.value)}
                           required
@@ -180,35 +182,35 @@ export default function ContactPage() {
 
                     <div className="grid md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <Label htmlFor="company">Company</Label>
+                        <Label htmlFor="company">{t("contact.form.company")}</Label>
                         <Input
                           id="company"
-                          placeholder="Your company name"
+                          placeholder={t("contact.form.companyPlaceholder")}
                           value={formData.company}
                           onChange={(e) => handleInputChange("company", e.target.value)}
                         />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="budget">Project Budget</Label>
+                        <Label htmlFor="budget">{t("contact.form.budget")}</Label>
                         <Select onValueChange={(value) => handleInputChange("budget", value)}>
                           <SelectTrigger>
-                            <SelectValue placeholder="Select budget range" />
+                            <SelectValue placeholder={t("contact.form.budgetPlaceholder")} />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="under-5k">Under $5,000</SelectItem>
-                            <SelectItem value="5k-15k">$5,000 - $15,000</SelectItem>
-                            <SelectItem value="15k-50k">$15,000 - $50,000</SelectItem>
-                            <SelectItem value="50k-plus">$50,000+</SelectItem>
+                            <SelectItem value="under-5k">{t("contact.budgetOptions.under5k")}</SelectItem>
+                            <SelectItem value="5k-15k">{t("contact.budgetOptions.5k-15k")}</SelectItem>
+                            <SelectItem value="15k-50k">{t("contact.budgetOptions.15k-50k")}</SelectItem>
+                            <SelectItem value="50k-plus">{t("contact.budgetOptions.over100k")}</SelectItem>
                           </SelectContent>
                         </Select>
                       </div>
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="subject">Subject *</Label>
+                      <Label htmlFor="subject">{t("contact.form.subject")} *</Label>
                       <Input
                         id="subject"
-                        placeholder="What can we help you with?"
+                        placeholder={t("contact.form.subjectPlaceholder")}
                         value={formData.subject}
                         onChange={(e) => handleInputChange("subject", e.target.value)}
                         required
@@ -216,10 +218,10 @@ export default function ContactPage() {
                     </div>
 
                     <div className="space-y-2">
-                      <Label htmlFor="message">Message *</Label>
+                      <Label htmlFor="message">{t("contact.form.message")} *</Label>
                       <Textarea
                         id="message"
-                        placeholder="Tell us more about your project and goals..."
+                        placeholder={t("contact.form.messagePlaceholder")}
                         rows={6}
                         value={formData.message}
                         onChange={(e) => handleInputChange("message", e.target.value)}
@@ -233,7 +235,7 @@ export default function ContactPage() {
                       className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
                     >
                       <Send className="mr-2 h-4 w-4" />
-                      Send Message
+                      {t("contact.form.submit")}
                     </Button>
                   </form>
                 </CardContent>
@@ -247,9 +249,9 @@ export default function ContactPage() {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-4xl font-bold mb-4">{t("contact.faq.title")}</h2>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Have questions? We've got answers. Here are some common questions about our services.
+              {t("contact.faq.subtitle")}
             </p>
           </div>
 
@@ -258,13 +260,12 @@ export default function ContactPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MessageSquare className="mr-2 h-5 w-5 text-primary" />
-                  How quickly can we get started?
+                  {t("contact.faq.questions.0.question")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  We can typically get you set up within 24-48 hours after our initial consultation. Our onboarding
-                  process is streamlined to get you seeing results fast.
+                  {t("contact.faq.questions.0.answer")}
                 </p>
               </CardContent>
             </Card>
@@ -273,13 +274,12 @@ export default function ContactPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MessageSquare className="mr-2 h-5 w-5 text-primary" />
-                  What's included in the free trial?
+                  {t("contact.faq.questions.1.question")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Our 14-day free trial includes full access to all features, dedicated support, and a strategy session
-                  with our team to help you get the most out of the platform.
+                  {t("contact.faq.questions.1.answer")}
                 </p>
               </CardContent>
             </Card>
@@ -288,13 +288,12 @@ export default function ContactPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MessageSquare className="mr-2 h-5 w-5 text-primary" />
-                  Do you offer custom integrations?
+                  {t("contact.faq.questions.2.question")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  Yes! We offer custom integrations with your existing tools and platforms. Our technical team can work
-                  with you to ensure seamless data flow across your marketing stack.
+                  {t("contact.faq.questions.2.answer")}
                 </p>
               </CardContent>
             </Card>
@@ -303,13 +302,12 @@ export default function ContactPage() {
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <MessageSquare className="mr-2 h-5 w-5 text-primary" />
-                  What kind of support do you provide?
+                  {t("contact.faq.questions.3.question")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground">
-                  We provide 24/7 chat support, dedicated account management for enterprise clients, and comprehensive
-                  onboarding with training sessions for your team.
+                  {t("contact.faq.questions.3.answer")}
                 </p>
               </CardContent>
             </Card>
@@ -329,83 +327,83 @@ export default function ContactPage() {
                 <span className="text-xl font-bold">Konvertix</span>
               </Link>
               <p className="text-muted-foreground mb-4">
-                Empowering businesses with AI-powered marketing analytics for smarter growth and faster scaling.
+                {t("footer.description")}
               </p>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Product</h4>
+              <h4 className="font-semibold mb-4">{t("footer.product")}</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   <a href="/#services" className="hover:text-foreground transition-colors">
-                    Features
+                    {t("footer.features")}
                   </a>
                 </li>
                 <li>
                   <a href="/#pricing" className="hover:text-foreground transition-colors">
-                    Pricing
+                    {t("footer.pricing")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Integrations
+                    {t("footer.integrations")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    API
-                  </a>
-                </li>
-              </ul>
-            </div>
-
-            <div>
-              <h4 className="font-semibold mb-4">Support</h4>
-              <ul className="space-y-2 text-muted-foreground">
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Help Center
-                  </a>
-                </li>
-                <li>
-                  <Link href="/contact" className="hover:text-foreground transition-colors">
-                    Contact
-                  </Link>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Status
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Community
+                    {t("footer.api")}
                   </a>
                 </li>
               </ul>
             </div>
 
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
+              <h4 className="font-semibold mb-4">{t("footer.support")}</h4>
               <ul className="space-y-2 text-muted-foreground">
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    About
+                    {t("footer.helpCenter")}
                   </a>
                 </li>
                 <li>
                   <Link href="/contact" className="hover:text-foreground transition-colors">
-                    Contact
+                    {t("footer.contact")}
                   </Link>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Careers
+                    {t("footer.status")}
                   </a>
                 </li>
                 <li>
                   <a href="#" className="hover:text-foreground transition-colors">
-                    Privacy
+                    {t("footer.community")}
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-semibold mb-4">{t("footer.company")}</h4>
+              <ul className="space-y-2 text-muted-foreground">
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    {t("footer.about")}
+                  </a>
+                </li>
+                <li>
+                  <Link href="/contact" className="hover:text-foreground transition-colors">
+                    {t("footer.contact")}
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    {t("footer.careers")}
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="hover:text-foreground transition-colors">
+                    {t("footer.privacy")}
                   </a>
                 </li>
               </ul>
@@ -413,7 +411,7 @@ export default function ContactPage() {
           </div>
 
           <div className="border-t border-border mt-12 pt-8 text-center text-muted-foreground">
-            <p>&copy; 2024 Konvertix. All rights reserved.</p>
+            <p>{t("footer.copyright")}</p>
           </div>
         </div>
       </footer>

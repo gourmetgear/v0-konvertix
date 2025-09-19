@@ -4,9 +4,15 @@ import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
 export default function GDPRPage() {
-  const { language } = useLanguage()
+  const { t } = useLanguage()
 
-  const content = {
+  const sections = Array.from({ length: 8 }, (_, i) => ({
+    title: t(`legal.gdpr.sections.${i}.title`),
+    content: t(`legal.gdpr.sections.${i}.content`)
+  }))
+
+  // Removed hardcoded content object - now using translation system
+  const oldContent = {
     en: {
       title: "GDPR Compliance",
       lastUpdated: "Last updated: January 15, 2024",
@@ -375,26 +381,24 @@ Bitte fügen Sie "DSGVO-Anfrage" in Ihre Betreffzeile ein und geben Sie ausreich
     }
   }
 
-  const currentContent = content[language] || content.en
-
   return (
     <div className="min-h-screen bg-[#0b021c] text-white">
       <div className="container mx-auto px-4 py-12 max-w-4xl">
         {/* Back Link */}
         <Link href="/" className="inline-flex items-center text-[#a545b6] hover:text-white transition-colors mb-8">
           <ArrowLeft className="h-4 w-4 mr-2" />
-          Back to Home
+          {t("navigation.backToHome")}
         </Link>
 
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-bold mb-4">{currentContent.title}</h1>
-          <p className="text-[#afafaf]">{currentContent.lastUpdated}</p>
+          <h1 className="text-4xl font-bold mb-4">{t("legal.gdpr.title")}</h1>
+          <p className="text-[#afafaf]">{t("legal.gdpr.lastUpdated")}</p>
         </div>
 
         {/* Content */}
         <div className="space-y-8">
-          {currentContent.sections.map((section, index) => (
+          {sections.map((section, index) => (
             <section key={index} className="bg-[#1b1527] rounded-lg p-6 border border-[#2b2b2b]">
               <h2 className="text-2xl font-semibold mb-4 text-white">{section.title}</h2>
               <div className="text-[#afafaf] whitespace-pre-line leading-relaxed">
@@ -407,7 +411,7 @@ Bitte fügen Sie "DSGVO-Anfrage" in Ihre Betreffzeile ein und geben Sie ausreich
         {/* Footer */}
         <div className="mt-12 pt-8 border-t border-[#2b2b2b] text-center">
           <p className="text-[#afafaf] text-sm">
-            For GDPR-related questions, contact our DPO at{" "}
+            {t("legal.gdpr.contactText")}{" "}
             <a href="mailto:dpo@konvertix.com" className="text-[#a545b6] hover:text-white transition-colors">
               dpo@konvertix.com
             </a>

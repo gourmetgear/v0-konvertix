@@ -1,5 +1,5 @@
 "use client"
-import Sidebar from "@/components/nav/Sidebar"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -22,77 +22,70 @@ import {
 } from "lucide-react"
 import Link from "next/link"
 
-const services = [
+const getServices = (t: (key: string) => string) => [
   {
-    name: "Paid Ads",
+    name: t("services.paidAds.name"),
     icon: DollarSign,
-    status: "Active",
-    description: "Run and optimize ad campaigns across Google, Meta & LinkedIn platforms effectively.",
-    buttonText: "Included in your plan",
+    status: t("services.paidAds.status"),
+    description: t("services.paidAds.description"),
+    buttonText: t("services.paidAds.buttonText"),
     isActive: true,
   },
   {
-    name: "SEO",
+    name: t("services.seo.name"),
     icon: Search,
-    status: "Inactive",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore",
-    buttonText: "Add SEO",
+    status: t("services.seo.status"),
+    description: t("services.seo.description"),
+    buttonText: t("services.seo.buttonText"),
     isActive: false,
   },
   {
-    name: "Automation",
+    name: t("services.automation.name"),
     icon: Zap,
-    status: "Inactive",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore",
-    buttonText: "Add Automation.",
+    status: t("services.automation.status"),
+    description: t("services.automation.description"),
+    buttonText: t("services.automation.buttonText"),
     isActive: false,
   },
   {
-    name: "Reporting",
+    name: t("services.reporting.name"),
     icon: BarChart3,
-    status: "Active",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore",
-    buttonText: "Included in your plan",
+    status: t("services.reporting.status"),
+    description: t("services.reporting.description"),
+    buttonText: t("services.reporting.buttonText"),
     isActive: true,
   },
   {
-    name: "Email Marketing",
+    name: t("services.emailMarketing.name"),
     icon: Mail,
-    status: "Inactive",
-    description: "Run and optimize ad campaigns across Google, Meta & LinkedIn platforms effectively.",
-    buttonText: "Add Email Marketing.",
+    status: t("services.emailMarketing.status"),
+    description: t("services.emailMarketing.description"),
+    buttonText: t("services.emailMarketing.buttonText"),
     isActive: false,
   },
   {
-    name: "Analytics",
+    name: t("services.analytics.name"),
     icon: PieChart,
-    status: "Active",
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore",
-    buttonText: "Included in your plan",
+    status: t("services.analytics.status"),
+    description: t("services.analytics.description"),
+    buttonText: t("services.analytics.buttonText"),
     isActive: true,
   },
 ]
 
 export default function ServicesPage() {
+  const { t } = useLanguage()
+  const services = getServices(t)
 
   return (
-    <div className="min-h-screen bg-[#0b021c] text-white flex">
-      {/* Sidebar */}
-      
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
+    <div className="flex-1 flex flex-col">
         {/* Services Content */}
         <main className="flex-1 p-6 space-y-6">
           {/* Page Header */}
           <div className="flex items-center justify-between">
-            <h1 className="text-3xl font-bold">Services</h1>
+            <h1 className="text-3xl font-bold">{t("services.title")}</h1>
             <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-              Request Upgrade
+              {t("services.requestUpgrade")}
             </Button>
           </div>
 
@@ -139,7 +132,6 @@ export default function ServicesPage() {
             ))}
           </div>
         </main>
-      </div>
     </div>
   )
 }

@@ -20,86 +20,88 @@ import {
   CheckCircle,
 } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function HelpCenterPage() {
+  const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
 
   const categories = [
     {
       icon: BookOpen,
-      title: "Getting Started",
-      description: "Learn the basics of Konvertix",
-      articles: 12,
+      title: t("helpCenter.categories.gettingStarted.title"),
+      description: t("helpCenter.categories.gettingStarted.description"),
+      articles: t("helpCenter.categories.gettingStarted.articles"),
       color: "from-primary to-secondary",
     },
     {
       icon: BarChart3,
-      title: "Analytics & Reporting",
-      description: "Understanding your data and metrics",
-      articles: 18,
+      title: t("helpCenter.categories.analytics.title"),
+      description: t("helpCenter.categories.analytics.description"),
+      articles: t("helpCenter.categories.analytics.articles"),
       color: "from-chart-3 to-chart-4",
     },
     {
       icon: Settings,
-      title: "Account & Billing",
-      description: "Manage your account and subscription",
-      articles: 8,
+      title: t("helpCenter.categories.account.title"),
+      description: t("helpCenter.categories.account.description"),
+      articles: t("helpCenter.categories.account.articles"),
       color: "from-chart-5 to-primary",
     },
     {
       icon: Users,
-      title: "Team Management",
-      description: "Collaborate with your team",
-      articles: 6,
+      title: t("helpCenter.categories.teamManagement.title"),
+      description: t("helpCenter.categories.teamManagement.description"),
+      articles: t("helpCenter.categories.teamManagement.articles"),
       color: "from-secondary to-chart-3",
     },
   ]
 
   const popularArticles = [
     {
-      title: "How to set up your first campaign",
-      category: "Getting Started",
-      readTime: "5 min read",
-      views: "2.1k views",
+      title: t("helpCenter.popularArticles.0.title"),
+      category: t("helpCenter.popularArticles.0.category"),
+      readTime: t("helpCenter.popularArticles.0.readTime"),
+      views: t("helpCenter.popularArticles.0.views"),
     },
     {
-      title: "Understanding conversion tracking",
-      category: "Analytics",
-      readTime: "8 min read",
-      views: "1.8k views",
+      title: t("helpCenter.popularArticles.1.title"),
+      category: t("helpCenter.popularArticles.1.category"),
+      readTime: t("helpCenter.popularArticles.1.readTime"),
+      views: t("helpCenter.popularArticles.1.views"),
     },
     {
-      title: "Integrating with Google Analytics",
-      category: "Integrations",
-      readTime: "6 min read",
-      views: "1.5k views",
+      title: t("helpCenter.popularArticles.2.title"),
+      category: t("helpCenter.popularArticles.2.category"),
+      readTime: t("helpCenter.popularArticles.2.readTime"),
+      views: t("helpCenter.popularArticles.2.views"),
     },
     {
-      title: "Setting up team permissions",
-      category: "Team Management",
-      readTime: "4 min read",
-      views: "1.2k views",
+      title: t("helpCenter.popularArticles.3.title"),
+      category: t("helpCenter.popularArticles.3.category"),
+      readTime: t("helpCenter.popularArticles.3.readTime"),
+      views: t("helpCenter.popularArticles.3.views"),
     },
   ]
 
   const quickActions = [
     {
       icon: MessageCircle,
-      title: "Contact Support",
-      description: "Get help from our support team",
-      action: "Start Chat",
+      title: t("helpCenter.quickActions.0.title"),
+      description: t("helpCenter.quickActions.0.description"),
+      action: t("helpCenter.quickActions.0.action"),
     },
     {
       icon: Video,
-      title: "Video Tutorials",
-      description: "Watch step-by-step guides",
-      action: "Watch Now",
+      title: t("helpCenter.quickActions.1.title"),
+      description: t("helpCenter.quickActions.1.description"),
+      action: t("helpCenter.quickActions.1.action"),
     },
     {
       icon: FileText,
-      title: "API Documentation",
-      description: "Technical documentation for developers",
-      action: "View Docs",
+      title: t("helpCenter.quickActions.2.title"),
+      description: t("helpCenter.quickActions.2.description"),
+      action: t("helpCenter.quickActions.2.action"),
     },
   ]
 
@@ -117,16 +119,16 @@ export default function HelpCenterPage() {
 
           <nav className="hidden md:flex items-center space-x-8">
             <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-              Home
+              {t("navigation.home")}
             </Link>
             <Link href="/contact" className="text-muted-foreground hover:text-foreground transition-colors">
-              Contact
+              {t("navigation.contact")}
             </Link>
           </nav>
 
           <Link href="/auth/signup">
             <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
-              Get Started
+              {t("cta.getStarted")}
             </Button>
           </Link>
         </div>
@@ -135,16 +137,16 @@ export default function HelpCenterPage() {
       {/* Hero Section */}
       <section className="py-20 bg-gradient-to-br from-primary/10 via-background to-secondary/10">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">How can we help you?</h1>
+          <h1 className="text-5xl font-bold mb-6">{t("helpCenter.title")}</h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Find answers, get support, and learn how to make the most of Konvertix
+            {t("helpCenter.subtitle")}
           </p>
 
           {/* Search Bar */}
           <div className="max-w-2xl mx-auto relative">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
-              placeholder="Search for articles, guides, and more..."
+              placeholder={t("helpCenter.searchPlaceholder")}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-12 pr-4 py-6 text-lg bg-background/80 backdrop-blur border-border"
@@ -188,8 +190,8 @@ export default function HelpCenterPage() {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Browse by Category</h2>
-            <p className="text-muted-foreground">Find the information you need organized by topic</p>
+            <h2 className="text-3xl font-bold mb-4">{t("helpCenter.browseByCategory")}</h2>
+            <p className="text-muted-foreground">{t("helpCenter.browseByDescription")}</p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -207,7 +209,7 @@ export default function HelpCenterPage() {
                   <CardTitle className="group-hover:text-primary transition-colors">{category.title}</CardTitle>
                   <CardDescription>{category.description}</CardDescription>
                   <div className="flex items-center justify-between pt-4">
-                    <Badge variant="secondary">{category.articles} articles</Badge>
+                    <Badge variant="secondary">{category.articles}</Badge>
                     <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
                   </div>
                 </CardHeader>
@@ -221,8 +223,8 @@ export default function HelpCenterPage() {
       <section className="py-16">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Popular Articles</h2>
-            <p className="text-muted-foreground">Most viewed and helpful articles from our community</p>
+            <h2 className="text-3xl font-bold mb-4">{t("helpCenter.popularArticlesTitle")}</h2>
+            <p className="text-muted-foreground">{t("helpCenter.popularArticlesSubtitle")}</p>
           </div>
 
           <div className="max-w-4xl mx-auto">
@@ -264,37 +266,20 @@ export default function HelpCenterPage() {
       <section className="py-16 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-            <p className="text-muted-foreground">Quick answers to common questions</p>
+            <h2 className="text-3xl font-bold mb-4">{t("helpCenter.faq.title")}</h2>
+            <p className="text-muted-foreground">{t("helpCenter.faq.subtitle")}</p>
           </div>
 
           <div className="max-w-3xl mx-auto space-y-4">
-            {[
-              {
-                question: "How do I get started with Konvertix?",
-                answer:
-                  "Simply sign up for a free account, complete the onboarding process, and start creating your first campaign. Our setup wizard will guide you through each step.",
-              },
-              {
-                question: "What integrations are available?",
-                answer:
-                  "Konvertix integrates with Google Analytics, Facebook Ads, Google Ads, Shopify, WooCommerce, and many other popular marketing and e-commerce platforms.",
-              },
-              {
-                question: "Can I upgrade or downgrade my plan anytime?",
-                answer:
-                  "Yes, you can change your subscription plan at any time. Changes take effect immediately, and billing is prorated accordingly.",
-              },
-              {
-                question: "Is there a mobile app available?",
-                answer:
-                  "Currently, Konvertix is available as a web application optimized for mobile browsers. A dedicated mobile app is in development.",
-              },
-            ].map((faq, index) => (
+            {[0, 1, 2, 3].map((index) => (
               <Card key={index} className="group hover:shadow-lg transition-all duration-300">
                 <CardHeader>
-                  <CardTitle className="text-left group-hover:text-primary transition-colors">{faq.question}</CardTitle>
-                  <CardDescription className="text-left">{faq.answer}</CardDescription>
+                  <CardTitle className="text-left group-hover:text-primary transition-colors">
+                    {t(`helpCenter.faq.questions.${index}.question`)}
+                  </CardTitle>
+                  <CardDescription className="text-left">
+                    {t(`helpCenter.faq.questions.${index}.answer`)}
+                  </CardDescription>
                 </CardHeader>
               </Card>
             ))}
@@ -306,20 +291,20 @@ export default function HelpCenterPage() {
       <section className="py-16">
         <div className="container mx-auto px-4 text-center">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold mb-4">Still need help?</h2>
+            <h2 className="text-3xl font-bold mb-4">{t("helpCenter.support.title")}</h2>
             <p className="text-muted-foreground mb-8">
-              Can't find what you're looking for? Our support team is here to help you succeed.
+              {t("helpCenter.support.description")}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/contact">
                 <Button className="bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90">
                   <MessageCircle className="mr-2 h-4 w-4" />
-                  Contact Support
+                  {t("helpCenter.support.contact")}
                 </Button>
               </Link>
               <Button variant="outline">
                 <Video className="mr-2 h-4 w-4" />
-                Schedule a Demo
+                {t("helpCenter.support.demo")}
               </Button>
             </div>
           </div>
@@ -333,12 +318,12 @@ export default function HelpCenterPage() {
             <div className="w-6 h-6 bg-gradient-to-br from-primary to-secondary rounded-lg flex items-center justify-center">
               <span className="text-primary-foreground font-bold text-xs">K</span>
             </div>
-            <span className="text-lg font-bold">Konvertix Help Center</span>
+            <span className="text-lg font-bold">{t("helpCenter.footer.title")}</span>
           </div>
           <p className="text-muted-foreground">
-            &copy; 2024 Konvertix. All rights reserved. |{" "}
+            {t("footer.copyright")} |{" "}
             <Link href="/" className="hover:text-foreground transition-colors">
-              Back to Konvertix
+              {t("helpCenter.footer.backToKonvertix")}
             </Link>
           </p>
         </div>

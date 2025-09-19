@@ -3,48 +3,50 @@
 import { useState } from "react"
 import { Check, BadgePercent, Zap, Layers } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/contexts/LanguageContext"
 
 export default function PricingPage() {
+  const { t } = useLanguage()
   const [tab, setTab] = useState<"paid" | "seo" | "full">("paid")
 
-  const plansByTab: Record<typeof tab, Array<{ title: string; price: string; items: string[]; highlight?: boolean; badge?: string }>> = {
+  const plansByTab: Record<typeof tab, Array<{ titleKey: string; priceKey: string; itemKeys: string[]; highlight?: boolean; badgeKey?: string }>> = {
     paid: [
       {
-        title: "Basic plan",
-        price: "$10/mth",
-        items: [
-          "Access to all basic features",
-          "Basic reporting and analytics",
-          "Up to 10 individual users",
-          "20GB individual data each user",
-          "Basic chat and email support",
+        titleKey: "pricing.plans.paid.basic.title",
+        priceKey: "pricing.plans.paid.basic.price",
+        itemKeys: [
+          "pricing.plans.paid.basic.features.0",
+          "pricing.plans.paid.basic.features.1",
+          "pricing.plans.paid.basic.features.2",
+          "pricing.plans.paid.basic.features.3",
+          "pricing.plans.paid.basic.features.4",
         ],
       },
       {
-        title: "Business plan",
-        price: "$20/mth",
+        titleKey: "pricing.plans.paid.business.title",
+        priceKey: "pricing.plans.paid.business.price",
         highlight: true,
-        badge: "Best Value",
-        items: [
-          "200+ integrations",
-          "Advanced reporting and analytics",
-          "Up to 20 individual users",
-          "40GB individual data each user",
-          "Priority chat and email support",
-          "Cancel anytime",
-          "14- day free trial",
-          "24/7 Support",
+        badgeKey: "pricing.plans.paid.business.badge",
+        itemKeys: [
+          "pricing.plans.paid.business.features.0",
+          "pricing.plans.paid.business.features.1",
+          "pricing.plans.paid.business.features.2",
+          "pricing.plans.paid.business.features.3",
+          "pricing.plans.paid.business.features.4",
+          "pricing.plans.paid.business.features.5",
+          "pricing.plans.paid.business.features.6",
+          "pricing.plans.paid.business.features.7",
         ],
       },
       {
-        title: "Enterprise plan",
-        price: "$40/mth",
-        items: [
-          "Advanced custom fields",
-          "Audit log and data history",
-          "Unlimited individual users",
-          "Unlimited individual data",
-          "Personalised+priority service",
+        titleKey: "pricing.plans.paid.enterprise.title",
+        priceKey: "pricing.plans.paid.enterprise.price",
+        itemKeys: [
+          "pricing.plans.paid.enterprise.features.0",
+          "pricing.plans.paid.enterprise.features.1",
+          "pricing.plans.paid.enterprise.features.2",
+          "pricing.plans.paid.enterprise.features.3",
+          "pricing.plans.paid.enterprise.features.4",
         ],
       },
     ],
@@ -141,18 +143,18 @@ export default function PricingPage() {
       <div className="relative mx-auto max-w-6xl px-4 py-16">
         <div className="mb-6">
           <span className="inline-block rounded-full border border-[#2b2b2b] bg-[#171226] px-3 py-1 text-xs text-white/90">
-            Pricing
+            {t("pricing.title")}
           </span>
         </div>
         <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-8">
-          Choose the Plan That Fits You Best
+          {t("pricing.heading")}
         </h1>
 
         {/* Tabs */}
         <div className="mb-12 flex items-center gap-2">
-          <TabButton value="paid" label="Paid Ads" />
-          <TabButton value="seo" label="SEO" />
-          <TabButton value="full" label="Full services" />
+          <TabButton value="paid" label={t("pricing.tabs.paidAds")} />
+          <TabButton value="seo" label={t("pricing.tabs.seo")} />
+          <TabButton value="full" label={t("pricing.tabs.fullServices")} />
         </div>
 
         {/* Cards (switch with tab) */}
@@ -161,12 +163,12 @@ export default function PricingPage() {
             <PlanCard
               key={`${tab}-${idx}`}
               icon={idx === 0 ? <Zap className="w-6 h-6" /> : idx === 1 ? <BadgePercent className="w-6 h-6" /> : <Layers className="w-6 h-6" />}
-              title={p.title}
-              price={p.price}
-              cta="Get started"
-              items={p.items}
+              title={t(p.titleKey)}
+              price={t(p.priceKey)}
+              cta={t("pricing.getStarted")}
+              items={p.itemKeys.map(key => t(key))}
               highlight={p.highlight}
-              badge={p.badge}
+              badge={p.badgeKey ? t(p.badgeKey) : undefined}
             />
           ))}
         </div>
@@ -174,7 +176,7 @@ export default function PricingPage() {
         {/* Bottom CTA */}
         <div className="mt-10 flex justify-center">
           <Button variant="outline" className="w-full max-w-xs border-[#3f3f3f] text-white bg-transparent hover:bg-[#3f3f3f]">
-            Get started
+            {t("pricing.getStarted")}
           </Button>
         </div>
       </div>

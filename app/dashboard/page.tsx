@@ -1,5 +1,4 @@
 "use client"
-import Sidebar from "@/components/nav/Sidebar"
 import ComprehensiveMetricsDashboard from "@/components/ComprehensiveMetricsDashboard"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -8,6 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabase/client"
+import { useLanguage } from '@/contexts/LanguageContext'
 import {
   Search,
   Bell,
@@ -69,6 +69,7 @@ const campaigns = [
 ]
 
 export default function DashboardPage() {
+  const { t } = useLanguage()
   const [showOnboarding, setShowOnboarding] = useState(false)
   const [userId, setUserId] = useState<string>('')
   const [loading, setLoading] = useState(true)
@@ -122,10 +123,10 @@ export default function DashboardPage() {
           {/* Welcome Section */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-[#afafaf] mb-1">Hi User,</h1>
-              <h2 className="text-3xl font-bold">Welcome to Konvertix!</h2>
+              <h1 className="text-2xl font-bold text-[#afafaf] mb-1">{t("dashboard.greeting")}</h1>
+              <h2 className="text-3xl font-bold">{t("dashboard.welcome")}</h2>
             </div>
-            <div className="text-[#afafaf]">📅 28 June -31 August 2025</div>
+            <div className="text-[#afafaf]">📅 {t("dashboard.dateRange")}</div>
           </div>
 
           {/* KPI Cards */}
@@ -134,7 +135,7 @@ export default function DashboardPage() {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center space-x-2">
                   <DollarSign className="h-5 w-5 text-[#f8c140]" />
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Total Spend</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("dashboard.metrics.totalSpend")}</CardTitle>
                 </div>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -146,7 +147,7 @@ export default function DashboardPage() {
                   <TrendingUp className="h-3 w-3 text-[#03ba2b]" />
                   <span className="text-[#03ba2b]">+8.12%</span>
                 </div>
-                <p className="text-xs text-[#afafaf] mt-1">Total ad spend this month</p>
+                <p className="text-xs text-[#afafaf] mt-1">{t("dashboard.metrics.totalSpendDesc")}</p>
               </CardContent>
             </Card>
 
@@ -154,7 +155,7 @@ export default function DashboardPage() {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center space-x-2">
                   <BarChart3 className="h-5 w-5 text-[#f73c3c]" />
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Revenue</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("dashboard.metrics.revenue")}</CardTitle>
                 </div>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -166,7 +167,7 @@ export default function DashboardPage() {
                   <TrendingDown className="h-3 w-3 text-[#f73c3c]" />
                   <span className="text-[#f73c3c]">-2.15%</span>
                 </div>
-                <p className="text-xs text-[#afafaf] mt-1">Total ad spend this month</p>
+                <p className="text-xs text-[#afafaf] mt-1">{t("dashboard.metrics.revenueDesc")}</p>
               </CardContent>
             </Card>
 
@@ -174,7 +175,7 @@ export default function DashboardPage() {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center space-x-2">
                   <Target className="h-5 w-5 text-[#f8c140]" />
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Return on Ad Spend</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("dashboard.metrics.roas")}</CardTitle>
                 </div>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -186,7 +187,7 @@ export default function DashboardPage() {
                   <TrendingUp className="h-3 w-3 text-[#03ba2b]" />
                   <span className="text-[#03ba2b]">+8.12%</span>
                 </div>
-                <p className="text-xs text-[#afafaf] mt-1">Revenue earned per $1 spent</p>
+                <p className="text-xs text-[#afafaf] mt-1">{t("dashboard.metrics.roasDesc")}</p>
               </CardContent>
             </Card>
 
@@ -194,7 +195,7 @@ export default function DashboardPage() {
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex items-center space-x-2">
                   <Users className="h-5 w-5 text-[#f73c3c]" />
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Conversions</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("dashboard.metrics.conversions")}</CardTitle>
                 </div>
                 <Button variant="ghost" size="icon" className="h-6 w-6">
                   <MoreHorizontal className="h-4 w-4 text-[#afafaf]" />
@@ -206,7 +207,7 @@ export default function DashboardPage() {
                   <TrendingDown className="h-3 w-3 text-[#f73c3c]" />
                   <span className="text-[#f73c3c]">-2.15%</span>
                 </div>
-                <p className="text-xs text-[#afafaf] mt-1">Total conversions tracked</p>
+                <p className="text-xs text-[#afafaf] mt-1">{t("dashboard.metrics.conversionsDesc")}</p>
               </CardContent>
             </Card>
           </div>
@@ -216,7 +217,7 @@ export default function DashboardPage() {
             {/* Performance Chart */}
             <Card className="lg:col-span-2 bg-[#2b2b2b] border-[#3f3f3f]">
               <CardHeader>
-                <CardTitle className="text-white">Performance Chart</CardTitle>
+                <CardTitle className="text-white">{t("dashboard.performanceChart")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="h-80">
@@ -248,9 +249,9 @@ export default function DashboardPage() {
             {/* Campaign Performance */}
             <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-white">Campaign performance</CardTitle>
+                <CardTitle className="text-white">{t("dashboard.campaignPerformance")}</CardTitle>
                 <Button variant="ghost" className="text-[#afafaf] hover:text-white">
-                  Last 7 Days
+                  {t("dashboard.lastSevenDays")}
                   <ChevronDown className="ml-2 h-4 w-4" />
                 </Button>
               </CardHeader>
@@ -263,7 +264,7 @@ export default function DashboardPage() {
                 <div className="space-y-4">
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-[#afafaf]">• Summer Sale 2025</span>
+                      <span className="text-sm text-[#afafaf]">• {t("dashboard.campaigns.summerSale")}</span>
                       <span className="text-sm text-white">1,25,000</span>
                     </div>
                     <div className="w-full bg-[#3f3f3f] rounded-full h-2">
@@ -274,7 +275,7 @@ export default function DashboardPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-[#afafaf]">• Back-to-School</span>
+                      <span className="text-sm text-[#afafaf]">• {t("dashboard.campaigns.backToSchool")}</span>
                       <span className="text-sm text-white">1,25,000</span>
                     </div>
                     <div className="w-full bg-[#3f3f3f] rounded-full h-2">
@@ -285,7 +286,7 @@ export default function DashboardPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-[#afafaf]">• Festive offers</span>
+                      <span className="text-sm text-[#afafaf]">• {t("dashboard.campaigns.festiveOffers")}</span>
                       <span className="text-sm text-white">1,25,000</span>
                     </div>
                     <div className="w-full bg-[#3f3f3f] rounded-full h-2">
@@ -296,7 +297,7 @@ export default function DashboardPage() {
 
                   <div>
                     <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-[#afafaf]">• New Arrival Campaign</span>
+                      <span className="text-sm text-[#afafaf]">• {t("dashboard.campaigns.newArrival")}</span>
                       <span className="text-sm text-white">1,25,000</span>
                     </div>
                     <div className="w-full bg-[#3f3f3f] rounded-full h-2">
@@ -312,10 +313,10 @@ export default function DashboardPage() {
           {/* Best Performing Campaigns Table */}
           <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-white">Best Performing Campaigns</CardTitle>
+              <CardTitle className="text-white">{t("dashboard.bestPerformingCampaigns")}</CardTitle>
               <Button variant="ghost" className="text-[#afafaf] hover:text-white">
                 <Download className="mr-2 h-4 w-4" />
-                Download
+                {t("dashboard.download")}
               </Button>
             </CardHeader>
             <CardContent>
@@ -323,13 +324,13 @@ export default function DashboardPage() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-[#3f3f3f]">
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">CAMPAIGN NAME</th>
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">SPEND (₹)</th>
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">REVENUE (₹)</th>
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">ROAS</th>
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">CONVERSIONS</th>
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">STATUS</th>
-                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">ACTION</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.campaignName")}</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.spend")}</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.revenue")}</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.roas")}</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.conversions")}</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.status")}</th>
+                      <th className="text-left py-3 px-4 text-[#afafaf] font-medium">{t("dashboard.table.action")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -354,7 +355,7 @@ export default function DashboardPage() {
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#afafaf] hover:text-white">
                               <Eye className="h-4 w-4" />
                             </Button>
-                            <span className="text-[#afafaf]">View</span>
+                            <span className="text-[#afafaf]">{t("dashboard.view")}</span>
                             <Button variant="ghost" size="icon" className="h-8 w-8 text-[#afafaf] hover:text-white">
                               <MoreHorizontal className="h-4 w-4" />
                             </Button>

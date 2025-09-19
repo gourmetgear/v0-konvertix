@@ -1,11 +1,11 @@
 "use client"
 import AuthGuard from "@/components/auth/AuthGuard"
-import Sidebar from "@/components/nav/Sidebar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Label } from "@/components/ui/label"
+import { useLanguage } from '@/contexts/LanguageContext'
 import {
   Search,
   Bell,
@@ -38,44 +38,47 @@ export default function ToolsPage() {
 }
 
 function ToolsContent() {
+  const { t } = useLanguage()
   const navItems = [] as any
 
-  const tools = [
+  const getTools = (t: (key: string) => string) => [
     {
-      title: "ROI Calculator",
-      description: "Calculate return on investment for your campaigns",
+      title: t("tools.roiCalculator.title"),
+      description: t("tools.roiCalculator.description"),
       icon: Calculator,
-      category: "Finance",
+      category: t("tools.categories.finance"),
     },
     {
-      title: "A/B Test Calculator",
-      description: "Determine statistical significance of your tests",
+      title: t("tools.abTestCalculator.title"),
+      description: t("tools.abTestCalculator.description"),
       icon: BarChart3,
-      category: "Testing",
+      category: t("tools.categories.testing"),
     },
     {
-      title: "Social Media Scheduler",
-      description: "Schedule and manage social media posts",
+      title: t("tools.socialMediaScheduler.title"),
+      description: t("tools.socialMediaScheduler.description"),
       icon: Calendar,
-      category: "Social Media",
+      category: t("tools.categories.socialMedia"),
     },
     {
-      title: "Conversion Rate Optimizer",
-      description: "Analyze and optimize conversion funnels",
+      title: t("tools.conversionOptimizer.title"),
+      description: t("tools.conversionOptimizer.description"),
       icon: Zap,
-      category: "Optimization",
+      category: t("tools.categories.optimization"),
     },
   ]
 
+  const tools = getTools(t)
+
   return (
-    <main className="p-6">
+    <main className="flex-1 p-6 overflow-auto">
           <div className="space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Marketing Tools</h1>
+              <h1 className="text-3xl font-bold">{t("tools.title")}</h1>
               <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                 <Download className="h-4 w-4 mr-2" />
-                Export All Data
+                {t("tools.exportAllData")}
               </Button>
             </div>
 
@@ -89,17 +92,17 @@ function ToolsContent() {
                         <Wand2 className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-lg">Ad Generator</CardTitle>
+                        <CardTitle className="text-white text-lg">{t("tools.adGenerator.title")}</CardTitle>
                         <Badge variant="secondary" className="bg-[#3f3f3f] text-[#afafaf] text-xs">
-                          AI-Powered
+                          {t("tools.badges.aiPowered")}
                         </Badge>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-[#afafaf] mb-4">Create perfect Facebook product ads with AI assistance</p>
+                    <p className="text-[#afafaf] mb-4">{t("tools.adGenerator.description")}</p>
                     <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Launch Tool
+                      {t("tools.launchTool")}
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>
@@ -113,17 +116,17 @@ function ToolsContent() {
                         <Users className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-lg">Target Audience Analyzer</CardTitle>
+                        <CardTitle className="text-white text-lg">{t("tools.targetAudienceAnalyzer.title")}</CardTitle>
                         <Badge variant="secondary" className="bg-[#3f3f3f] text-[#afafaf] text-xs">
-                          AI-Powered
+                          {t("tools.badges.aiPowered")}
                         </Badge>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-[#afafaf] mb-4">Discover optimal audiences with ChatGPT analysis</p>
+                    <p className="text-[#afafaf] mb-4">{t("tools.targetAudienceAnalyzer.description")}</p>
                     <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Launch Tool
+                      {t("tools.launchTool")}
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>
@@ -137,17 +140,17 @@ function ToolsContent() {
                         <Target className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <CardTitle className="text-white text-lg">Competitor Analysis</CardTitle>
+                        <CardTitle className="text-white text-lg">{t("tools.competitorAnalysis.title")}</CardTitle>
                         <Badge variant="secondary" className="bg-[#3f3f3f] text-[#afafaf] text-xs">
-                          AI-Powered
+                          {t("tools.badges.aiPowered")}
                         </Badge>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-[#afafaf] mb-4">Analyze competitors and discover market opportunities</p>
+                    <p className="text-[#afafaf] mb-4">{t("tools.competitorAnalysis.description")}</p>
                     <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Launch Tool
+                      {t("tools.launchTool")}
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>
@@ -174,7 +177,7 @@ function ToolsContent() {
                   <CardContent>
                     <p className="text-[#afafaf] mb-4">{tool.description}</p>
                     <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
-                      Launch Tool
+                      {t("tools.launchTool")}
                       <ExternalLink className="h-4 w-4 ml-2" />
                     </Button>
                   </CardContent>
@@ -188,14 +191,14 @@ function ToolsContent() {
               <CardHeader>
                 <CardTitle className="text-white flex items-center">
                   <Calculator className="h-5 w-5 mr-2" />
-                  ROI Calculator
+                  {t("tools.roiCalculator.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="investment" className="text-[#afafaf]">
-                      Investment ($)
+                      {t("tools.roiCalculator.investment")}
                     </Label>
                     <Input
                       id="investment"
@@ -206,7 +209,7 @@ function ToolsContent() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="revenue" className="text-[#afafaf]">
-                      Revenue ($)
+                      {t("tools.roiCalculator.revenue")}
                     </Label>
                     <Input
                       id="revenue"
@@ -216,7 +219,7 @@ function ToolsContent() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-[#afafaf]">ROI</Label>
+                    <Label className="text-[#afafaf]">{t("tools.roiCalculator.roi")}</Label>
                     <div className="p-3 bg-[#3f3f3f] rounded-lg">
                       <span className="text-green-500 font-bold text-lg">50%</span>
                     </div>
@@ -224,13 +227,13 @@ function ToolsContent() {
                   <div className="flex items-end">
                     <Button className="w-full bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Calculate
+                      {t("tools.roiCalculator.calculate")}
                     </Button>
                   </div>
                 </div>
               </CardContent>
             </Card>
           </div>
-    </main>
+      </main>
   )
 }

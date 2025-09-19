@@ -6,6 +6,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import AppShell from "@/components/layout/AppShell"
 import { LanguageProvider } from "@/contexts/LanguageContext"
+import { Toaster } from "sonner"
 import "./globals.css"
 
 export const metadata: Metadata = {
@@ -27,6 +28,11 @@ export default function RootLayout({
             {children}
           </AppShell>
         </LanguageProvider>
+        <Toaster
+          position="bottom-right"
+          theme="dark"
+          richColors
+        />
         <Analytics />
       </body>
     </html>

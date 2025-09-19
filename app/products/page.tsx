@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import AuthGuard from '@/components/auth/AuthGuard'
 import { supabase } from '@/lib/supabase/client'
+import { useLanguage } from '@/contexts/LanguageContext'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -50,6 +51,7 @@ export default function ProductsPage() {
 }
 
 function ProductsContent() {
+  const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
   const [syncing, setSyncing] = useState(false)
   const [syncStatus, setSyncStatus] = useState<{ type: 'success' | 'error' | null; message: string }>({ type: null, message: '' })
@@ -69,7 +71,7 @@ function ProductsContent() {
         }
       } catch (error) {
         console.error('Error loading user:', error)
-        setError('Failed to load user data')
+        setError(t('products.errors.failedToLoadUser'))
       }
     }
     loadUser()
@@ -100,7 +102,7 @@ function ProductsContent() {
 
       if (!response.ok) {
         const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to load products')
+        throw new Error(errorData.error || t('products.errors.failedToLoadProducts'))
       }
 
       const { products, stats } = await response.json()
@@ -111,7 +113,7 @@ function ProductsContent() {
 
     } catch (error) {
       console.error('Error loading products:', error)
-      setError(error instanceof Error ? error.message : 'Failed to load products')
+      setError(error instanceof Error ? error.message : t('products.errors.failedToLoadProducts'))
     } finally {
       setLoading(false)
     }
@@ -119,7 +121,7 @@ function ProductsContent() {
 
   const handleSyncProducts = async () => {
     if (!userId) {
-      setSyncStatus({ type: 'error', message: 'User authentication required' })
+      setSyncStatus({ type: 'error', message: t('products.sync.userAuthRequired') })
       return
     }
 
@@ -137,7 +139,7 @@ function ProductsContent() {
 
       if (!response.ok) {
         const errorResult = await response.json()
-        throw new Error(errorResult.error || 'Failed to sync products')
+        throw new Error(errorResult.error || t('products.errors.failedToSyncProducts'))
       }
 
       const result = await response.json()
@@ -145,7 +147,7 @@ function ProductsContent() {
 
       setSyncStatus({
         type: 'success',
-        message: 'Products sync initiated successfully. Your products will be updated shortly.'
+        message: t('products.sync.success')
       })
 
       // Clear success message after 5 seconds
@@ -160,7 +162,7 @@ function ProductsContent() {
       console.error('Sync error:', error)
       setSyncStatus({
         type: 'error',
-        message: error instanceof Error ? error.message : 'Failed to sync products'
+        message: error instanceof Error ? error.message : t('products.errors.failedToSyncProducts')
       })
     } finally {
       setSyncing(false)
@@ -191,6 +193,24 @@ function ProductsContent() {
     }
   }
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'publish': return t('products.status.publish')
+      case 'draft': return t('products.status.draft')
+      case 'private': return t('products.status.private')
+      default: return status
+    }
+  }
+
+  const getStockStatusText = (stockStatus: string) => {
+    switch (stockStatus) {
+      case 'instock': return t('products.status.inStock')
+      case 'outofstock': return t('products.status.outOfStock')
+      case 'onbackorder': return t('products.status.onBackorder')
+      default: return stockStatus
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#0b021c] text-white flex">
       {/* Main Content */}
@@ -199,11 +219,11 @@ function ProductsContent() {
           <div className="space-y-6">
             {/* Page Header */}
             <div className="flex items-center justify-between">
-              <h1 className="text-3xl font-bold">Products</h1>
+              <h1 className="text-3xl font-bold">{t("products.title")}</h1>
               <div className="flex items-center space-x-3">
                 <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
                   <Filter className="h-4 w-4 mr-2" />
-                  Filter
+                  {t("products.actions.filter")}
                 </Button>
                 <Button
                   variant="outline"
@@ -214,25 +234,25 @@ function ProductsContent() {
                   {syncing ? (
                     <>
                       <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                      Syncing...
+                      {t("products.actions.syncing")}
                     </>
                   ) : (
                     <>
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Sync Now
+                      {t("products.actions.syncProducts")}
                     </>
                   )}
                 </Button>
                 <Link href="/products/bulk-upload">
                   <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent">
                     <FileSpreadsheet className="h-4 w-4 mr-2" />
-                    Bulk Upload
+                    {t("products.actions.bulkUpload")}
                   </Button>
                 </Link>
                 <Link href="/products/upload">
                   <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                     <Upload className="h-4 w-4 mr-2" />
-                    Upload Product
+                    {t("products.actions.uploadProduct")}
                   </Button>
                 </Link>
               </div>
@@ -264,41 +284,41 @@ function ProductsContent() {
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Total Products</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("products.stats.totalProducts")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.total}</div>
-                  <p className="text-xs text-[#afafaf]">WooCommerce products</p>
+                  <p className="text-xs text-[#afafaf]">{t("products.stats.totalProductsDesc")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Published</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("products.stats.published")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.published}</div>
-                  <p className="text-xs text-[#afafaf]">Live products</p>
+                  <p className="text-xs text-[#afafaf]">{t("products.stats.publishedDesc")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Draft</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("products.stats.draft")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{stats.draft}</div>
-                  <p className="text-xs text-[#afafaf]">Unpublished</p>
+                  <p className="text-xs text-[#afafaf]">{t("products.stats.draftDesc")}</p>
                 </CardContent>
               </Card>
 
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-[#afafaf]">Total Value</CardTitle>
+                  <CardTitle className="text-sm font-medium text-[#afafaf]">{t("products.stats.totalValue")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-2xl font-bold">{formatPrice(stats.totalRevenue)}</div>
-                  <p className="text-xs text-[#afafaf]">Product value</p>
+                  <p className="text-xs text-[#afafaf]">{t("products.stats.totalValueDesc")}</p>
                 </CardContent>
               </Card>
             </div>
@@ -307,7 +327,7 @@ function ProductsContent() {
             <div className="relative flex-1 max-w-md">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-[#afafaf]" />
               <Input
-                placeholder="Search products..."
+                placeholder={t("products.search.placeholder")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 bg-[#2b2b2b] border-[#3f3f3f] text-white placeholder-[#afafaf]"
@@ -319,7 +339,7 @@ function ProductsContent() {
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardContent className="p-12 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-white mx-auto mb-4"></div>
-                  <p className="text-[#afafaf]">Loading products...</p>
+                  <p className="text-[#afafaf]">{t("products.states.loadingProducts")}</p>
                 </CardContent>
               </Card>
             )}
@@ -370,20 +390,20 @@ function ProductsContent() {
                                 {product.name}
                               </h3>
                               <p className="text-sm text-[#afafaf] mt-1">
-                                ID: {product.woo_product_id} • SKU: {product.sku || 'N/A'}
+                                {t("products.details.id")}: {product.woo_product_id} • {t("products.details.sku")}: {product.sku || 'N/A'}
                               </p>
 
                               {/* Status and Type Badges */}
                               <div className="flex items-center space-x-2 mt-2">
                                 <Badge className={`${getStatusColor(product.status)} text-white`}>
-                                  {product.status}
+                                  {getStatusText(product.status)}
                                 </Badge>
                                 <Badge variant="outline" className="border-[#5f5f5f] text-[#afafaf]">
                                   {product.type}
                                 </Badge>
                                 {product.featured && (
                                   <Badge className="bg-yellow-600 text-white">
-                                    Featured
+                                    {t("products.status.featured")}
                                   </Badge>
                                 )}
                               </div>
@@ -396,13 +416,11 @@ function ProductsContent() {
                               </div>
                               {product.sale_price && parseFloat(product.sale_price.toString()) > 0 && (
                                 <div className="text-sm text-green-400 font-medium">
-                                  Sale: {formatPrice(product.sale_price)}
+                                  {t("products.details.sale")}: {formatPrice(product.sale_price)}
                                 </div>
                               )}
                               <div className={`text-sm mt-1 ${getStockStatusColor(product.stock_status)}`}>
-                                {product.stock_status === 'instock' && 'In Stock'}
-                                {product.stock_status === 'outofstock' && 'Out of Stock'}
-                                {product.stock_status === 'onbackorder' && 'On Backorder'}
+                                {getStockStatusText(product.stock_status)}
                                 {product.manage_stock && product.stock_quantity !== undefined && (
                                   <span className="text-[#afafaf]"> ({product.stock_quantity})</span>
                                 )}
@@ -420,7 +438,7 @@ function ProductsContent() {
                           {/* Actions */}
                           <div className="flex items-center justify-between mt-4">
                             <div className="text-xs text-[#afafaf]">
-                              Last synced: {new Date(product.last_synced_at).toLocaleString()}
+                              {t("products.details.lastSynced")}: {new Date(product.last_synced_at).toLocaleString()}
                             </div>
                             <div className="flex items-center space-x-2">
                               <Link href={`/products/${product.id}`}>
@@ -430,7 +448,7 @@ function ProductsContent() {
                                   className="border-[#5f5f5f] text-[#afafaf] hover:text-white hover:border-[#7f7f7f]"
                                 >
                                   <Eye className="h-4 w-4 mr-1" />
-                                  Details
+                                  {t("products.actions.view")}
                                 </Button>
                               </Link>
                               {product.permalink && (
@@ -441,7 +459,7 @@ function ProductsContent() {
                                   onClick={() => window.open(product.permalink, '_blank')}
                                 >
                                   <ExternalLink className="h-4 w-4 mr-1" />
-                                  Store
+                                  {t("products.actions.viewInStore")}
                                 </Button>
                               )}
                             </div>
@@ -459,9 +477,9 @@ function ProductsContent() {
               <Card className="bg-[#2b2b2b] border-[#3f3f3f]">
                 <CardContent className="p-12 text-center">
                   <Package className="h-16 w-16 mx-auto mb-4 text-[#afafaf]" />
-                  <h3 className="text-xl font-semibold mb-2">No products found</h3>
+                  <h3 className="text-xl font-semibold mb-2">{t("products.search.noProductsFound")}</h3>
                   <p className="text-[#afafaf] mb-6">
-                    {searchTerm ? 'No products match your search.' : 'Sync your WooCommerce products to get started.'}
+                    {searchTerm ? t("products.search.noResults") : t("products.states.noProductsDesc")}
                   </p>
                   <div className="flex justify-center space-x-3">
                     <Button
@@ -470,18 +488,18 @@ function ProductsContent() {
                       className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent"
                     >
                       <RefreshCw className="h-4 w-4 mr-2" />
-                      Refresh
+                      {t("products.actions.refresh")}
                     </Button>
                     <Link href="/products/bulk-upload">
                       <Button variant="outline" className="border-[#3f3f3f] text-white hover:bg-[#3f3f3f] bg-transparent mr-3">
                         <FileSpreadsheet className="h-4 w-4 mr-2" />
-                        Bulk Upload
+                        {t("products.actions.bulkUpload")}
                       </Button>
                     </Link>
                     <Link href="/products/upload">
                       <Button className="bg-gradient-to-r from-[#a545b6] to-[#cd4f9d] hover:from-[#a545b6]/90 hover:to-[#cd4f9d]/90">
                         <Upload className="h-4 w-4 mr-2" />
-                        Upload Product
+                        {t("products.actions.uploadProduct")}
                       </Button>
                     </Link>
                   </div>
